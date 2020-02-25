@@ -1,0 +1,14 @@
+<window>
+	<controls>
+		<control type="image">
+			<!--<description> l'image de fond de l'application </description>-->
+			<posx>0</posx>
+			<posy>0</posy>
+			<width>1920</width>
+			<height>1080</height>
+			<!--<visible>True</visible>-->
+			<!--<texture>fond-noir.jpg</texture>-->
+			<texture>pcp_sonata.png</texture>
+		</control>
+	</controls>
+</window>
