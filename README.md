@@ -23,3 +23,7 @@ I gave the name kodijivelette addon which is not a very great originality being 
 running on the platform kodi
 
 I hope that this little kodi addon will please you
+
+Screenshots
+-----------
+![](https://drive.google.com/open?id=1NariyUEFWcBmWNyUiaJAl4C-CKrcCaOK)
