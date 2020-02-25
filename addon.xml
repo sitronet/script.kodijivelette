@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<addon id="script.kodijivelette" name="Kodijivelette, Squeeze viewer" version="0.0.b" provider-name="rondrach">
+	<requires>
+		<import addon="xbmc.python" version="2.25.0"/>
+		<import addon="script.module.pyxbmct" version="1.3.0" />
+	</requires>
+	<extension point="xbmc.python.script" library="testit.py">
+		<provides>executable</provides>
+	</extension>
+	<extension point="xbmc.addon.metadata">
+		<summary lang="en_GB">window squeeze box  script</summary>
+		<description lang="en_GB">a skeleton to display squeeze box information of the music playing , script use the library pyxbmct </description>
+		<language></language>
+		<platform>all</platform>
+	</extension>
+</addon>
