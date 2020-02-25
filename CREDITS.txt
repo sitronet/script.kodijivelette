@@ -1,0 +1,10 @@
+Fond d'écran par miroha du site https://wall.alphacoders.com/
+
+l'icône est de :
+<div>Icon made from <a href="http://www.onlinewebfonts.com/icon">Icon Fonts</a> is licensed by CC BY 3.0</div>
+<a href="http://www.onlinewebfonts.com">oNline Web Fonts</a>
+
+
+en fait non ! car OTF
+# Fonts : Gravity by Vincenzo Vuono.    Public domain / GPL / OFL - 10 font files
+Utilisé à la place QuickSand de debian

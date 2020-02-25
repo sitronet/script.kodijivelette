@@ -1,0 +1,50 @@
+Version Française
+
+Bonjour,
+
+Cela fait un bout de temps que je cherchais une façon d'afficher sur ma télévision les informations sur la musique que j'écoute.
+Ma télévision étant connectée à un boitier raspberry avec kodi, il me semblait naturel d'utiliser celui-ci pour afficher
+les informations et pochettes de disques stockés sur mon LogitechMediaServer, par ailleurs je n'utilise que des players
+totalement indépendant de ma TV et de Kodi (squeezebox, picoreplayer, max2play). En cherchant, j'ai trouvé des addons qui tournent sur
+Kodi comme Xsqueeze de bossanova et dernièrement le plugin audio Squeezebox de macerlveldt. Aucun des deux ne me donne
+satisfaction. Le programme de bossanova ne tourne que partiellement chez moi et encore après avoir fait quelques bidouilles
+ dans le code dont défaire ce fond de guitare enflammée, tandis que le plugin audio de marcel ne fonctionne carrèment pas
+ puisqu'il faut absolument installer squeezelite sur la station Kodi, ce dont je n'ai ni envie, ni besoin.
+ j'ai tenté de mettre les mains dans le cambouis pour modifier selon mes désiderata mais j'ai assez vite compris que
+ je ne comprenais rien à leur logique de codage et que pour tenter d'avancer il me serait plus pédagogique pour moi
+ d'écrire un nouveau code en python. je me suis donc tourné vers l'écriture de code en python, en commençant par le début
+ c'est à dire installation d'un IDE, lecture de la doc python, tester des exemples simples de structures de données, de threads,
+ etc...la lecture des bibliothèques pour Addon de Kodi puis commencer l'embryon de l'application en addon pour kodi.
+ Assez vite je me suis retrouvé sur un nouvel écueil, je ne comprennais rien à la logique de kodi pour le placement d'éléments
+ sur l'écran. j'allais définitivement abandonner ce fatras de fichier skin en XML quand par hasard je suis tombé sur
+ la bibliothèque pyxbmct de Roman_V_M. Le chemin du codage de l'affichage s'est d'un coup éclairci, enfin quelque chose,
+ que moi qui suit de la vieille école comprenait. je pouvais enfin envisager de disposer de l'affichage des pochettes
+ de mes disques sur ma TV. Bon ceci moyennant quelques heures de codage assidu sur mon ordinateur et aussi encore quelques
+ lectures pour comprendre le fonctionnement du modèle de communication du serveur musical et aussi la programmation
+ objet en python. Bien entendu après quelques déboires et mauvaises compréhension de la programmation objet j'ai un truc
+  pas parfait fait de bric et broc qui me satisfait en ce que je peux afficher ma bibliothèque musicale et mes deux radios
+  préférées (radio paradise et Fip Bordeaux) , c'est le principal. Il n'est pas fini, le sera-t-il un jour ?
+  il est bourré de bugs, cela ajoute à son charme mais c'est moi qui l'est fait avec mon petit cerveau et mes paluches
+  pianotant sur le clavier. Le bug principal est la latence de réponse à la télécommande. Parfois un simple abandon
+  (retour en arrière ou escape ) peut prendre une 10zaine de seconde pour répondre , parfois c'est l'affichage de l'écran
+qui prend des plombes.j'en suis très fier n'en déplaise aux puristes qui trouveront à la lecture les défauts
+  d'un novice. Pour le reste si ce petit programme peut vous satisfaire j'en serai très aise, il est à votre disposition
+  selon les termes de la licence GNU-GPL ou CECILL
+
+  Ce qui devrait fonctionner :
+
+  - Affichage de la musique en cours (c'était mon but initial)
+  - parcours et sélection des radios, quelques applications et les favoris
+  - parcours des artistes , albums, et des pistes en aléatoires
+
+  Ce qui ne fonctionne pas pour l'instant dans cette version alpha :
+  - Sélection du player (choix aléatoire du programme)
+  - modification du volume du player
+  - éteindre le player
+
+  Ce qui buggue fortement :
+  - La latence entre l'affichage des écrans ou bien la latence de sortie d'un écran. (parfois jusqu'à 10 secondes)
+  - Le temps de recherche de tous les artistes ou albums sur les grosses bibliothèques
+
+à noter : Vous pouvez toujours piloter depuis un smartphone (par exemple avec Squeezer app) les fonctions manquantes
+tout en affichant sur l'écran la musique qui se joue...
