@@ -30,3 +30,4 @@ Screenshots
 ![](https://i.imgur.com/w7ZmBEH.png)
 ![](https://i.imgur.com/WWRaSVf.png)
 ![](https://i.imgur.com/Ls2AOt0.png)
+![](https://i.imgur.com/6P3uBTi.png)
