@@ -1,0 +1,17 @@
+--------------------------------------------------------------
+Version 0.0.c :
+- Add translation for French and English_US and en_GB language to the root and mains Menus
+- Rewrite the process/step of the initialisation
+    (step of discovery network after the start of screen Menu
+    add a menu for the initialisation )
+    and a selected receiver's box (sync is still missing)
+- Add a catch  on action ContextMenu for future function
+- In The FramePlaying.py :
+    - Add function Volume Slider when action Volume Up/Down on remote
+    - Add Pause/Play function when action Pause on remote (space bar)
+
+
+--------------------------------------------------------------
+Version 0.0.a :
+Premice of skeleton
+Release february 2020

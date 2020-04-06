@@ -78,6 +78,15 @@ if Kodi:
     ACTION_MOUSE_LEFT_CLICK = 100
     """Mouse click"""
 
+    ACTION_PAUSE = 12
+    ACTION_PLAY = 68
+    ACTION_PLAYER_PLAY = 79
+
+    ACTION_VOLAMP_DOWN = 94
+    ACTION_VOLAMP_UP = 93
+    ACTION_VOLUME_DOWN = 89
+    ACTION_VOLUME_UP = 88
+
 tempsdeLecture = 1.0        # when a time.sleep(tempsdeLecture) is done to let the user read the screen. to ajust
                             # to be ergonomic or ask the user the wish timeout
 def singleton(cls):
@@ -98,6 +107,7 @@ class SlimIsPlaying(pyxbmct.AddonFullWindow):
         super(SlimIsPlaying, self).__init__( title)
 
         self.threadRunning = True
+        self.flagStatePause = False
 
         xbmc.log( ' param : ' + title  , xbmc.LOGNOTICE)
 
@@ -146,11 +156,11 @@ class SlimIsPlaying(pyxbmct.AddonFullWindow):
         self.cover_jpg = self.image_dir + '/music.png'      # pour le démarrage then updated
         self.image_background = self.image_dir + '/fond-noir.jpg'  # in next release could be change by users
         self.image_progress = self.image_dir + '/ajax-loader-bar.gif'   # not yet used, get from speedtest
-        self.image_button_pause = self.image_dir + '/pause.png'   # get from Xsqueeze
+        #self.image_button_pause = self.image_dir + '/pause.png'   # get from Xsqueeze
         # self.image_button_stop = self.image_dir + '/stop.png'     # get from Xsqueeze
         self.image_button_play = self.image_dir + '/play.png'     # get from Xsqueeze
         #self.image_button_play = self.image_dir + '/icon_toolbar_play.png'  # get from jivelite
-        #self.image_button_pause = self.image_dir + '/icon_toolbar_pause.png'     # get from jivelite
+        self.image_button_pause = self.image_dir + '/icon_toolbar_pause.png'     # get from jivelite
 
         self.textureback_slider_duration = self.image_dir + '/slider_back.png'  # get from plugin audio spotify
         #self.textureback_slider_duration = self.image_dir + '/seekslider2.png'  # get from plugin Xsqueeze
@@ -158,6 +168,9 @@ class SlimIsPlaying(pyxbmct.AddonFullWindow):
         self.texture_slider_duration = self.image_dir + '/slider_button_new.png'
 
         self.image_list_focus = self.image_dir + '/MenuItemFO.png'  # myself
+
+        self.textureback_slider_volume = self.image_dir + '/slider_back.png'
+        self.texture_slider_volume = self.image_dir + '/slider_button_new.png'
 
         # reserve pour afficher cover.jpg
         self.pochette = pyxbmct.Image(self.cover_jpg)
@@ -198,28 +211,34 @@ class SlimIsPlaying(pyxbmct.AddonFullWindow):
         self.labelduree_jouee = pyxbmct.Label('')
         self.placeControl(control=self.labelduree_jouee, row=ligneButton - 2 , column=int( SEIZE /2 ),  rowspan= 2 , columnspan = 5 , pad_x = 5 , pad_y = 5 )
         self.labelduree_fin = pyxbmct.Label('')
-        self.placeControl(control=self.labelduree_fin,row= ligneButton - 2 , column=int( SEIZE /2 + 25), rowspan=2 ,columnspan= 3 , pad_x = 5 , pad_y = 5 )
+        self.placeControl(control=self.labelduree_fin,row= ligneButton - 2 , column=int( SEIZE /2 + 25), rowspan=2 ,columnspan= 4 , pad_x = 5 , pad_y = 5 )
 
         # no connect key
 
-        # Slider volume
         # réserver la boite pour les infos sur le player, à ajuster selon retour expérience.
         self.playerbox = pyxbmct.TextBox()
         self.placeControl(self.playerbox, 1, 1 , 2 , 5 )
 
         # button pause :
-        self.bouton_pause = pyxbmct.Button(label='', focusTexture=self.image_button_pause, noFocusTexture='')
-        self.placeControl(self.bouton_pause, row = ligneButton + 2 , column= int(SEIZE / 2 ) + 12 , rowspan= 2 , columnspan= 2)
+        self.bouton_pause = pyxbmct.Button(label='', focusTexture=self.image_button_pause, noFocusTexture=self.image_button_pause)
+        self.placeControl(control=self.bouton_pause, row = NEUF / 2 , column= int(SEIZE /2) - 5  , rowspan= 6 , columnspan= 6 )
+        self.bouton_pause.setVisible(False)
         self.bouton_play = pyxbmct.Button(label='', focusTexture=self.image_button_play, noFocusTexture='')
-        self.placeControl(self.bouton_play , row = ligneButton + 2 , column= int(SEIZE / 2 ) + 14 , rowspan= 2 , columnspan= 2)
+        self.placeControl(self.bouton_play , row = NEUF / 2 , column= (SEIZE / 2 ) - 2  , rowspan= 6 , columnspan= 6 )
+        self.bouton_play.setVisible(False)
 
+        # Slider Volume :
+        self.label_volume = pyxbmct.Label('')
+        self.placeControl(control=self.label_volume, row= ( NEUF / 2 )- 2 , column= ( SEIZE /2 ) - 15  , rowspan=2, columnspan=30)
+        self.slider_volume = pyxbmct.Slider(textureback=self.textureback_slider_volume, texture=self.texture_slider_volume,
+                                            texturefocus=self.textureback_slider_volume, orientation=xbmcgui.HORIZONTAL)
+        self.placeControl(control=self.slider_volume , row = NEUF / 2  , column = ( SEIZE / 2 ) - 15  , rowspan = 3 , columnspan = 30  )
+        self.label_volume.setVisible(False)
+        self.slider_volume.setVisible(False)
         # zone de contrôle des actions
 
-        self.set_navigation()
-        self.threadRunning = True
-
-        self.connect(self.bouton_pause, self.miseenpause)
-        self.connect(self.bouton_play, self.enleverpause)
+        self.connect(self.bouton_pause, self.pause_play)
+        #self.connect(self.bouton_play, self.enleverpause)
 
         self.connexionEvent()
 
@@ -236,7 +255,7 @@ class SlimIsPlaying(pyxbmct.AddonFullWindow):
              pyxbmct.ACTION_MOUSE_MOVE,
              pyxbmct.ACTION_MOVE_LEFT,
              pyxbmct.ACTION_MOVE_RIGHT],
-            self.rafraichirBouton)
+            self.futureFunction)
 
     def onAction(self, action):
         """
@@ -247,12 +266,36 @@ class SlimIsPlaying(pyxbmct.AddonFullWindow):
         if action == ACTION_PREVIOUS_MENU:
             xbmc.log('Previous_menu' , xbmc.LOGNOTICE)
             self.quit_now_playing()
+
         elif action == ACTION_NAV_BACK:
             xbmc.log('nav_back' , xbmc.LOGNOTICE)
             self.quit_now_playing()
+
+        elif action == ACTION_PAUSE : # currently it's the space on my keyboard
+            xbmc.log('Action Pause', xbmc.LOGNOTICE)
+            self.pause_play()
+        
+        elif action == ACTION_PLAY or action == ACTION_PLAYER_PLAY:
+            xbmc.log('Action Play', xbmc.LOGNOTICE)
+            self.pause_play()
+
+        elif action == ACTION_VOLUME_UP :
+            self.setVolume('UP')
+        elif action == ACTION_VOLUME_DOWN:
+            self.setVolume('DOWN')
+
         else:
             xbmc.log('else condition onAction' , xbmc.LOGNOTICE)
             self._executeConnected(action, self.actions_connected)
+
+    def connexionEventVolume(self):
+        # Connect key and mouse events for list navigation feedback.
+        self.connectEventList(
+            [ACTION_VOLUME_UP,
+             ACTION_VOLAMP_UP,
+             ACTION_VOLUME_DOWN,
+             ACTION_VOLAMP_DOWN],
+            self.setVolume)
 
     def quit_now_playing(self):# todo : à tester
         self.WindowPlayinghere = xbmcgui.getCurrentWindowId()
@@ -266,37 +309,70 @@ class SlimIsPlaying(pyxbmct.AddonFullWindow):
         self.threadRunning = False
         self.close()
 
-    def set_navigation(self):
-        # Set navigation between controls (Button and others )
-        # here nothing yet todo
-        self.setFocus(self.bouton_pause)
-        self.bouton_pause.controlRight(self.bouton_play)
-        self.bouton_play.controlLeft(self.bouton_pause)
-
-    def rafraichirBouton(self):
-        self.bouton_pause.setVisible(True)
-        self.bouton_play.setVisible(True)
-
-    def miseenpause(self):
-
+    def pause_play(self):
         self.get_playerid()
         self.get_ident_server()
         self.connectInterface()
 
-        requete = self.playerid + ' pause 1'
-        self.InterfaceCLI.sendtoCLISomething(requete)
-        reponse = self.InterfaceCLI.receptionReponseEtDecodage()
+        if not self.flagStatePause:
+            self.bouton_pause.setVisible(True)
+            self.flagStatePause = True
+            requete = self.playerid + ' pause 1'
+            self.InterfaceCLI.sendtoCLISomething(requete)
+            reponse = self.InterfaceCLI.receptionReponseEtDecodage()
+            del reponse
+
+        else:
+
+            requete = self.playerid + ' pause 0'
+            self.InterfaceCLI.sendtoCLISomething(requete)
+            reponse = self.InterfaceCLI.receptionReponseEtDecodage()
+            if 'pause' in reponse:
+                self.bouton_pause.setVisible(False)
+                self.flagStatePause = False
+            del reponse
+
+    def futureFunction(self):
+        pass
+
+    def setVolume(self, UpOrDown):
 
 
-    def enleverpause(self):
-
+        # need to know the actual volume in percent
         self.get_playerid()
         self.get_ident_server()
         self.connectInterface()
-
-        requete = self.playerid + ' pause 0'
+        requete = self.playerid + ' mixer volume ?'
         self.InterfaceCLI.sendtoCLISomething(requete)
         reponse = self.InterfaceCLI.receptionReponseEtDecodage()
+        temp = reponse.split('volume|')
+        volumePercent = float(temp[1])
+        self.slider_volume.setPercent(volumePercent)
+        self.label_volume.setLabel('Volume on ' + self.playerid + ' - - -  ' + str(volumePercent) + ' %')
+
+        self.label_volume.setVisible(True)
+        self.slider_volume.setVisible(True)
+
+        if UpOrDown == 'UP':
+            volumePercent = volumePercent + 5.
+            if volumePercent >= 100:
+                volumePercent = 100
+
+        elif UpOrDown == 'DOWN':
+            volumePercent = volumePercent - 5.
+            if volumePercent < 0 :
+                volumePercent = 0
+        else:
+            pass
+        requete = self.playerid + ' mixer volume ' + str(volumePercent)
+        self.InterfaceCLI.sendtoCLISomething(requete)
+        reponse = self.InterfaceCLI.receptionReponseEtDecodage()
+        self.slider_volume.setPercent(volumePercent)
+
+
+
+
+
 
 
 

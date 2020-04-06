@@ -512,7 +512,12 @@ class ViewListPlugin(pyxbmct.AddonFullWindow):
             compteur = 1
             titreenlecture = ''
             self.breakBoucle_A = False
+            timeoutduVolume = time.time() + 20
             while (self.breakBoucle_A == False):  # Boucle A principale de Subscribe
+
+                if time.time() > timeoutduVolume:
+                    self.jivelette.label_volume.setVisible(False)
+                    self.jivelette.slider_volume.setVisible(False)
                 if time.time() > timeoutdeTestdelaBoucle:
                     xbmc.log('Timeout : break A  ', xbmc.LOGNOTICE)
                     break

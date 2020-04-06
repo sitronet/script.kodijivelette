@@ -1,0 +1,216 @@
+# XBMC Media Center language file
+# Addon Name: Kodijivelette
+# Addon id: script.kodijivelette
+# Addon Provider: rondrach
+msgid ""
+msgstr ""
+"Project-Id-Version: XBMC Main\n"
+"Report-Msgid-Bugs-To: http://trac.xbmc.org/\n"
+"POT-Creation-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: fr_FR\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#settings labels
+
+msgctxt "#32010"
+msgid "Running Kodijivelette Addon Script"
+msgstr "Lancement du script Kodijivelette"
+
+msgctxt "#32020"
+msgid "Version de Kodi : "
+msgstr ""
+
+msgctxt "#32030"
+msgid "Addon : "
+msgstr ""
+
+msgctxt "#32030"
+msgid "Version :"
+msgstr "Version :"
+
+# labels des menus :
+
+msgctxt "#32040"
+msgid "Now Playing"
+msgstr "Lecture en cours"
+
+msgctxt "#32041"
+msgid "My Music"
+msgstr ""
+
+msgctxt "#32042"
+msgid "I-Radio"
+msgstr "I-Radio"
+
+msgctxt "#32043"
+msgid "My Apps"
+msgstr "Mes Applications"
+
+msgctxt "#32044"
+msgid "Favorites"
+msgstr "Favoris"
+
+msgctxt "#320455"
+msgid "Extras"
+msgstr "Extras"
+
+msgctxt "#32046"
+msgid "Quit"
+msgstr "Quitter"
+
+
+msgctxt "#32050"
+msgid "Album Artists"
+msgstr "Albums des Artistes"
+
+msgctxt "#32051"
+msgid "All Artists"
+msgstr "Tous les Artistes"
+
+msgctxt "#32052"
+msgid "Composers"
+msgstr "Compositeurs"
+
+msgctxt "#32053"
+msgid "Albums"
+msgstr "Albums"
+
+
+msgctxt "#32054"
+msgid "Compilations"
+msgstr "Compilations"
+
+msgctxt "#32055"
+msgid "Genres"
+msgstr "Genres"
+
+msgctxt "#32056"
+msgid "Years"
+msgstr "Années"
+
+msgctxt "#32057"
+msgid "New Music"
+msgstr "Nouveautés"
+
+msgctxt "#32058"
+msgid "Random Mix"
+msgstr "Mix Aleatoire"
+
+msgctxt "#32059"
+msgid "Music Folder"
+msgstr "Dossier sur disque"
+
+msgctxt "#32060"
+msgid "Playlists"
+msgstr "Playlists"
+
+msgctxt "#32061"
+msgid "Search"
+msgstr "Chercher"
+
+msgctxt "#32062"
+msgid "Remote Music Librairies"
+msgstr "Bibliothèques distantes"
+
+msgctxt "#32072"
+msgid "players"
+msgstr "récepteurs"
+
+msgctxt "#32073"
+msgid "Music Source"
+msgstr "Source musicale"
+
+msgctxt "#32074"
+msgid "Don\'t stop the music"
+msgstr "Musique en continu"
+
+msgctxt "#32080"
+msgid "Song Mix"
+msgstr "Mixage de titre"
+
+msgctxt "#32081"
+msgid "Album Mix"
+msgstr "Mixage d'albums"
+
+msgctxt "#32082"
+msgid "Artist Mix"
+msgstr "Mixage d'artistes"
+
+msgctxt "#32080"
+msgid "Years mix"
+msgstr "Mixage des années"
+
+# server and players labels :
+
+msgctxt "#32800"
+msgid "Activate Player"
+msgstr "Allumer le récepteur"
+
+msgctxt "#32801"
+msgid "Deactivate Player"
+msgstr "Eteindre le récepteur"
+
+
+msgctxt "#32900"
+msgid "Network Discovery"
+msgstr "Requète exploratoire du réseau"
+
+msgctxt "#32901"
+msgid "Running scan on Network..."
+msgstr "Scan du réseau"
+
+msgctxt "#32902"
+msgid "nom du LogitechMediaServeur : "
+msgstr "nom du LogitechMediaServeur : "
+
+msgctxt "#32903"
+msgid "UUID du LogitechMediaServeur : "
+msgstr "UUID du LogitechMediaServeur : "
+
+msgctxt "#32904"
+msgid "version du LogitechMediaServeur : "
+msgstr "version du LogitechMediaServeur : "
+
+msgctxt "#32905"
+msgid "port web du LogitechMediaServeur : "
+msgstr "port web du LogitechMediaServeur : "
+
+msgctxt "#32906"
+msgid "adresse ip du LogitechMediaServeur : "
+msgstr "adresse du  LogitechMediaServeur : "
+
+msgctxt "#32907"
+msgid "port du CLI du LogitechMediaServeur : "
+msgstr "port du  CLI du LogitechMediaServer : "
+
+msgctxt "#32908"
+msgid "End scanning Network. Continue ..."
+msgstr "Fin du scan réseau. Continuons ..."
+
+msgctxt "#32910"
+msgid "Fail ... no server found"
+msgstr "Erreur ... aucun serveur trouvé"
+
+msgctxt "#32911"
+msgid "End scanning Network. Exit ...Error N° 32910"
+msgstr "Fin du scan réseau. Fin. ...Erreur N° 32910"
+
+msgctxt "#32920"
+msgid "Init the Server"
+msgstr "Initialisation Serveur"
+
+msgctxt "#32921"
+msgid "Quit the program"
+msgstr "Quitter le programme"
+
+
+msgctxt "#32930"
+msgid "Select One player in the list below"
+msgstr "Choisir un récepteur musical dans la liste"
+
+
