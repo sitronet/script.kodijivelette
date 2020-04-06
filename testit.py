@@ -26,7 +26,7 @@ sys.path.append(os.path.join(os.path.dirname(__file__), "resources", "lib"))
 
 
 from outils import KODI_VERSION
-from outils import singleton
+#from outils import singleton
 
 if Kodi:
     import xbmc
@@ -41,8 +41,19 @@ if Kodi:
     ADDONVERSION = ADDON.getAddonInfo('version')
     ARTWORK = xbmc.translatePath(os.path.join(ADDON.getAddonInfo('path'), 'resources', 'skins', 'Default', 'media'))
 
+
+
+
 import FrameMenu
 
+def singleton(cls):
+    instance = [None]
+    def wrapper(*args, **kwargs):
+        if instance[0] is None:
+            instance[0] = cls(*args, **kwargs)
+        return instance[0]
+
+    return wrapper
 
 tempsdeLecture = 1.0        # when a time.sleep(tempsdeLecture) is done to let the user read the screen. to ajust
                             # to be ergonomic or ask the user the wish timeout

@@ -1,0 +1,120 @@
+# XBMC Media Center language file
+# Addon Name: Kodijivelette
+# Addon id: script.kodijivelette
+# Addon Provider: rondrach
+msgid ""
+msgstr ""
+"Project-Id-Version: XBMC Main\n"
+"Report-Msgid-Bugs-To: http://trac.xbmc.org/\n"
+"POT-Creation-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: en_US\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#settings labels
+
+msgctxt "#32010"
+msgid "Running Kodijivelette Addon Script"
+msgstr ""
+
+msgctxt "#32020"
+msgid "Version de Kodi : "
+msgstr "Kodi's version : "
+
+msgctxt "#32030"
+msgid "Addon : "
+msgstr ""
+
+msgctxt "#32030"
+msgid "Version :"
+msgstr "Version :"
+
+# labels des menus :
+
+msgctxt "#32040"
+msgid "Lecture en cours"
+msgstr "Now Playing"
+
+msgctxt "#32041"
+msgid "My Music"
+msgstr "My Music"
+
+msgctxt "#32042"
+msgid "I-Radio"
+msgstr "I-Radio"
+
+msgctxt "#32043"
+msgid "My Apps"
+msgstr "My Apps"
+
+msgctxt "#32044"
+msgid "Favorites"
+msgstr "Favorites"
+
+msgctxt "#320455"
+msgid "Extras"
+msgstr "Extras"
+
+msgctxt "#32046"
+msgid "Quit"
+msgstr "Quit"
+
+
+
+# server and players labels :
+
+msgctxt "#32900"
+msgid "Network Discovery"
+msgstr "Network Discovery"
+
+msgctxt "#32901"
+msgid "Running scan on Network..."
+msgstr "Scanning Network..."
+
+msgctxt "#32902"
+msgid "nom du LogitechMediaServeur : "
+msgstr "Name of LogitechMediaServer : "
+
+msgctxt "#32903"
+msgid "UUID du LogitechMediaServeur : "
+msgstr "UUID of LogitechMediaServer : "
+
+msgctxt "#32904"
+msgid "version du LogitechMediaServeur : "
+msgstr "version of LogitechMediaServer : "
+
+msgctxt "#32905"
+msgid "port web du LogitechMediaServeur : "
+msgstr "web port of LogitechMediaServer : "
+
+msgctxt "#32906"
+msgid "adresse ip du LogitechMediaServeur : "
+msgstr "ip adress of the LogitechMediaServer : "
+
+msgctxt "#32907"
+msgid "port du CLI du LogitechMediaServeur : "
+msgstr "port adress of the CLI LogitechMediaServer : "
+
+msgctxt "#32908"
+msgid "End scanning Network. Continue ..."
+msgstr "End scanning Network. Continue ..."
+
+msgctxt "#32910"
+msgid "Fail ... no server found"
+msgstr "Fail ... no server found"
+
+msgctxt "#32911"
+msgid "End scanning Network. Exit ...Error N° 32910"
+msgstr "End scanning Network. Exit ...Error N° 32910"
+
+msgctxt "#32920"
+msgid "Init the Server"
+msgstr "Init Server"
+
+msgctxt "#32930"
+msgid "Select One player in the list below"
+msgstr "Select One Squeezebox player in the list below"

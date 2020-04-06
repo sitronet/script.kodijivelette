@@ -12,6 +12,7 @@ Kodi = True
 global savepath  # à revoir
 global tempsdeLecture
 
+import platform
 import os
 import sys
 import urllib
@@ -22,7 +23,7 @@ import copy
 
 sys.path.append(os.path.join(os.path.dirname(__file__), "resources", "lib"))
 
-from outils import WhereIsTheLMSServer
+#from outils import WhereIsTheLMSServer
 from ConnexionClient import InterfaceCLIduLMS
 from outils import KODI_VERSION
 from Ecoute import Souscription
@@ -48,6 +49,12 @@ if Kodi:
     ADDONVERSION = ADDON.getAddonInfo('version')
     ARTWORK = xbmc.translatePath(os.path.join(ADDON.getAddonInfo('path'), 'resources', 'skins', 'Default', 'media'))
 
+    #__language__ = xbmc.Language(os.getcwd()).getLocalizedString
+    __settings__ = xbmcaddon.Addon(id=ADDONID)
+    __language__ = __settings__.getLocalizedString
+
+    # print __language__(32001)
+
     TIME_OF_LOOP_SUBSCRIBE = Ecoute.TIME_OF_LOOP_SUBSCRIBE
 
     # screen 16:9 so to have grid square fix to 16-9 on 1280 x 720 max of pyxbmct
@@ -56,8 +63,24 @@ if Kodi:
     SEIZE = 16 * 4  #32 16 option
     NEUF =   9 * 4  #18 or 9
 
-#savepath = '/tmp/'
-savepath = xbmc.translatePath('special://temp')
+    #savepath = '/tmp/'
+    savepath = xbmc.translatePath('special://temp')
+
+    def translation(message_id, default=False):
+
+        try:
+            if not __language__(message_id) and default:
+                #xbmc.log('language default', xbmc.LOGNOTICE)
+                xbmc.log( 'traduction absente : ' + str(message_id) , xbmc.LOGNOTICE)
+                return default
+            xbmc.log('language traduit', xbmc.LOGNOTICE)
+            xbmc.log( __language__(message_id), xbmc.LOGNOTICE)
+            #xbmc.log(ADDON.getLocalizedString(message_id), xbmc.LOGNOTICE)
+            #self.addon.getLocalizedString(message_id)
+            return __language__(message_id).encode('utf-8')
+            #return  ADDON.getLocalizedString(message_id).encode('utf-8')
+        except:
+            return __language__(message_id)
 
 tempsdeLecture = 1.0        # when a time.sleep(tempsdeLecture) is done to let the user read the screen. to ajust
                             # to be ergonomic or ask the user the wish timeout
@@ -86,6 +109,41 @@ ACTION_MOUSE_MOVE = 107
 """Mouse move"""
 ACTION_MOUSE_LEFT_CLICK = 100
 """Mouse click"""
+
+ACTION_CONTEXT_MENU = 117
+'''for my webchip remote'''
+ACTION_FORWARD = 16
+ACTION_REWIND = 17
+ACTION_MUTE = 91
+ACTION_NEXT_ITEM = 14
+ACTION_PAUSE = 12
+ACTION_PLAY = 68
+ACTION_PLAYER_FORWARD = 77
+ACTION_PLAYER_PLAY = 79
+ACTION_PLAYER_PLAYPAUSE = 229
+ACTION_PLAYER_REWIND = 78
+ACTION_PREV_CONTROL = 182
+ACTION_PREV_ITEM = 15
+ACTION_PREV_LETTER = 141
+ACTION_PREV_PICTURE = 29
+ACTION_PREV_SCENE = 139
+ACTION_SHOW_FULLSCREEN = 36
+ACTION_SHOW_GUI = 18
+ACTION_SHOW_INFO = 11
+ACTION_SHOW_MPLAYER_OSD = 83
+ACTION_SHOW_OSD = 24
+ACTION_SHOW_OSD_TIME = 123
+ACTION_SHOW_PLAYLIST = 33
+ACTION_SMALL_STEP_BACK = 76
+ACTION_STEP_BACK = 21
+ACTION_STEP_FORWARD = 20
+ACTION_STOP = 13
+ACTION_SWITCH_PLAYER = 234
+ACTION_VOLAMP_DOWN = 94
+ACTION_VOLAMP_UP = 93
+ACTION_VOLUME_DOWN = 89
+ACTION_VOLUME_UP = 88
+
 
 
 
@@ -149,7 +207,8 @@ class fenetreMenu(pyxbmct.AddonFullWindow):
         super(fenetreMenu, self).__init__(title)
 
         self.Window_is_playing  = 0
-
+        self.flagContextMenu = False
+        self.flagVolumeDisplay = False
         self.recevoirEnAttente = threading.Event()
         self.recevoirEnAttente.clear()
         self.demandedeStop = threading.Event()
@@ -170,22 +229,37 @@ class fenetreMenu(pyxbmct.AddonFullWindow):
         self.startSqueeze()
         self.testEnvironnement()
 
+        xbmc.log('Starting geometrie', xbmc.LOGDEBUG)
         self.geometrie()
+        xbmc.log('Starting defineControlMenus', xbmc.LOGDEBUG)
         self.defineControlMenus()
+        xbmc.log('Starting putControlElements', xbmc.LOGDEBUG)
         self.putControlElements()
+        xbmc.log('Starting set_navigation_lateral', xbmc.LOGDEBUG)
         self.set_navigation_lateral()
+        xbmc.log('Starting connexionEvent', xbmc.LOGDEBUG)
         self.connexionEvent()
+        self.connexionEventVolume()
+        xbmc.log('Starting population', xbmc.LOGDEBUG)
+        self.population()
+        #xbmc.log('Starting connect ACTION', xbmc.LOGDEBUG)
+        #self.connect(pyxbmct.ACTION_NAV_BACK, self.quit)
+        #self.connect(pyxbmct.ACTION_PREVIOUS_MENU, self.quit)
+        xbmc.log('Starting connect Elements', xbmc.LOGDEBUG)
+        self.connectControlElements()
 
-        self.initialisationServeurPlayeur()
-        self.testCapaciteServeur()
-        self.set_artwork_size()
+        xbmc.log('FIN de _init_', xbmc.LOGDEBUG)
+
+
+        #self.initialisationServeurPlayeur()
+        #self.testCapaciteServeur()
+        #self.set_artwork_size()
 
         # on  mouve mouse or keyboard key -> self.list_Menu_Navigation (the main navigation througth the Menus)
 
-        self.population()
 
-        self.connect(pyxbmct.ACTION_NAV_BACK, self.quit)
-        self.connect(pyxbmct.ACTION_PREVIOUS_MENU , self.quit)
+
+
 
 
     def onAction(self, action):
@@ -197,21 +271,38 @@ class fenetreMenu(pyxbmct.AddonFullWindow):
         self.WindowPlaying_current = xbmcgui.getCurrentWindowId()
         xbmc.log('fenetre en sortie dans methode onAction n° : ' + str(self.WindowPlaying_current), xbmc.LOGDEBUG)
         xbmc.log('fenetre enregistrée dans methode now_is_playing n° : ' + str(self.Window_is_playing), xbmc.LOGDEBUG)
+
         if action == ACTION_PREVIOUS_MENU:
             # todo : à redéfinir si au milieu des menus
             # pour ne pas sortir
-            # sortir uniquement si menu racine
-            xbmc.log('Previous_menu' , xbmc.LOGDEBUG)
-            self.quit()
+            # sortir uniquement si menu racine ou init
+            xbmc.log('Action Previous_menu' , xbmc.LOGNOTICE)
+            if self.getFocus() == self.listMenu_Racine or self.getFocus() == self.listMenu_Initialisation:
+                self.quit()
+            else:
+                pass
+
         elif action == ACTION_NAV_BACK:
-            xbmc.log('nav_back' , xbmc.LOGDEBUG)
+            xbmc.log('Action nav_back' , xbmc.LOGNOTICE)
             self.quit()
+
+        elif action == ACTION_CONTEXT_MENU:
+            xbmc.log('Action ContextMenu', xbmc.LOGNOTICE)
+            if not self.flagContextMenu:
+                self.label_ContextFuture.setLabel('developpement futur')
+                self.label_ContextFuture.setVisible(True)
+                self.flagContextMenu = True
+            else:
+                self.label_ContextFuture.setVisible(False)
+                self.flagContextMenu = False
+
+
         else:
-            xbmc.log('else condition onAction' , xbmc.LOGDEBUG)
+            xbmc.log('else condition onAction ' + repr(action)  , xbmc.LOGNOTICE)
             self._executeConnected(action, self.actions_connected)
 
     def quit(self):
-        xbmc.log('quit asked - Exit program  0 fonction quit() .', xbmc.LOGNOTICE)
+        xbmc.log('quit asked - Exit program  0 fonction quit() .', xbmc.LOGDEBUG)
         self.Abonnement.clear()
         time.sleep(0.2)
         self.demandedeStop.set()
@@ -238,9 +329,9 @@ class fenetreMenu(pyxbmct.AddonFullWindow):
         __addonname__ = __addon__.getAddonInfo('name')
         __icon__ = __addon__.getAddonInfo('icon')
 
-        ligne_1_Information = 'Running Kodijivelette Addon Script'
-        ligne_2_Information = 'Version de Kodi : ' + str(KODI_VERSION)
-        ligne_3_Information =  'Addon : ' + ADDONNAME + ' ; version : ' + ADDONVERSION
+        ligne_1_Information = translation(32010, default='Running Kodijivelette Addon Script')
+        ligne_2_Information = translation((32020), default='Version de Kodi : ') + str(KODI_VERSION)
+        ligne_3_Information =  translation(32030, default='Addon : ') + ADDONNAME + ' ; ' + translation(32040, default= 'Version : ') + ADDONVERSION
         # don't have this information at this time :
         #ligne_4_Information = 'Size of fixed screen : ' + str(self.screenx) + ' x ' + str(self.screeny)
         time = 5000 #in miliseconds
@@ -252,8 +343,10 @@ class fenetreMenu(pyxbmct.AddonFullWindow):
 
 
     def testEnvironnement(self):
-        xbmc.log('path : ' + str(sys.path) , xbmc.LOGDEBUG)
-        xbmc.log('test environnement : ' + str(os.tmpfile()) + ' - '+ str(os.uname()) , xbmc.LOGDEBUG)
+        xbmc.log('path : ' + str(sys.path) , xbmc.LOGNOTICE)
+        xbmc.log('test environnement : ' + str(os.tmpfile()) + ' - '+ str(os.uname()) , xbmc.LOGNOTICE)
+        leSystem = platform.system()
+        xbmc.log( 'System : ' + str(leSystem) , xbmc.LOGNOTICE )
 
     def geometrie(self):
         '''set the geometry of the screen to place later elements and controls (list button image etc...)'''
@@ -298,17 +391,40 @@ class fenetreMenu(pyxbmct.AddonFullWindow):
     def defineControlMenus(self):
         ''' Fix the size of itemlists in menus lists'''
 
-        self.listeRacinePourMenuRacine = ['Now Playing', 'My Music', 'I-Radio', 'My Apps', 'Favorites', 'Extras', 'Quit']
+        self.ListePourInitialisationServerPlayers = [ translation(32920 , 'Init the Server' ),
+                                                      translation(32921 , 'Quit the program' )]
 
-        self.listeMyMusicPourMenuMyMusic = ['Album Artists', 'All Artists', 'Composers', 'Albums', 'Compilations', 'Genres', \
-                                     'Years', 'New Music', 'Random Mix', 'Music Folder', 'Playlists', 'Search', \
-                                     'Remote Music Librairies']
+        self.listeRacinePourMenuRacine = [ translation(32040 , 'Now Playing'),
+                                           translation(32041 , 'My Music'),
+                                           translation(32042 , 'I-Radio' ),
+                                           translation(32043 , 'My Apps'),
+                                           translation(32044 , 'Favorites'),
+                                           translation(32045 , 'Extras'),
+                                           translation(32046 , 'Quit') ]
 
-        self.listeExtraPourMenuExtras = [ 'players', 'Music Source' , 'Don\'t stop the music']
+        self.listeMyMusicPourMenuMyMusic = [
+                                        translation(32050 , 'Album Artists'),
+                                        translation(32051 , 'All Artists'),
+                                        translation(32052 , 'Composers'),
+                                        translation(32053 , 'Albums'),
+                                        translation(32054 , 'Compilations'),
+                                        translation(32055 , 'Genres'),
+                                        translation(32056 , 'Years'),
+                                        translation(32057 , 'New Music'),
+                                        translation(32058 , 'Random Mix'),
+                                        translation(32059 , 'Music Folder'),
+                                        translation(32060 , 'Playlists'),
+                                        translation(32061 , 'Search'),
+                                        translation(32062 , 'Remote Music Librairies') ]
+
+        self.listeExtraPourMenuExtras = [ translation(32072 , 'players'),
+                                          translation(32073 , 'Music Source') ,
+                                          translation(32074 , 'Don\'t stop the music') ]
+
+        self.listMenu_Initialisation = pyxbmct.List(buttonFocusTexture=self.image_list_focus, _itemHeight=40)
 
         self.listMenu_Racine = pyxbmct.List(buttonFocusTexture=self.image_list_focus, _itemHeight=40)
-        
-        # todo : replace Menu_MyMusic par Menu_Branches ?
+
         self.listMenu_MyMusic = pyxbmct.List(buttonFocusTexture=self.image_list_focus, _imageWidth= 38 , _imageHeight = 38 , _itemHeight = 40 )
 
         self.listMenu_Branches  = pyxbmct.List(buttonFocusTexture=self.image_list_focus, _imageWidth= 38 , _imageHeight = 38 , _itemHeight = 40 )
@@ -331,6 +447,8 @@ class fenetreMenu(pyxbmct.AddonFullWindow):
         in fact each is removed and added according to the positioning in the menu in the function
         list_Menu_Navigation(self):
         '''
+
+
         ligneLabel= NEUF - 1
         #label pour indiquer les items sélectionnés dans la hiérarchie des menus, permet aussi de tester la navigation
         self.list_racine_label = pyxbmct.Label('', textColor='0xFF808080')
@@ -345,6 +463,9 @@ class fenetreMenu(pyxbmct.AddonFullWindow):
         self.list_item_fleur_label = pyxbmct.Label('', textColor='0xFF808080')
         self.placeControl(self.list_item_fleur_label, ligneLabel, 34, 1, 20)
 
+        self.Information_label = pyxbmct.Label('', textColor='0xFF808888')
+        self.placeControl(self.Information_label, (NEUF / 2) - 5 , ( SEIZE / 2 )- 10 , 1 , 20  )
+
 
         row_depart = 1
         espace_row = 30
@@ -357,9 +478,14 @@ class fenetreMenu(pyxbmct.AddonFullWindow):
         col_largeur_menu_feuille = col_largeur_menu_branche + 10
         row_hauteur_menu_feuille = row_hauteur_menu_branche
 
+        # init
+        self.placeControl(self.listMenu_Initialisation,  NEUF / 2  ,  (SEIZE / 2 ) - espace_col  , espace_row, espace_col * 2 )
+
         self.placeControl(self.listMenu_Racine , row_depart , 0, espace_row, espace_col)
 
         # Add items to the list
+        self.listMenu_Initialisation.addItems(self.ListePourInitialisationServerPlayers)
+
         self.listMenu_Racine.addItems(self.listeRacinePourMenuRacine)
         self.listMenu_Extras.addItems(self.listeExtraPourMenuExtras)
 
@@ -389,10 +515,19 @@ class fenetreMenu(pyxbmct.AddonFullWindow):
         self.placeControl(self.listMenu_Fleur, row_depart , col_depart_menu_feuille + col_largeur_menu_branche  , \
                           row_hauteur_menu_branche , col_largeur_menu_branche )
 
+        # future
+        self.label_ContextFuture = pyxbmct.Label('', textColor='0xFF808080')
+        self.placeControl(self.label_ContextFuture,  NEUF / 2  ,  (SEIZE / 2 ) - espace_col  , 3 * espace_row , espace_col * 2 )
+
+    def connectControlElements(self):
         # Connect the list to a function to display which list item is selected.
         # example :
         # self.connect(self.list_Menu, lambda: xbmc.executebuiltin('Notification(Note!,{0} selected.)'.format(
         #    self.list_Menu.getListItem(self.list_Menu.getSelectedPosition()).getLabel())))
+
+        # init
+        #self.connect(self.listMenu_Initialisation, self.navigationFromMenuInitialisation())
+        #
         self.connect(self.listMenu_Racine, self.navigationFromMenuRacine)
         self.connect(self.listMenu_MyMusic, self.navigationFromMenusMyMusic)
         self.connect(self.listMenu_Branches, self.navigationFromMenuBranche)
@@ -402,10 +537,12 @@ class fenetreMenu(pyxbmct.AddonFullWindow):
         self.connect(self.listMenu_Extras, self.navigationFromMenuBrancheExtras)
         self.connect(self.listMenu_Feuilles_Extras, self.navigationFromMenuFeuillesExtras)
 
-
-
         self.connect(self.listMenu_Fleur, self.launchPlayingItem)
         # etcoetera...
+        # init
+        self.connect(self.listMenu_Initialisation, self.navigationFromMenuInitialisation)
+
+        #
 
     def connexionEvent(self):
         # Connect key and mouse events for list navigation feedback.
@@ -418,6 +555,24 @@ class fenetreMenu(pyxbmct.AddonFullWindow):
              pyxbmct.ACTION_MOVE_LEFT,
              pyxbmct.ACTION_MOVE_RIGHT],
             self.list_Menu_Navigation)
+
+    def connexionEventVolume(self):
+        self.connectEventList(
+            [ACTION_VOLAMP_DOWN,
+             ACTION_VOLAMP_UP,
+             ACTION_VOLUME_DOWN,
+             ACTION_VOLUME_UP] ,
+            self.actionVolume)
+
+    def actionVolume(self):
+        xbmc.log('Action Volume', xbmc.LOGNOTICE)
+        if not self.flagVolumeDisplay:
+            self.label_ContextFuture.setLabel('developpement futur pour le Volume')
+            self.label_ContextFuture.setVisible(True)
+            self.flagVolumeDisplay = True
+        else:
+            self.label_ContextFuture.setVisible(False)
+            self.flagVolumeDisplay = False
 
     def population(self):
         # todo dois je créer toutes les sous-listes ici ? ou bien attendre dans le menu
@@ -458,7 +613,8 @@ class fenetreMenu(pyxbmct.AddonFullWindow):
         # todo : à revoir pour les autre menus (radios , favorites etc...
 
         # Set initial focus
-        self.setFocus(self.listMenu_Racine)
+        #self.setFocus(self.listMenu_Racine)
+        self.setFocus(self.listMenu_Initialisation)
 
     def move_through_sub_menu(self):
         # on verra plus tard si nécessaire Todo
@@ -508,14 +664,60 @@ class fenetreMenu(pyxbmct.AddonFullWindow):
             notFinish = Plugin.Plugin_Generique()
             notFinish.functionNotYetImplemented()
 
+    def navigationFromMenuInitialisation(self):
+        try:
+                self.listMenu_Initialisation.setVisible(True)
+                self.listMenu_Racine.setVisible(True)
+                self.listMenu_MyMusic.setVisible(False)
+                self.listMenu_Branches.setVisible(False)
+                self.listMenu_Extras.setVisible(False)
+                self.listMenu_Feuilles.setVisible(False)
+                self.listMenu_Feuilles_all_Artists.setVisible(False)
+
+                self.listMenu_Fleur.setVisible(False)
+        except:
+                pass
+        itemSelection = self.listMenu_Initialisation.getListItem(self.listMenu_Initialisation.getSelectedPosition()).getLabel()
+        itemPosition = self.listMenu_Initialisation.getSelectedPosition()
+        xbmc.log('item is : ' + str(itemSelection), xbmc.LOGNOTICE)
+        if itemSelection ==  translation(32920 , 'Init the Server'):
+            self.initialisationServeurPlayeur()
+            self.testCapaciteServeur()
+            self.set_artwork_size()
+            #self.listMenu_Initialisation.setVisible(False)
+            #self.removeControl(self.listMenu_Initialisation)
+            #self.getFocus(self.listMenu_Racine)
+
+
+        elif itemSelection == translation(32921 , 'Quit the program' ):
+            self.quit()
+
+        else :
+            self.playerid = self.dictionnairedesplayers[itemPosition + 1]['playerid']
+            try:
+                self.listMenu_Initialisation.setVisible(False)
+                self.listMenu_Racine.setVisible(True)
+                self.listMenu_MyMusic.setVisible(False)
+                self.listMenu_Branches.setVisible(False)
+                self.listMenu_Extras.setVisible(False)
+                self.listMenu_Feuilles.setVisible(False)
+                self.listMenu_Feuilles_all_Artists.setVisible(False)
+
+                self.listMenu_Fleur.setVisible(False)
+                self.setFocus(self.listMenu_Racine)
+                self.Information_label.setVisible(False)
+            except:
+                pass
+
+
     def navigationFromMenuRacine(self):
 
         itemSelectionRacine = self.listMenu_Racine.getListItem(self.listMenu_Racine.getSelectedPosition()).getLabel()
 
-        if itemSelectionRacine == 'Now Playing':
+        if itemSelectionRacine == translation(32040 , 'Now Playing'):
             # activer frame EcouteEnCours
             self.Abonnement.set() # need to renew subscribe after interupt
-            self.jivelette = FramePLaying.SlimIsPlaying('Now Playing' )
+            self.jivelette = FramePLaying.SlimIsPlaying(translation(32040 , 'Now Playing'))
 
             self.WindowPlaying = xbmcgui.getCurrentWindowId()
             xbmc.log('fenetre en cours n° : ' + str(self.WindowPlaying), xbmc.LOGDEBUG)
@@ -527,13 +729,13 @@ class fenetreMenu(pyxbmct.AddonFullWindow):
             #self.jivelette.doModal()
             del self.jivelette
 
-        elif itemSelectionRacine == 'My Music':
+        elif itemSelectionRacine == translation(32041 , 'My Music'):
 
             if not self.music_branch_populated:
                 self.listMenu_MyMusic.addItems(self.listeMyMusicPourMenuMyMusic)
             self.setFocus(self.listMenu_MyMusic)
 
-        elif itemSelectionRacine == 'I-Radio':
+        elif itemSelectionRacine == translation(32042 , 'I-Radio' ):
             self.listMenu_Branches.reset()
             self.setFocus(self.listMenu_Branches)
 
@@ -542,7 +744,7 @@ class fenetreMenu(pyxbmct.AddonFullWindow):
             self.setFocus(self.listMenu_Branches)
 
 
-        elif itemSelectionRacine == 'My Apps':
+        elif itemSelectionRacine == translation(32043 , 'My Apps'):
 
             if self.can_myapps:
                 self.listMenu_Branches.reset()
@@ -555,7 +757,7 @@ class fenetreMenu(pyxbmct.AddonFullWindow):
             else:
                 self.functionNotPossible(menu=self.listMenu_Branches)
 
-        elif itemSelectionRacine == 'Favorites':
+        elif itemSelectionRacine == translation(32044 , 'Favorites'):
             if self.can_favorites:
                 self.listMenu_Branches.reset()
 
@@ -564,14 +766,14 @@ class fenetreMenu(pyxbmct.AddonFullWindow):
             else:
                 self.functionNotPossible(menu=self.listMenu_Branches)
 
-        elif  itemSelectionRacine == 'Extras':
+        elif  itemSelectionRacine == translation(32045 , 'Extras'):
             xbmc.log('selection Extras' , xbmc.LOGNOTICE)
             self.listMenu_Extras.reset()
             self.listMenu_Extras.addItems(self.listeExtraPourMenuExtras)
             self.setFocus(self.listMenu_Extras)
             #self.navigationFromMenuBrancheExtras()
 
-        elif itemSelectionRacine == 'Quit':
+        elif itemSelectionRacine == translation(32046 , 'Quit'):
             xbmc.log('menu Quit requested', xbmc.LOGNOTICE)
             self.quit()
 
@@ -596,7 +798,7 @@ class fenetreMenu(pyxbmct.AddonFullWindow):
         except:
                 pass
 
-        if self.itemSelectionBranche == 'All Artists':
+        if self.itemSelectionBranche == translation(32051 , 'All Artists'):
             try:
                 self.listMenu_Racine.setVisible(True)
                 self.listMenu_MyMusic.setVisible(True)
@@ -616,7 +818,7 @@ class fenetreMenu(pyxbmct.AddonFullWindow):
                 new_music = Plugin.MyMusic(self)
                 new_music.le_menu_feuille(numeroItemSelectionBranche=NumeroItemSelectionBranche)
 
-        elif self.itemSelectionBranche == 'Random Mix':
+        elif self.itemSelectionBranche == translation(32058 , default='Random Mix'):
 
             try:
                 self.listMenu_Racine.setVisible(True)
@@ -638,16 +840,16 @@ class fenetreMenu(pyxbmct.AddonFullWindow):
             self.listMenu_Feuilles_RandomMix.reset()
 
             itemtampon = xbmcgui.ListItem()
-            itemtampon.setLabel('Song mix')
+            itemtampon.setLabel(translation(32080, 'Song mix' ))
             self.listMenu_Feuilles_RandomMix.addItem(itemtampon)
             itemtampon = xbmcgui.ListItem()
-            itemtampon.setLabel('Album mix')
+            itemtampon.setLabel(translation(32081 , 'Album mix' ))
             self.listMenu_Feuilles_RandomMix.addItem(itemtampon)
             itemtampon = xbmcgui.ListItem()
-            itemtampon.setLabel('Artist mix')
+            itemtampon.setLabel(translation(32082 , 'Artist mix' ))
             self.listMenu_Feuilles_RandomMix.addItem(itemtampon)
             itemtampon = xbmcgui.ListItem()
-            itemtampon.setLabel('Years mix')
+            itemtampon.setLabel(translation(32083 , 'Years mix' ))
             self.listMenu_Feuilles_RandomMix.addItem(itemtampon)
 
             self.setFocus(self.listMenu_Feuilles_RandomMix)
@@ -675,12 +877,12 @@ class fenetreMenu(pyxbmct.AddonFullWindow):
 
         self.listMenu_Racine.controlRight(self.listMenu_Branches)
 
-        if self.itemSelectionRacine == 'My Music':
+        if self.itemSelectionRacine == translation(32041 , 'My Music'):
             # it must not be possible as we are in menu Branch and not in menu MyMusic
             pass
 
-        if self.itemSelectionRacine == 'I-Radio' or \
-                self.itemSelectionRacine == 'My Apps' :
+        if self.itemSelectionRacine == translation(32042 , 'I-Radio' ) or \
+                self.itemSelectionRacine == translation(32043 , 'My Apps'):
 
             try:
                 # self.listMenu_Branches.reset() # à voir plus tard si on reset les lists menu
@@ -698,7 +900,7 @@ class fenetreMenu(pyxbmct.AddonFullWindow):
 
             new_feuille = Plugin.Plugin_Generique(self)
 
-        elif self.itemSelectionRacine == 'Favorites' :
+        elif self.itemSelectionRacine == translation(32044 , 'Favorites'):
 
             new_feuille = Plugin.Plugin_Favorites(self)
 
@@ -740,7 +942,7 @@ class fenetreMenu(pyxbmct.AddonFullWindow):
 
         #self.setFocus(self.listMenu_Fleur)
         # todo : is it right this ?
-        if self.itemSelectionRacine == 'My Music':
+        if self.itemSelectionRacine == translation(32041 , 'My Music'):
             itemSelection = self.listMenu_Feuilles.getListItem(
                 self.listMenu_Feuilles.getSelectedPosition()).getProperty('artist_id')
             xbmc.log('id item artist : ' + str(itemSelection) , xbmc.LOGNOTICE)
@@ -819,27 +1021,27 @@ class fenetreMenu(pyxbmct.AddonFullWindow):
 
         self.list_item_feuille_label.setLabel(' :: ' + itemSelectionFeuille)
 
-        if itemSelectionFeuille == 'Song mix':
+        if itemSelectionFeuille ==  translation(32080 , 'Song mix' ) :
             requete = self.playerid + ' randomplay tracks'
-            title = 'Song mix'
+            title = translation(32080 , 'Song mix' )
 
-        elif itemSelectionFeuille == 'Album mix':
+        elif itemSelectionFeuille == translation(32081 , 'Album mix' ):
             requete = self.playerid + ' randomplay albums'
-            title = 'Album mix'
+            title = translation(32081 , 'Album mix')
 
-        elif itemSelectionFeuille == 'Artist mix':
+        elif itemSelectionFeuille == translation(32082 , 'Artist mix' ):
             requete = self.playerid + ' randomplay contributors'
-            title = 'Artist mix'
+            title = translation(32082 , 'Artist mix' )
 
-        elif itemSelectionFeuille == 'Years mix':
+        elif itemSelectionFeuille == translation(32083 , 'Years mix' ):
             requete = self.playerid + ' randomplay year'
-            title = 'Years mix'
+            title = translation(32083 , 'Years mix' )
 
         self.InterfaceCLI.sendtoCLISomething(requete)
         reponse = self.InterfaceCLI.receptionReponseEtDecodage()
 
         self.Abonnement.set()
-        self.frameRandomPlay = FramePlaylist.PlaylistPlugin('Now playing ' + title)
+        self.frameRandomPlay = FramePlaylist.PlaylistPlugin( translation( 32040 , 'Now playing ')  + title)
         self.frameRandomPlay.show()
         self.frameRandomPlay.listMenu_playlist.reset()
         self.update_random_mix_Playlist()
@@ -936,12 +1138,12 @@ class fenetreMenu(pyxbmct.AddonFullWindow):
             menuunplayer.setProperty('playerid' , unplayer['playerid'])
             if unplayer['power'] == '0':
                 # player éteint on peut l'allumer
-                labeltemp = labeltemp + ' : Activate Player'
+                labeltemp = labeltemp + ' : ' + translation(32800 , 'Activate Player' )
             else:
-                labeltemp = labeltemp + ' : Deactivate Player'
+                labeltemp = labeltemp + ' : ' + translation(32801 , 'Deactivate Player')
 
             menuunplayer.setLabel(labeltemp)
-            xbmc.log('populate player menu' + labeltemp + unplayer['playerid']  , xbmc.LOGNOTICE)
+            #xbmc.log('populate player menu' + labeltemp + unplayer['playerid']  , xbmc.LOGNOTICE) # ! could be unicode
             self.listMenu_Feuilles_Extras.addItem(menuunplayer)
 
 
@@ -975,7 +1177,13 @@ class fenetreMenu(pyxbmct.AddonFullWindow):
         # affichage en bas écran dans un label le menu en cours
         #self.list_racine_label.setLabel('# ' + self.itemSelectionRacine)
         xbmc.log( 'position curseur sur menu : ' + self.itemSelectionRacine, xbmc.LOGDEBUG)
+
         try:
+            if self.getFocus() == self.listMenu_Initialisation:
+                self.itemSelectionInitialisation = self.listMenu_Initialisation.getListItem(
+                    self.listMenu_Initialisation.getSelectedPosition()).getLabel()
+                self.list_racine_label.setLabel('::' + self.itemSelectionInitialisation)
+                xbmc.log('position curseur sur menu init : ' + self.itemSelectionInitialisation, xbmc.LOGNOTICE)
 
             if self.getFocus() == self.listMenu_Racine:
 
@@ -989,7 +1197,7 @@ class fenetreMenu(pyxbmct.AddonFullWindow):
                 self.list_item_branche_label.setLabel('')
                 self.list_item_feuille_label.setLabel('')
 
-                if self.itemSelectionRacine == 'My Music': # condition always true. never mind
+                if self.itemSelectionRacine == translation(32041 , 'My Music'): # condition always true. never mind
                                                            # we will delete them later after try et rewriting the code
 
                     try:
@@ -1018,7 +1226,7 @@ class fenetreMenu(pyxbmct.AddonFullWindow):
                     except:
                         pass
 
-                elif self.itemSelectionRacine == 'I-Radio':
+                elif self.itemSelectionRacine == translation(32042 , 'I-Radio' ):
 
                     try:
                         self.placeControl(self.listMenu_Branches, row_depart,
@@ -1051,7 +1259,7 @@ class fenetreMenu(pyxbmct.AddonFullWindow):
                     except:
                         pass
 
-                elif self.itemSelectionRacine == 'My Apps': 
+                elif self.itemSelectionRacine == translation(32043 , 'My Apps'): 
 
                     try:
                         self.listMenu_Racine.setVisible(True)
@@ -1078,7 +1286,7 @@ class fenetreMenu(pyxbmct.AddonFullWindow):
                     except:
                         pass
 
-                elif self.itemSelectionRacine == 'Favorites':
+                elif self.itemSelectionRacine == translation(32044 , 'Favorites'):
 
                     try:
                         self.listMenu_Racine.setVisible(True)
@@ -1104,7 +1312,7 @@ class fenetreMenu(pyxbmct.AddonFullWindow):
                     except:
                         pass
 
-                elif self.itemSelectionRacine == 'Extras':    
+                elif self.itemSelectionRacine == translation(32045 , 'Extras'):    
 
                     try:
                         self.placeControl(self.listMenu_Extras, row_depart,
@@ -1133,7 +1341,7 @@ class fenetreMenu(pyxbmct.AddonFullWindow):
 
 
 
-                elif self.itemSelectionRacine == 'Quit':
+                elif self.itemSelectionRacine == translation(32046 , 'Quit'):
                     pass
 
             elif self.getFocus() == self.listMenu_MyMusic:
@@ -1398,6 +1606,10 @@ class fenetreMenu(pyxbmct.AddonFullWindow):
 
     def initialisationServeurPlayeur(self):
 
+        # use the same list, just remove the previous items (ie init and quit)
+        self.listMenu_Initialisation.removeItem(1)
+        self.listMenu_Initialisation.removeItem(0)
+        self.Information_label.setLabel( translation(32930, 'Select One player in the list below'))
         outils.recherchonsleServeur(self)
 
         # maintenant nous connaissons le serveur Idem mainBoucle -> todo revoir logique
@@ -1433,6 +1645,9 @@ class fenetreMenu(pyxbmct.AddonFullWindow):
         self.dictionnairedesplayers = dict()
         self.dictionnairedesplayers = self.Players.recherchedesPlayers(self.InterfaceCLI, self.recevoirEnAttente)
         # recherche d'un player actif et si actif vrai . actif = isplaying
+        # fill the menu Select a player
+
+
         self.actif , index_dictionnairedesPlayers ,  self.playerid = self.Players.playerActif(self.dictionnairedesplayers)
 
         # todo test
@@ -1442,8 +1657,10 @@ class fenetreMenu(pyxbmct.AddonFullWindow):
         xbmc.log(str(self.actif) + '  ' + self.playerid, xbmc.LOGDEBUG)
 
         if self.actif:
-            pass
-            #
+            nombredeplayers = self.dictionnairedesplayers[0]['count']
+            for x in range(1, nombredeplayers + 1):
+                if (self.dictionnairedesplayers[x]['connected'] == '1'):
+                    self.listMenu_Initialisation.addItem(self.dictionnairedesplayers[x]['name'])
             # todo : afficher dans une boite-liste les players et en évidence le player actif
             # or choose the player by user
             #
@@ -1527,18 +1744,28 @@ class fenetreMenu(pyxbmct.AddonFullWindow):
         while self.Abonnement.is_set():  # remember Abonnement is an thread event for souscription
             time.sleep(0.5)
 
+
+
+
             timeoutdeTestdelaBoucle = time.time() + 60 * 2  # 2 minutes from now -for testing
             timeoutdeRecherchedesPlayers = time.time() + 60 * 20  #todo toutes les 20 minutes nous rechercherons les players
             timeEntreeDansLaBoucle = time.time()
             compteur = 1
             titreenlecture = ''
             self.breakBoucle_A = False
+            timeoutduVolume = time.time() + 20
             while (self.breakBoucle_A == False):  # Boucle A principale de Subscribe
+
                 if time.time() > timeoutdeTestdelaBoucle:
                     xbmc.log('Timeout : break A  ', xbmc.LOGNOTICE)
                     self.jivelette.bouton_pause.setVisible(False)
                     self.jivelette.bouton_play.setVisible(False)
+
                     break
+
+                if time.time() > timeoutduVolume:
+                    self.jivelette.label_volume.setVisible(False)
+                    self.jivelette.slider_volume.setVisible(False)
                 if not self.Abonnement.is_set:
                     break
                 if xbmc.Monitor().waitForAbort(0.5):
