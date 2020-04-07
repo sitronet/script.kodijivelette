@@ -15,7 +15,7 @@ satisfaction. Le programme de bossanova ne tourne que partiellement chez moi et 
  d'écrire un nouveau code en python. je me suis donc tourné vers l'écriture de code en python, en commençant par le début
  c'est à dire installation d'un IDE, lecture de la doc python, tester des exemples simples de structures de données, de threads,
  etc...la lecture des bibliothèques pour Addon de Kodi puis commencer l'embryon de l'application en addon pour kodi.
- Assez vite je me suis retrouvé sur un nouvel écueil, je ne comprennais rien à la logique de kodi pour le placement d'éléments
+ Assez vite je me suis retrouvé sur un nouvel écueil, je ne comprenais rien à la logique de kodi pour le placement d'éléments
  sur l'écran. j'allais définitivement abandonner ce fatras de fichier skin en XML quand par hasard je suis tombé sur
  la bibliothèque pyxbmct de Roman_V_M. Le chemin du codage de l'affichage s'est d'un coup éclairci, enfin quelque chose,
  que moi qui suit de la vieille école comprenait. je pouvais enfin envisager de disposer de l'affichage des pochettes
@@ -37,7 +37,7 @@ qui prend des plombes.j'en suis très fier n'en déplaise aux puristes qui trouv
   - parcours et sélection des radios, quelques applications et les favoris
   - parcours des artistes , albums, et des pistes en aléatoires
 
-  Ce qui ne fonctionne pas pour l'instant dans cette version alpha :
+  Ce qui ne fonctionnait pas pour l'instant dans la version alpha (mais devrait fonctionner dans la 0.0.d):
   - Sélection du player (choix aléatoire du programme)
   - modification du volume du player
   - éteindre le player
