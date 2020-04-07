@@ -35,10 +35,10 @@ of elements on the screen. I was definitely going to give up this jumble of skin
   - route and selection of radios, some applications and favorites
   - tour of artists, albums, repertoires and random tracks
   
-  What does not work for the moment in this alpha version:
+  What did not work for the moment in this alpha version (but should word in the 0.0.d):
   - Player selection (random choice of program)
   - modification of the player volume
-  - turn off the player
+  - turn on/off the player
    
 to note: You can always control from a smartphone (for example with Squeezer app) the missing functions
 while displaying on the screen the music playing.
