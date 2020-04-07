@@ -1941,19 +1941,13 @@ class fenetreMenu(pyxbmct.AddonFullWindow):
         # activation de la souscription au serveur process = Thread(target=crawl, args=[urls[ii], result, ii])
         self.subscribe = Souscription(self.InterfaceCLI , self.playerid,  self.Abonnement, self.recevoirEnAttente )
         self.subscribe.subscriptionLongue()
-        # todo Q : comment faire la gestion de l'arret de la boucle de souscription ?
-        #      A : fonction resiliersouscription()
-
         compteur = 0
         self.frameRandomPlay.update_coverbox(lmsip=self.lmsip, lmswebport=self.lmswebport, playerid=self.playerid,
                                              compteur=compteur)
-        # reponse = self.InterfaceCLI.receptionReponseEtDecodageavecCR()
-
         old_current_index_title = ''
 
         while self.Abonnement.is_set():
             if xbmc.Monitor().waitForAbort(0.5):
-                #self.breakBoucle_A = True
                 self.Abonnement.clear()
 
             compteur = compteur + 1
@@ -1986,16 +1980,11 @@ class fenetreMenu(pyxbmct.AddonFullWindow):
             playlist index:12|id:6011|title:A toutes les filles
             '''
 
-
             indexdecurrentTitle = atraiter.find('cur_index:')
             indexFincurrentTitle = atraiter.find('|', indexdecurrentTitle)
-            # xbmc.log('index debut : ' + str(indexdecurrentTitle) + ' fin : ' + str(indexFincurrentTitle), xbmc.LOGDEBUG)
             playlist_current_index_title = atraiter[indexdecurrentTitle + 10: indexFincurrentTitle]
             xbmc.log('current_index_title :' + playlist_current_index_title, xbmc.LOGNOTICE)
-
-
             listedechamps = atraiter.split('|playlist index:')
-
             # traiter d'abord les temps :
             listeRetour = listedechamps[0].split('|')  # on obtient une liste des items
             dico = dict()  # pour chaque élement de la liste sous la forme <val1>:<val2>
@@ -2013,19 +2002,16 @@ class fenetreMenu(pyxbmct.AddonFullWindow):
 
             try:
                 self.frameRandomPlay.slider_duration.setPercent(pourcentagedureejouee)
-                # self.slider_duration.setPercent(pourcentagedureejouee)
             except KeyError:
                 pass
 
             try:
                 self.frameRandomPlay.labelduree_jouee.setLabel(label=outils.getInHMS(dico['time']))
-                # self.labelduree_jouee.setLabel(label= outils.getInHMS(self, dico['time']))
             except KeyError:
                 pass
 
             try:
                 self.frameRandomPlay.labelduree_fin.setLabel(label=outils.getInHMS(dico['duration']))
-                # self.labelduree_fin.setLabel(label= outils.getInHMS(self, dico['duration']))
             except KeyError:
                 self.frameRandomPlay.labelduree_fin.setLabel(label=outils.getInHMS(0.0))
 
@@ -2037,12 +2023,8 @@ class fenetreMenu(pyxbmct.AddonFullWindow):
 
                 indexdeID = champs.find('|id:')
                 indexdeTitre = champs.find('|title:')
-                # xbmc.log('index ID : ' + str(indexdeID) + ' titre : ' + str(indexdeTitre), xbmc.LOGDEBUG)
-
                 titre = champs[indexdeTitre + 7:]
-                # xbmc.log('titre : ' + titre , xbmc.LOGDEBUG)
                 track_id = champs[indexdeID + 4: indexdeTitre]
-                # xbmc.log('track_id : ' + str(track_id) , xbmc.LOGDEBUG)
                 playlist_index = champs[0: indexdeID]
                 tracktampon = xbmcgui.ListItem()
                 tracktampon.setLabel(titre)
@@ -2051,15 +2033,13 @@ class fenetreMenu(pyxbmct.AddonFullWindow):
                 try:
                     dejaexistant = self.frameRandomPlay.listMenu_playlist.getListItem(int(playlist_index))
                 except RuntimeError:
-                    # dont exist so add it
+                    # dont exist so add it in the list
                     self.frameRandomPlay.listMenu_playlist.addItem(tracktampon)
                     # put again the playing item because lost by addItem
                     self.frameRandomPlay.listMenu_playlist.selectItem(int(playlist_current_index_title))
 
             if not self.frameRandomPlay.threadRunning:
                 xbmc.log(' jivelette.threadRunning is not True ', xbmc.LOGNOTICE)
-                #self.subscribe.resiliersouscription() # double emploi
-                #self.breakBoucle_A = True
                 self.Abonnement.clear()
 
             if not old_current_index_title == playlist_current_index_title:
@@ -2083,13 +2063,12 @@ class fenetreMenu(pyxbmct.AddonFullWindow):
             artist = reponse.split('title|').pop()
             self.frameRandomPlay.labelTitle.reset()
             self.frameRandomPlay.labelTitle.addLabel(label='[B]' + artist + '[/B]')
-            #reponse = self.InterfaceCLI.receptionReponseEtDecodage()
 
         # else:
         #     # here subscribe doesn't work
         #     self.functionNotYetImplemented()
         #     return
-        xbmc.log('End of Boucle of Squueze , Bye', xbmc.LOGNOTICE)
+        xbmc.log('End of Boucle in Update random mix', xbmc.LOGNOTICE)
         self.subscribe.resiliersouscription()
 
     # end random mix
