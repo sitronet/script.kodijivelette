@@ -2043,7 +2043,7 @@ class fenetreMenu(pyxbmct.AddonFullWindow):
                     dejaexistant = self.frameRandomPlay.listMenu_playlist.getListItem(int(playlist_index))
                 except RuntimeError:
                     # dont exist so add it in the list and try to get some more info about song
-                    nameOfFileArtwork = self.get_artwork(index , track_id)
+                    nameOfFileArtwork = self.get_artwork(playlist_index , track_id)
                     tracktampon.setArt({'thumb': nameOfFileArtwork})
                     self.frameRandomPlay.listMenu_playlist.addItem(tracktampon)
                     # put again the playing item because lost by addItem
