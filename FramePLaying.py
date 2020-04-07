@@ -228,7 +228,7 @@ class SlimIsPlaying(pyxbmct.AddonFullWindow):
         self.bouton_play.setVisible(False)
 
         # Slider Volume :
-        self.label_volume = pyxbmct.Label('')
+        self.label_volume = pyxbmct.Label('' , alignment=pyxbmct.ALIGN_CENTER)
         self.placeControl(control=self.label_volume, row= ( NEUF / 2 )- 2 , column= ( SEIZE /2 ) - 15  , rowspan=2, columnspan=30)
         self.slider_volume = pyxbmct.Slider(textureback=self.textureback_slider_volume, texture=self.texture_slider_volume,
                                             texturefocus=self.textureback_slider_volume, orientation=xbmcgui.HORIZONTAL)
