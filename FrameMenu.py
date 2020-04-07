@@ -229,23 +229,14 @@ class fenetreMenu(pyxbmct.AddonFullWindow):
         self.startSqueeze()
         self.testEnvironnement()
 
-        xbmc.log('Starting geometrie', xbmc.LOGDEBUG)
         self.geometrie()
-        xbmc.log('Starting defineControlMenus', xbmc.LOGDEBUG)
         self.defineControlMenus()
-        xbmc.log('Starting putControlElements', xbmc.LOGDEBUG)
         self.putControlElements()
-        xbmc.log('Starting set_navigation_lateral', xbmc.LOGDEBUG)
+        self.welcome()
         self.set_navigation_lateral()
-        xbmc.log('Starting connexionEvent', xbmc.LOGDEBUG)
         self.connexionEvent()
         self.connexionEventVolume()
-        xbmc.log('Starting population', xbmc.LOGDEBUG)
         self.population()
-        #xbmc.log('Starting connect ACTION', xbmc.LOGDEBUG)
-        #self.connect(pyxbmct.ACTION_NAV_BACK, self.quit)
-        #self.connect(pyxbmct.ACTION_PREVIOUS_MENU, self.quit)
-        xbmc.log('Starting connect Elements', xbmc.LOGDEBUG)
         self.connectControlElements()
 
         xbmc.log('FIN de _init_', xbmc.LOGDEBUG)
@@ -256,11 +247,6 @@ class fenetreMenu(pyxbmct.AddonFullWindow):
         #self.set_artwork_size()
 
         # on  mouve mouse or keyboard key -> self.list_Menu_Navigation (the main navigation througth the Menus)
-
-
-
-
-
 
     def onAction(self, action):
         """
@@ -302,18 +288,24 @@ class fenetreMenu(pyxbmct.AddonFullWindow):
             self._executeConnected(action, self.actions_connected)
 
     def quit(self):
-        xbmc.log('quit asked - Exit program  0 fonction quit() .', xbmc.LOGDEBUG)
-        self.Abonnement.clear()
-        time.sleep(0.2)
-        self.demandedeStop.set()
-        try:
-            self.InterfaceCLI.closeconnexionWithCLI()
+        xbmc.log('quit asked - Exit program  0 fonction quit() .', xbmc.LOGNOTICE)
+        line1 = " Do you want to exit this script ? "
+        Acknownledge = xbmcgui.Dialog().yesno('Exit KodiJivelette', line1)
+        if Acknownledge:
+            self.Abonnement.clear()
             time.sleep(0.2)
-            del self.InterfaceCLI
-        except AttributeError:
+            self.demandedeStop.set()
+            try:
+                self.InterfaceCLI.closeconnexionWithCLI()
+                time.sleep(0.2)
+                del self.InterfaceCLI
+            except AttributeError:
+                pass
+            xbmc.log('quit done - Exit program  0 fonction quit() .', xbmc.LOGNOTICE)
+            self.close()
+        else:
             pass
-        xbmc.log('quit done - Exit program  0 fonction quit() .', xbmc.LOGNOTICE)
-        self.close()
+
 
     #def onControl(self, control):
     #    xbmc.log("Window.onControl(control=[%s])"%control , xbmc.LOGNOTICE)
@@ -479,6 +471,7 @@ class fenetreMenu(pyxbmct.AddonFullWindow):
         row_hauteur_menu_feuille = row_hauteur_menu_branche
 
         # init
+        
         self.placeControl(self.listMenu_Initialisation,  NEUF / 2  ,  (SEIZE / 2 ) - espace_col  , espace_row, espace_col * 2 )
 
         self.placeControl(self.listMenu_Racine , row_depart , 0, espace_row, espace_col)
@@ -1602,6 +1595,9 @@ class fenetreMenu(pyxbmct.AddonFullWindow):
             pass
 
     # fin fonction list_Menu_Navigation
+
+    def welcome(self):
+        self.Information_label.setLabel( translation(32931, 'Welcome to the most simple Squeeze Box Display : Kodi Jivelette'))
 
 
     def initialisationServeurPlayeur(self):
