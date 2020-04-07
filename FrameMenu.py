@@ -2042,7 +2042,9 @@ class fenetreMenu(pyxbmct.AddonFullWindow):
                 try:
                     dejaexistant = self.frameRandomPlay.listMenu_playlist.getListItem(int(playlist_index))
                 except RuntimeError:
-                    # dont exist so add it in the list
+                    # dont exist so add it in the list and try to get some more info about song
+                    nameOfFileArtwork = self.get_artwork(track_id)
+                    tracktampon.setArt({'thumb': nameOfFileArtwork})
                     self.frameRandomPlay.listMenu_playlist.addItem(tracktampon)
                     # put again the playing item because lost by addItem
                     self.frameRandomPlay.listMenu_playlist.selectItem(int(playlist_current_index_title))
@@ -2090,7 +2092,25 @@ class fenetreMenu(pyxbmct.AddonFullWindow):
     def les_menus_feuilles_Extras(self, numeroItemSelectionBranche):
         self.functionNotYetImplemented((self.listMenu_Feuilles))
 
+    def get_artwork(self, artwork_track_id):
+        '''
+                fetch the image artwork  or icon from server or somewhere in tne net
+                and store it in a temporay directory .
 
+        '''
+        filename = 'artwork.image_' + str(index) + '.tmp'
+        completeNameofFile = os.path.join(savepath, filename)
+        xbmc.log('filename artwork : ' + str(completeNameofFile), xbmc.LOGDEBUG)
+        # http://<server>:<port>/music/<track_id>/cover.jpg
+        urltoopen = 'http://' + self.lmsip + ':' + self.lmswebport + '/music/' + artwork_track_id + '/cover.jpg'
+        try:
+            urllib.urlretrieve(urltoopen, completeNameofFile)
+        except IOError:
+            self.functionNotYetImplemented()
+        xbmc.log('nom du fichier image : ' + completeNameofFile, xbmc.LOGNOTICE)
+        return completeNameofFile
+        # fin fonction fin fonction get_icon, class Plugin_Generique
+        # test
 
 
     def functionNotYetImplemented(self, menu):
