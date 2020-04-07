@@ -17,6 +17,8 @@ msgstr ""
 
 #settings labels
 
+
+
 msgctxt "#32010"
 msgid "Running Kodijivelette Addon Script"
 msgstr "Lancement du script Kodijivelette"
@@ -32,6 +34,11 @@ msgstr ""
 msgctxt "#32030"
 msgid "Version :"
 msgstr "Version :"
+
+msgctxt "#32031"
+msgid "Welcome to the most simple Squeeze Box Display : Kodi Jivelette"
+msgstr "Bienvenue dans l'afficheur SqueezeBox : Kodi Jivelette"
+
 
 # labels des menus :
 
