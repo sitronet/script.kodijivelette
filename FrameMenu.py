@@ -2032,7 +2032,7 @@ class fenetreMenu(pyxbmct.AddonFullWindow):
                     xbmc.log('Titre : ' + titre + ' - Titre_index_O : ' + Titre_of_index_0 , xbmc.LOGNOTICE)
                     if not Titre_of_index_0 == titre :
                         self.frameRandomPlay.listMenu_playlist.reset()
-                        Titre_of_index_0 =  Titre
+                        Titre_of_index_0 =  titre
 
                 tracktampon = xbmcgui.ListItem()
                 tracktampon.setLabel(titre)
