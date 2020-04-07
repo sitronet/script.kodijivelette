@@ -68,6 +68,16 @@ if Kodi:
     ACTION_MOUSE_LEFT_CLICK = 100
     """Mouse click"""
 
+
+    ACTION_PAUSE = 12
+    ACTION_PLAY = 68
+    ACTION_PLAYER_PLAY = 79
+
+    ACTION_VOLAMP_DOWN = 94
+    ACTION_VOLAMP_UP = 93
+    ACTION_VOLUME_DOWN = 89
+    ACTION_VOLUME_UP = 88
+
     TIME_OF_LOOP_SUBSCRIBE = Ecoute.TIME_OF_LOOP_SUBSCRIBE
 
 TAGS = 'aCdejJKlstuwxy'
@@ -248,10 +258,25 @@ class PlaylistPlugin(pyxbmct.AddonFullWindow):
             xbmc.log('Previous_menu' , xbmc.LOGNOTICE)
             self.mustQuit = True
             self.quit_listing()
+
         elif action == ACTION_NAV_BACK:
             xbmc.log('nav_back' , xbmc.LOGNOTICE)
             self.mustQuit = True
             self.quit_listing()
+
+        elif action == ACTION_PAUSE:  # currently it's the space on my keyboard
+            xbmc.log('Action Pause', xbmc.LOGNOTICE)
+            self.pause_play()
+
+        elif action == ACTION_PLAY or action == ACTION_PLAYER_PLAY:
+            xbmc.log('Action Play', xbmc.LOGNOTICE)
+            self.pause_play()
+
+        elif action == ACTION_VOLUME_UP:
+            self.setVolume('UP')
+        elif action == ACTION_VOLUME_DOWN:
+            self.setVolume('DOWN')
+
         else:
             xbmc.log('else condition onAction' , xbmc.LOGNOTICE)
             self._executeConnected(action, self.actions_connected)
@@ -271,6 +296,67 @@ class PlaylistPlugin(pyxbmct.AddonFullWindow):
     def exit_this_frame(self):
         self.mustQuit = True
         self.quit_listing()
+
+    def pause_play(self):
+        self.get_playerid()
+        self.get_ident_server()
+        self.connectInterface()
+
+        if not self.flagStatePause:
+            self.bouton_pause.setVisible(True)
+            self.flagStatePause = True
+            requete = self.playerid + ' pause 1'
+            self.InterfaceCLI.sendtoCLISomething(requete)
+            reponse = self.InterfaceCLI.receptionReponseEtDecodage()
+            del reponse
+
+        else:
+
+            requete = self.playerid + ' pause 0'
+            self.InterfaceCLI.sendtoCLISomething(requete)
+            reponse = self.InterfaceCLI.receptionReponseEtDecodage()
+            if 'pause' in reponse:
+                self.bouton_pause.setVisible(False)
+                self.flagStatePause = False
+            del reponse
+
+    def futureFunction(self):
+        pass
+
+    def setVolume(self, UpOrDown):
+
+
+        # need to know the actual volume in percent
+        self.get_playerid()
+        self.get_ident_server()
+        self.connectInterface()
+        requete = self.playerid + ' mixer volume ?'
+        self.InterfaceCLI.sendtoCLISomething(requete)
+        reponse = self.InterfaceCLI.receptionReponseEtDecodage()
+        temp = reponse.split('volume|')
+        volumePercent = float(temp[1])
+        self.slider_volume.setPercent(volumePercent)
+        self.label_volume.setLabel('Volume on ' + self.playerid + ' - - -  ' + str(volumePercent) + ' %')
+
+        self.label_volume.setVisible(True)
+        self.slider_volume.setVisible(True)
+
+        if UpOrDown == 'UP':
+            volumePercent = volumePercent + 5.
+            if volumePercent >= 100:
+                volumePercent = 100
+
+        elif UpOrDown == 'DOWN':
+            volumePercent = volumePercent - 5.
+            if volumePercent < 0 :
+                volumePercent = 0
+        else:
+            pass
+        requete = self.playerid + ' mixer volume ' + str(volumePercent)
+        self.InterfaceCLI.sendtoCLISomething(requete)
+        reponse = self.InterfaceCLI.receptionReponseEtDecodage()
+        self.slider_volume.setPercent(volumePercent)
+
 
 
     def set_navigation(self):
