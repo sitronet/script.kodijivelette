@@ -1034,7 +1034,7 @@ class fenetreMenu(pyxbmct.AddonFullWindow):
         reponse = self.InterfaceCLI.receptionReponseEtDecodage()
 
         self.Abonnement.set()
-        self.frameRandomPlay = FramePlaylist.PlaylistPlugin( translation( 32040 , 'Now playing ')  + title)
+        self.frameRandomPlay = FramePlaylist.PlaylistPlugin( translation( 32040 , 'Now playing ') + ' : '  + title)
         self.frameRandomPlay.show()
         self.frameRandomPlay.listMenu_playlist.reset()
         self.update_random_mix_Playlist()
@@ -2017,7 +2017,7 @@ class fenetreMenu(pyxbmct.AddonFullWindow):
 
             playlistatraiter = listedechamps[1:]
             xbmc.log('playlist à traiter : ' + str(playlistatraiter), xbmc.LOGNOTICE)
-
+            self.frameRandomPlay.listMenu_playlist.reset()
             for champs in playlistatraiter:
                 xbmc.log('champs : ' + str(champs), xbmc.LOGNOTICE)
 
@@ -2042,9 +2042,9 @@ class fenetreMenu(pyxbmct.AddonFullWindow):
                 xbmc.log(' jivelette.threadRunning is not True ', xbmc.LOGNOTICE)
                 self.Abonnement.clear()
 
-            if not old_current_index_title == playlist_current_index_title:
-                self.frameRandomPlay.listMenu_playlist.selectItem(int(playlist_current_index_title))
-                old_current_index_title = playlist_current_index_title
+            #if not old_current_index_title == playlist_current_index_title:
+            self.frameRandomPlay.listMenu_playlist.selectItem(int(playlist_current_index_title))
+            old_current_index_title = playlist_current_index_title
 
             self.InterfaceCLI.sendtoCLISomething('album ?')
             reponse = self.InterfaceCLI.receptionReponseEtDecodage()
