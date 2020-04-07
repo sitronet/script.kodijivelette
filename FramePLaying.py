@@ -180,19 +180,19 @@ class SlimIsPlaying(pyxbmct.AddonFullWindow):
         # title of radio , apps songs ...
         self.labeltitre_1 = pyxbmct.FadeLabel( font= 'font50caps_title' , textColor ='0xFF888888' )
         self.placeControl(self.labeltitre_1,  8 , 4 , 3 , 27 )
-        self.labeltitre_1.addLabel('title one')
+        self.labeltitre_1.addLabel('')
 
         self.labeltitre_2 = pyxbmct.FadeLabel( font = 'font13', textColor ='0xFF888888' )
         self.placeControl(self.labeltitre_2, 12 , 4 , 2 , 27 )
-        self.labeltitre_1.addLabel('title two')
+        self.labeltitre_1.addLabel('')
 
         self.labelAlbum = pyxbmct.FadeLabel( font = 'font13', textColor ='0xFF888888' )
         self.placeControl(self.labelAlbum, 14 , 4 , 2 , 27 )
-        self.labelAlbum.addLabel('Album')
+        self.labelAlbum.addLabel('')
 
         self.labelArtist = pyxbmct.FadeLabel( font = 'font13', textColor ='0xFF888888' )
         self.placeControl(self.labelArtist, 16 , 4 , 2 , 27 )
-        self.labelArtist.addLabel('Artist')
+        self.labelArtist.addLabel('')
 
         # la boite de texte 2 carrés de large sur 8 de hauteur (test avec 3 -> pas assez d'espace)
         # attention qu'elle ne chevauche pas la playerbox
