@@ -125,9 +125,12 @@ class InterfaceCLIduLMS(threading.Thread):
         '''
         chunks = []
         bytes_recd = 0
-        chunk = self.socketdeConnexion.recv(32768)   # atatention si reset connexion -> bug faire un try todo
-        # taille buffer was 2048 not enougth ?8192 ?
-        xbmc.log(b'reponse brute du serveur LMS : ' + chunk , xbmc.LOGDEBUG)
+        try:
+            chunk = self.socketdeConnexion.recv(32768)   # Attention si reset connexion catch exception
+            # taille buffer was 2048 not enougth ?8192 ?
+            xbmc.log(b'reponse brute du serveur LMS : ' + chunk, xbmc.LOGDEBUG)
+        except:
+            xbmc.log('Exception sur réponse du serveur', xbmc.LOGNOTICE)
         return chunk
 
     def SignalAUnConsommateurDataRecu(self):
