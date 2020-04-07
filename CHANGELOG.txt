@@ -1,3 +1,9 @@
+Version 0.0.d :
+Correction bug si timeout dans ConnectionClient.py :
+    lors d'un time out -> Exception , pose d'un catch exception
+Modification de label (welcome and init : informationLabel) -> AlignementCenter
+
+
 --------------------------------------------------------------
 Version 0.0.c :
 - Add translation for French and English_US and en_GB language to the root and mains Menus
