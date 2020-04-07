@@ -1,3 +1,7 @@
+Version 0.0.e :
+Ajout artwork to the itemlist for the Random mix
+
+--------------------------------------------------------------
 Version 0.0.d :
 Correction bug si timeout dans ConnectionClient.py :
     lors d'un time out -> Exception , pose d'un catch exception
