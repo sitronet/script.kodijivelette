@@ -200,15 +200,15 @@ class PlaylistPlugin(pyxbmct.AddonFullWindow):
         self.placeControl(control=self.labelduree_fin,row= ligneButton - 4 , column=int( SEIZE /2 + 25), rowspan=2 ,columnspan= 3 , pad_x = 5 , pad_y = 5 )
 
         self.labelAlbum = pyxbmct.FadeLabel(font='font13', textColor='0xFF888888')
-        self.placeControl(self.labelAlbum, row=ligneButton - 3 , column= int( SEIZE /2 ) , rowspan= 1, columnspan=27)
+        self.placeControl(self.labelAlbum, row=ligneButton - 2 , column= int( SEIZE /2 ) , rowspan= 1, columnspan=27)
         self.labelAlbum.addLabel('Album')
 
         self.labelArtist = pyxbmct.FadeLabel(font='font13', textColor='0xFF888888')
-        self.placeControl(self.labelArtist, row=ligneButton - 2 , column= int( SEIZE /2 ) , rowspan= 1, columnspan=27)
+        self.placeControl(self.labelArtist, row=ligneButton - 1 , column= int( SEIZE /2 ) , rowspan= 1, columnspan=27)
         self.labelArtist.addLabel('Artist')
 
         self.labelTitle = pyxbmct.FadeLabel(font='font13', textColor='0xFF888888')
-        self.placeControl(self.labelTitle, row=ligneButton - 1 , column= int( SEIZE /2 ) , rowspan= 1, columnspan=27)
+        self.placeControl(self.labelTitle, row=ligneButton - 0 , column= int( SEIZE /2 ) , rowspan= 1, columnspan=27)
         self.labelTitle.addLabel('Title')
 
     def controlMenus(self):
