@@ -2026,9 +2026,11 @@ class fenetreMenu(pyxbmct.AddonFullWindow):
                 titre = champs[indexdeTitre + 7:]
                 track_id = champs[indexdeID + 4: indexdeTitre]
                 playlist_index = champs[0: indexdeID]
+                xbmc.log('index : ' + playlist_index, xbmc.LOGNOTICE)
 
-                if playlist_index == 0 :
-                    if not Titre_of_index_0 == Titre :
+                if playlist_index == '0' :
+                    xbmc.log('Titre : ' + titre + ' - Titre_index_O : ' + Titre_of_index_0 , xbmc.LOGNOTICE)
+                    if not Titre_of_index_0 == titre :
                         self.frameRandomPlay.listMenu_playlist.reset()
                         Titre_of_index_0 =  Titre
 
