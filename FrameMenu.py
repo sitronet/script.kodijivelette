@@ -1945,7 +1945,7 @@ class fenetreMenu(pyxbmct.AddonFullWindow):
         self.frameRandomPlay.update_coverbox(lmsip=self.lmsip, lmswebport=self.lmswebport, playerid=self.playerid,
                                              compteur=compteur)
         old_current_index_title = ''
-
+        Titre_of_index_0 = "absolutely_Nothing_Here,I_guess_this_title_does_not_really_exists"
         while self.Abonnement.is_set():
             if xbmc.Monitor().waitForAbort(0.5):
                 self.Abonnement.clear()
@@ -2017,7 +2017,7 @@ class fenetreMenu(pyxbmct.AddonFullWindow):
 
             playlistatraiter = listedechamps[1:]
             xbmc.log('playlist à traiter : ' + str(playlistatraiter), xbmc.LOGNOTICE)
-            self.frameRandomPlay.listMenu_playlist.reset()
+
             for champs in playlistatraiter:
                 xbmc.log('champs : ' + str(champs), xbmc.LOGNOTICE)
 
@@ -2026,10 +2026,17 @@ class fenetreMenu(pyxbmct.AddonFullWindow):
                 titre = champs[indexdeTitre + 7:]
                 track_id = champs[indexdeID + 4: indexdeTitre]
                 playlist_index = champs[0: indexdeID]
+
+                if playlist_index == 0 :
+                    if not Titre_of_index_0 == Titre :
+                        self.frameRandomPlay.listMenu_playlist.reset()
+                        Titre_of_index_0 =  Titre
+
                 tracktampon = xbmcgui.ListItem()
                 tracktampon.setLabel(titre)
                 tracktampon.setProperty('track_id', track_id)
                 tracktampon.setProperty('index', playlist_index)
+
                 try:
                     dejaexistant = self.frameRandomPlay.listMenu_playlist.getListItem(int(playlist_index))
                 except RuntimeError:
@@ -2042,9 +2049,9 @@ class fenetreMenu(pyxbmct.AddonFullWindow):
                 xbmc.log(' jivelette.threadRunning is not True ', xbmc.LOGNOTICE)
                 self.Abonnement.clear()
 
-            #if not old_current_index_title == playlist_current_index_title:
-            self.frameRandomPlay.listMenu_playlist.selectItem(int(playlist_current_index_title))
-            old_current_index_title = playlist_current_index_title
+            if not old_current_index_title == playlist_current_index_title:
+                self.frameRandomPlay.listMenu_playlist.selectItem(int(playlist_current_index_title))
+                old_current_index_title = playlist_current_index_title
 
             self.InterfaceCLI.sendtoCLISomething('album ?')
             reponse = self.InterfaceCLI.receptionReponseEtDecodage()
