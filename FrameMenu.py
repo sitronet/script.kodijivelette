@@ -2043,7 +2043,7 @@ class fenetreMenu(pyxbmct.AddonFullWindow):
                     dejaexistant = self.frameRandomPlay.listMenu_playlist.getListItem(int(playlist_index))
                 except RuntimeError:
                     # dont exist so add it in the list and try to get some more info about song
-                    nameOfFileArtwork = self.get_artwork(track_id)
+                    nameOfFileArtwork = self.get_artwork(index , track_id)
                     tracktampon.setArt({'thumb': nameOfFileArtwork})
                     self.frameRandomPlay.listMenu_playlist.addItem(tracktampon)
                     # put again the playing item because lost by addItem
@@ -2092,7 +2092,7 @@ class fenetreMenu(pyxbmct.AddonFullWindow):
     def les_menus_feuilles_Extras(self, numeroItemSelectionBranche):
         self.functionNotYetImplemented((self.listMenu_Feuilles))
 
-    def get_artwork(self, artwork_track_id):
+    def get_artwork(self, index , artwork_track_id):
         '''
                 fetch the image artwork  or icon from server or somewhere in tne net
                 and store it in a temporay directory .
