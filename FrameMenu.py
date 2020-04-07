@@ -1955,99 +1955,103 @@ class fenetreMenu(pyxbmct.AddonFullWindow):
                                                  playerid=self.playerid, compteur=compteur)
 
             reponse = self.InterfaceCLI.receptionReponseEtDecodage()
-            entete , atraiter = reponse.split('subscribe:' +  TIME_OF_LOOP_SUBSCRIBE + '|')
-            '''
-            exemple :
-            00:04:20:17:1c:44|status|0|100|subscribe:10|player_name:Squeezebox Receiver|player_connected:1|
-            player_ip:192.168.1.17:31021|power:1|signalstrength:96|mode:play|time:150.337900035858|rate:1|
-            duration:888.555|can_seek:1|mixer volume:81|playlist repeat:0|playlist shuffle:0|playlist mode:off|
-            seq_no:0|
-            playlist_cur_index:2|
-            playlist_timestamp:1577823454.11438|playlist_tracks:13|
-            digital_volume_control:1|
-            playlist index:0|id:9663|title:Chesky / Atmosphere|
-            playlist index:1|id:7843|title:Fly Away|
-            playlist index:2|id:10850|title:Track 2|
-            playlist index:3|id:14972|title:Skin O' My Teeth|
-            playlist index:4|id:27085|title:With My Own Two Hands (Feat. Ben Harper)|
-            playlist index:5|id:8648|title:Sonata No.7 in D major, op.10 no.3 - IV. Rondo. Allegro|
-            playlist index:6|id:14743|title:Breadfan|
-            playlist index:7|id:7426|title:Idylle anglo-normande|
-            playlist index:8|id:9861|title:Wolfgang Amadeus Mozart - Krânungsmesse (K. 317) - Agnus Dei|
-            playlist index:9|id:27812|title:My Baby Wants to Rock & Roll|
-            playlist index:10|id:19598|title:Santiano|
-            playlist index:11|id:8286|title:Chill Out (Things Gonna Change)|
-            playlist index:12|id:6011|title:A toutes les filles
-            '''
-
-            indexdecurrentTitle = atraiter.find('cur_index:')
-            indexFincurrentTitle = atraiter.find('|', indexdecurrentTitle)
-            playlist_current_index_title = atraiter[indexdecurrentTitle + 10: indexFincurrentTitle]
-            xbmc.log('current_index_title :' + playlist_current_index_title, xbmc.LOGNOTICE)
-            listedechamps = atraiter.split('|playlist index:')
-            # traiter d'abord les temps :
-            listeRetour = listedechamps[0].split('|')  # on obtient une liste des items
-            dico = dict()  # pour chaque élement de la liste sous la forme <val1>:<val2>
-            for x in listeRetour:  # on la place dans un dictionnaire
-                c = x.split(':')  # sous la forme  key: value et <val1> devient la key
-                clef = c[0]
-                dico[clef] = c[1]  # ensuite on pourra piocher dans le dico la valeur
-
             try:
-                pourcentagedureejouee = 100 * float(dico['time']) / float(dico['duration'])
-                xbmc.log('percent duree : ' + str(pourcentagedureejouee) + ' - time: ' + dico['time'],
-                         xbmc.LOGNOTICE)
-            except KeyError:
-                pourcentagedureejouee = 0
+                entete , atraiter = reponse.split('subscribe:' +  TIME_OF_LOOP_SUBSCRIBE + '|')
 
-            try:
-                self.frameRandomPlay.slider_duration.setPercent(pourcentagedureejouee)
-            except KeyError:
-                pass
+                '''
+                exemple :
+                00:04:20:17:1c:44|status|0|100|subscribe:10|player_name:Squeezebox Receiver|player_connected:1|
+                player_ip:192.168.1.17:31021|power:1|signalstrength:96|mode:play|time:150.337900035858|rate:1|
+                duration:888.555|can_seek:1|mixer volume:81|playlist repeat:0|playlist shuffle:0|playlist mode:off|
+                seq_no:0|
+                playlist_cur_index:2|
+                playlist_timestamp:1577823454.11438|playlist_tracks:13|
+                digital_volume_control:1|
+                playlist index:0|id:9663|title:Chesky / Atmosphere|
+                playlist index:1|id:7843|title:Fly Away|
+                playlist index:2|id:10850|title:Track 2|
+                playlist index:3|id:14972|title:Skin O' My Teeth|
+                playlist index:4|id:27085|title:With My Own Two Hands (Feat. Ben Harper)|
+                playlist index:5|id:8648|title:Sonata No.7 in D major, op.10 no.3 - IV. Rondo. Allegro|
+                playlist index:6|id:14743|title:Breadfan|
+                playlist index:7|id:7426|title:Idylle anglo-normande|
+                playlist index:8|id:9861|title:Wolfgang Amadeus Mozart - Krânungsmesse (K. 317) - Agnus Dei|
+                playlist index:9|id:27812|title:My Baby Wants to Rock & Roll|
+                playlist index:10|id:19598|title:Santiano|
+                playlist index:11|id:8286|title:Chill Out (Things Gonna Change)|
+                playlist index:12|id:6011|title:A toutes les filles
+                '''
 
-            try:
-                self.frameRandomPlay.labelduree_jouee.setLabel(label=outils.getInHMS(dico['time']))
-            except KeyError:
-                pass
-
-            try:
-                self.frameRandomPlay.labelduree_fin.setLabel(label=outils.getInHMS(dico['duration']))
-            except KeyError:
-                self.frameRandomPlay.labelduree_fin.setLabel(label=outils.getInHMS(0.0))
-
-            playlistatraiter = listedechamps[1:]
-            xbmc.log('playlist à traiter : ' + str(playlistatraiter), xbmc.LOGNOTICE)
-
-            for champs in playlistatraiter:
-                xbmc.log('champs : ' + str(champs), xbmc.LOGNOTICE)
-
-                indexdeID = champs.find('|id:')
-                indexdeTitre = champs.find('|title:')
-                titre = champs[indexdeTitre + 7:]
-                track_id = champs[indexdeID + 4: indexdeTitre]
-                playlist_index = champs[0: indexdeID]
-                xbmc.log('index : ' + playlist_index, xbmc.LOGNOTICE)
-
-                if playlist_index == '0' :
-                    xbmc.log('Titre : ' + titre + ' - Titre_index_O : ' + Titre_of_index_0 , xbmc.LOGNOTICE)
-                    if not Titre_of_index_0 == titre :
-                        self.frameRandomPlay.listMenu_playlist.reset()
-                        Titre_of_index_0 =  titre
-
-                tracktampon = xbmcgui.ListItem()
-                tracktampon.setLabel(titre)
-                tracktampon.setProperty('track_id', track_id)
-                tracktampon.setProperty('index', playlist_index)
+                indexdecurrentTitle = atraiter.find('cur_index:')
+                indexFincurrentTitle = atraiter.find('|', indexdecurrentTitle)
+                playlist_current_index_title = atraiter[indexdecurrentTitle + 10: indexFincurrentTitle]
+                xbmc.log('current_index_title :' + playlist_current_index_title, xbmc.LOGNOTICE)
+                listedechamps = atraiter.split('|playlist index:')
+                # traiter d'abord les temps :
+                listeRetour = listedechamps[0].split('|')  # on obtient une liste des items
+                dico = dict()  # pour chaque élement de la liste sous la forme <val1>:<val2>
+                for x in listeRetour:  # on la place dans un dictionnaire
+                    c = x.split(':')  # sous la forme  key: value et <val1> devient la key
+                    clef = c[0]
+                    dico[clef] = c[1]  # ensuite on pourra piocher dans le dico la valeur
 
                 try:
-                    dejaexistant = self.frameRandomPlay.listMenu_playlist.getListItem(int(playlist_index))
-                except RuntimeError:
-                    # dont exist so add it in the list and try to get some more info about song
-                    nameOfFileArtwork = self.get_artwork(playlist_index , track_id)
-                    tracktampon.setArt({'thumb': nameOfFileArtwork})
-                    self.frameRandomPlay.listMenu_playlist.addItem(tracktampon)
-                    # put again the playing item because lost by addItem
-                    self.frameRandomPlay.listMenu_playlist.selectItem(int(playlist_current_index_title))
+                    pourcentagedureejouee = 100 * float(dico['time']) / float(dico['duration'])
+                    xbmc.log('percent duree : ' + str(pourcentagedureejouee) + ' - time: ' + dico['time'],
+                             xbmc.LOGNOTICE)
+                except KeyError:
+                    pourcentagedureejouee = 0
+
+                try:
+                    self.frameRandomPlay.slider_duration.setPercent(pourcentagedureejouee)
+                except KeyError:
+                    pass
+
+                try:
+                    self.frameRandomPlay.labelduree_jouee.setLabel(label=outils.getInHMS(dico['time']))
+                except KeyError:
+                    pass
+
+                try:
+                    self.frameRandomPlay.labelduree_fin.setLabel(label=outils.getInHMS(dico['duration']))
+                except KeyError:
+                    self.frameRandomPlay.labelduree_fin.setLabel(label=outils.getInHMS(0.0))
+
+                playlistatraiter = listedechamps[1:]
+                xbmc.log('playlist à traiter : ' + str(playlistatraiter), xbmc.LOGNOTICE)
+
+                for champs in playlistatraiter:
+                    xbmc.log('champs : ' + str(champs), xbmc.LOGNOTICE)
+
+                    indexdeID = champs.find('|id:')
+                    indexdeTitre = champs.find('|title:')
+                    titre = champs[indexdeTitre + 7:]
+                    track_id = champs[indexdeID + 4: indexdeTitre]
+                    playlist_index = champs[0: indexdeID]
+                    xbmc.log('index : ' + playlist_index, xbmc.LOGNOTICE)
+
+                    if playlist_index == '0' :
+                        xbmc.log('Titre : ' + titre + ' - Titre_index_O : ' + Titre_of_index_0 , xbmc.LOGNOTICE)
+                        if not Titre_of_index_0 == titre :
+                            self.frameRandomPlay.listMenu_playlist.reset()
+                            Titre_of_index_0 =  titre
+
+                    tracktampon = xbmcgui.ListItem()
+                    tracktampon.setLabel(titre)
+                    tracktampon.setProperty('track_id', track_id)
+                    tracktampon.setProperty('index', playlist_index)
+
+                    try:
+                        dejaexistant = self.frameRandomPlay.listMenu_playlist.getListItem(int(playlist_index))
+                    except RuntimeError:
+                        # dont exist so add it in the list and try to get some more info about song
+                        nameOfFileArtwork = self.get_artwork(playlist_index , track_id)
+                        tracktampon.setArt({'thumb': nameOfFileArtwork})
+                        self.frameRandomPlay.listMenu_playlist.addItem(tracktampon)
+                        # put again the playing item because lost by addItem
+                        self.frameRandomPlay.listMenu_playlist.selectItem(int(playlist_current_index_title))
+            except ValueError:
+                pass
 
             if not self.frameRandomPlay.threadRunning:
                 xbmc.log(' jivelette.threadRunning is not True ', xbmc.LOGNOTICE)
