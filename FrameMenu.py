@@ -60,8 +60,8 @@ if Kodi:
     # screen 16:9 so to have grid square fix to 16-9 on 1280 x 720 max of pyxbmct
     SIZE_WIDTH_pyxbmct = 1280
     SIZE_HEIGHT_pyxbmct = 720
-    SEIZE = 16 * 4  #32 16 option
-    NEUF =   9 * 4  #18 or 9
+    self.SEIZE = 16 * 4  #32 16 option
+    self.NEUF =   9 * 4  #18 or 9
 
     #savepath = '/tmp/'
     savepath = xbmc.translatePath('special://temp')
@@ -364,12 +364,12 @@ class fenetreMenu(pyxbmct.AddonFullWindow):
             self.screeny = SIZE_HEIGHT_pyxbmct
 
         #pyxbmct :
-        self.setGeometry(self.screenx  , self.screeny , NEUF, SEIZE)
+        self.setGeometry(self.screenx  , self.screeny , self.NEUF, self.SEIZE)
         xbmc.log('Size of Frame Menu fix to : ' + str(self.screenx) + ' x ' + str(self.screeny), xbmc.LOGNOTICE)
 
         # sizecover must be  a square
         #SIZECOVER_X  = int(self.GRIDSCREEN_X * 2.5)  # need to ask artWork size from server, adapt to the size screen
-        SIZECOVER_X = int(self.screenx / SEIZE * 28 )
+        SIZECOVER_X = int(self.screenx / self.SEIZE * 28 )
         self.sizecover_x = SIZECOVER_X
         #SIZECOVER_Y = self.GRIDSCREEN_Y * 3  # and reserve a sized frame to covers,attention SIZECOVER_X != SIZECOVER_Y
         xbmc.log('Taille pochette : ' + str(SIZECOVER_X) + ' x ' + str(SIZECOVER_X) , xbmc.LOGNOTICE)
@@ -394,26 +394,26 @@ class fenetreMenu(pyxbmct.AddonFullWindow):
         # button pause :
         self.bouton_pause = pyxbmct.Button(label='', focusTexture=self.image_button_pause,
                                            noFocusTexture=self.image_button_pause)
-        self.placeControl(control=self.bouton_pause, row=NEUF / 2, column=int(SEIZE / 2) - 5, rowspan=6, columnspan=6)
+        self.placeControl(control=self.bouton_pause, row=self.NEUF / 2, column=int(self.SEIZE / 2) - 5, rowspan=6, columnspan=6)
         self.bouton_pause.setVisible(False)
         self.bouton_play = pyxbmct.Button(label='', focusTexture=self.image_button_play, noFocusTexture='')
-        self.placeControl(self.bouton_play, row=NEUF / 2, column=(SEIZE / 2) - 2, rowspan=6, columnspan=6)
+        self.placeControl(self.bouton_play, row=self.NEUF / 2, column=(self.SEIZE / 2) - 2, rowspan=6, columnspan=6)
         self.bouton_play.setVisible(False)
 
         # Slider Volume :
         self.label_volume = pyxbmct.Label('', alignment=pyxbmct.ALIGN_CENTER)
-        self.placeControl(control=self.label_volume, row=(NEUF / 2) - 2, column=(SEIZE / 2) - 15, rowspan=2,
+        self.placeControl(control=self.label_volume, row=(self.NEUF / 2) - 2, column=(self.SEIZE / 2) - 15, rowspan=2,
                           columnspan=30)
         self.slider_volume = pyxbmct.Slider(textureback=self.textureback_slider_volume,
                                             texture=self.texture_slider_volume,
                                             texturefocus=self.textureback_slider_volume, orientation=xbmcgui.HORIZONTAL)
-        self.placeControl(control=self.slider_volume, row=NEUF / 2, column=(SEIZE / 2) - 15, rowspan=3, columnspan=30)
+        self.placeControl(control=self.slider_volume, row=self.NEUF / 2, column=(self.SEIZE / 2) - 15, rowspan=3, columnspan=30)
         self.label_volume.setVisible(False)
         self.slider_volume.setVisible(False)
 
         # future
         self.label_ContextFuture = pyxbmct.Label('', textColor='0xFF808080')
-        self.placeControl(self.label_ContextFuture, NEUF / 2, (SEIZE / 2) - espace_col, 3 * espace_row, espace_col * 2)
+        self.placeControl(self.label_ContextFuture, self.NEUF / 2, (self.SEIZE / 2) - self.espace_col, 3 * self.espace_row, self.espace_col * 2)
         self.label_ContextFuture.setVisible(False)
 
 
@@ -479,7 +479,7 @@ class fenetreMenu(pyxbmct.AddonFullWindow):
         '''
 
 
-        ligneLabel= NEUF - 1
+        ligneLabel= self.NEUF - 1
         #label pour indiquer les items sélectionnés dans la hiérarchie des menus, permet aussi de tester la navigation
         self.list_racine_label = pyxbmct.Label('', textColor='0xFF808080')
         self.placeControl(self.list_racine_label, ligneLabel, 2, 1 , 10)
@@ -494,14 +494,14 @@ class fenetreMenu(pyxbmct.AddonFullWindow):
         self.placeControl(self.list_item_fleur_label, ligneLabel, 34, 1, 20)
 
         self.Information_label = pyxbmct.Label('', textColor='0xFF808888')
-        self.placeControl(self.Information_label, (NEUF / 2) - 5 , ( SEIZE / 2 )- 10 , 1 , 20  )
+        self.placeControl(self.Information_label, (self.NEUF / 2) - 5 , ( self.SEIZE / 2 )- 10 , 1 , 20  )
 
 
         row_depart = 1
-        espace_row = 30
-        espace_col = 10
+        self.espace_row = 30
+        self.espace_col = 10
         hauteur_menu = 25
-        col_depart_menu_branche = espace_col + 1
+        col_depart_menu_branche = self.espace_col + 1
         row_hauteur_menu_branche = 30
         col_largeur_menu_branche = 15
         col_depart_menu_feuille = col_depart_menu_branche + col_largeur_menu_branche + 2
@@ -510,9 +510,9 @@ class fenetreMenu(pyxbmct.AddonFullWindow):
 
         # init
         
-        self.placeControl(self.listMenu_Initialisation,  NEUF / 2  ,  (SEIZE / 2 ) - espace_col  , espace_row, espace_col * 2 )
+        self.placeControl(self.listMenu_Initialisation,  self.NEUF / 2  ,  (self.SEIZE / 2 ) - self.espace_col  , self.espace_row, self.espace_col * 2 )
 
-        self.placeControl(self.listMenu_Racine , row_depart , 0, espace_row, espace_col)
+        self.placeControl(self.listMenu_Racine , row_depart , 0, self.espace_row, self.espace_col)
 
         # Add items to the list
         self.listMenu_Initialisation.addItems(self.ListePourInitialisationServerPlayers)
@@ -1174,10 +1174,10 @@ class fenetreMenu(pyxbmct.AddonFullWindow):
         '''
         # rappel des valeurs pour positionnement
         row_depart = 1
-        espace_row = 20
-        espace_col = 10
+        self.espace_row = 20
+        self.espace_col = 10
         hauteur_menu = 25
-        col_depart_menu_branche = espace_col + 1
+        col_depart_menu_branche = self.espace_col + 1
         row_hauteur_menu_branche = 30
         col_largeur_menu_branche = 15
         # Update list_item label when navigating through the list.
