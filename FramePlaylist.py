@@ -199,17 +199,17 @@ class PlaylistPlugin(pyxbmct.AddonFullWindow):
         self.labelduree_fin = pyxbmct.Label('')
         self.placeControl(control=self.labelduree_fin,row= ligneButton - 4 , column=int( SEIZE /2 + 25), rowspan=2 ,columnspan= 3 , pad_x = 5 , pad_y = 5 )
 
-        self.labelAlbum = pyxbmct.FadeLabel(font='font13', textColor='0xFF888888', alignment=pyxbmct.ALIGN_CENTER)
+        self.labelAlbum = pyxbmct.Label(font='font13', textColor='0xFF888888', alignment=pyxbmct.ALIGN_CENTER)
         self.placeControl(self.labelAlbum, row=ligneButton - 2 , column= int( SEIZE /2 ) , rowspan= 1, columnspan=27)
-        self.labelAlbum.addLabel('Album')
+        self.labelAlbum.setLabel('Album')
 
-        self.labelArtist = pyxbmct.FadeLabel(font='font13', textColor='0xFF888888', alignment=pyxbmct.ALIGN_CENTER)
+        self.labelArtist = pyxbmct.Label(font='font13', textColor='0xFF888888', alignment=pyxbmct.ALIGN_CENTER)
         self.placeControl(self.labelArtist, row=ligneButton - 1 , column= int( SEIZE /2 ) , rowspan= 1, columnspan=27)
-        self.labelArtist.addLabel('Artist')
+        self.labelArtist.setLabel('Artist')
 
-        self.labelTitle = pyxbmct.FadeLabel(font='font13', textColor='0xFF888888', alignment=pyxbmct.ALIGN_CENTER)
+        self.labelTitle = pyxbmct.Label(font='font13', textColor='0xFF888888', alignment=pyxbmct.ALIGN_CENTER)
         self.placeControl(self.labelTitle, row=ligneButton - 0 , column= int( SEIZE /2 ) , rowspan= 1, columnspan=27)
-        self.labelTitle.addLabel('Title')
+        self.labelTitle.setLabel('Title')
 
     def controlMenus(self):
         ''' Fix the size of itemlists in menus lists'''
