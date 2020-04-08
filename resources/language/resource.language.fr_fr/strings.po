@@ -17,6 +17,9 @@ msgstr ""
 
 #settings labels
 
+msgctxt "#32001"
+msgid "Home"
+msgstr "Accueil"
 
 
 msgctxt "#32010"
