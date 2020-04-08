@@ -359,6 +359,7 @@ class WhatAreThePlayers():  # pas utilisé , ou cela va servir ?
 
     def __init__(self):
         self.listePlayers = []
+        self.playerSelection = ''
 
     def combienDePlayers(self):
         pass
@@ -516,6 +517,7 @@ class WhatAreThePlayers():  # pas utilisé , ou cela va servir ?
         mais non pas bon -> en fait si connecté
         et si non actif passer par la fonction activeRplayer
         et si rien de jouer passer par la fonction jouerPlayer
+        Todo : revoir une fois le player selectionnée dans le menu principal
         :param dictionnairedesPlayers:
         :return:
         '''
@@ -545,7 +547,12 @@ class WhatAreThePlayers():  # pas utilisé , ou cela va servir ?
 
     def get_unplayeractif(self):
         xbmc.log('request of one player :  ' + str(self.unplayeractif) ,xbmc.LOGNOTICE)
-        return self.unplayeractif
+        if self.playerSelection:
+            # this one must be selected by the user in the beginning of the program
+            return self.playerSelection
+        else:   # in case the player selected is empty we return an other one.
+                # this case must not happen, but we never know a wrong program....
+            return self.unplayeractif
 
     def activerPlayer(self):
         '''
