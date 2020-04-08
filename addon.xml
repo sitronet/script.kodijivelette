@@ -26,10 +26,10 @@
 		<platform>all</platform>
 
 		<assets>
-			<fanart>resources/skins/media/icon.png</fanart>
-          	<screenshot>docs/screenshots/screenshot-01.png</screenshot>
-          	<screenshot>docs/screenshots/screenshot-02.png</screenshot>
-          	<screenshot>docs/screenshots/screenshot-03.png</screenshot>
+			<fanart>resources/skins/Default/media/icon.png</fanart>
+          	<screenshot>docs/screenshots/screenshot001.png</screenshot>
+          	<screenshot>docs/screenshots/screenshot002.png</screenshot>
+          	<screenshot>docs/screenshots/screenshot003.png</screenshot>
         </assets>
 
 	</extension>
