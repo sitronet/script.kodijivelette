@@ -6,7 +6,6 @@
 
 '''
 
-
 global Kodi
 Kodi = True
 
@@ -33,23 +32,33 @@ if Kodi:
     ADDONVERSION = ADDON.getAddonInfo('version')
     ARTWORK = xbmc.translatePath(os.path.join(ADDON.getAddonInfo('path'), 'resources', 'skins', 'Default', 'media'))
 
-
-
-
 import FrameMenu
 
+#__language__ = xbmc.Language(os.getcwd()).getLocalizedString
+__settings__ = xbmcaddon.Addon(id=ADDONID)
+__language__ = __settings__.getLocalizedString
 
+
+def translation(message_id, default=False):
+    try:
+        if not __language__(message_id) and default:
+            # xbmc.log('language default', xbmc.LOGNOTICE)
+            xbmc.log('traduction absente : ' + str(message_id), xbmc.LOGNOTICE)
+            return default
+        xbmc.log('language traduit', xbmc.LOGNOTICE)
+        xbmc.log(__language__(message_id), xbmc.LOGNOTICE)
+        # xbmc.log(ADDON.getLocalizedString(message_id), xbmc.LOGNOTICE)
+        # self.addon.getLocalizedString(message_id)
+        return __language__(message_id).encode('utf-8')
+        # return  ADDON.getLocalizedString(message_id).encode('utf-8')
+    except:
+        return __language__(message_id)
 
 
 if __name__ == '__main__':
 
-    fenetredesMenus = FrameMenu.fenetreMenu('Menu')
+    fenetredesMenus = FrameMenu.fenetreMenu(translation(32000, 'Home'))
     fenetredesMenus.doModal()
-    #jivelette = SlimIsPlaying('Welcome to the most simple Squeeze Box Display : Kodi Jivelette')
-    #jivelette.doModal()
-    # Destroy the instance explicitly because
-    # underlying xbmcgui classes are not garbage-collected on exit.
-
 
     del fenetredesMenus
-    #del jivelette
+
