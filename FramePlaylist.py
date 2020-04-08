@@ -199,15 +199,15 @@ class PlaylistPlugin(pyxbmct.AddonFullWindow):
         self.labelduree_fin = pyxbmct.Label('')
         self.placeControl(control=self.labelduree_fin,row= ligneButton - 4 , column=int( SEIZE /2 + 25), rowspan=2 ,columnspan= 3 , pad_x = 5 , pad_y = 5 )
 
-        self.labelAlbum = pyxbmct.Label(font='font13', textColor='0xFF888888', alignment=pyxbmct.ALIGN_CENTER)
+        self.labelAlbum = pyxbmct.Label(label='' , font='font13', textColor='0xFF888888', alignment=pyxbmct.ALIGN_CENTER)
         self.placeControl(self.labelAlbum, row=ligneButton - 2 , column= int( SEIZE /2 ) , rowspan= 1, columnspan=27)
         self.labelAlbum.setLabel('Album')
 
-        self.labelArtist = pyxbmct.Label(font='font13', textColor='0xFF888888', alignment=pyxbmct.ALIGN_CENTER)
+        self.labelArtist = pyxbmct.Label(label='' , font='font13', textColor='0xFF888888', alignment=pyxbmct.ALIGN_CENTER)
         self.placeControl(self.labelArtist, row=ligneButton - 1 , column= int( SEIZE /2 ) , rowspan= 1, columnspan=27)
         self.labelArtist.setLabel('Artist')
 
-        self.labelTitle = pyxbmct.Label(font='font13', textColor='0xFF888888', alignment=pyxbmct.ALIGN_CENTER)
+        self.labelTitle = pyxbmct.Label(label='' , font='font13', textColor='0xFF888888', alignment=pyxbmct.ALIGN_CENTER)
         self.placeControl(self.labelTitle, row=ligneButton - 0 , column= int( SEIZE /2 ) , rowspan= 1, columnspan=27)
         self.labelTitle.setLabel('Title')
 
