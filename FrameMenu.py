@@ -274,7 +274,7 @@ class fenetreMenu(pyxbmct.AddonFullWindow):
                 self.label_ContextFuture.setVisible(False)
                 self.flagContextMenu = False
 
-        elif action == ACTION_PAUSE:  # currently it's the space on my keyboard
+        elif action == ACTION_PAUSE:  # currently it's the space bar on my remote
             xbmc.log('Action Pause', xbmc.LOGNOTICE)
             self.pause_play()
 
@@ -282,10 +282,10 @@ class fenetreMenu(pyxbmct.AddonFullWindow):
             xbmc.log('Action Play', xbmc.LOGNOTICE)
             self.pause_play()
 
-        elif action == ACTION_VOLUME_UP:  # it's the volume power (- +)  on my remote
+        elif action == ACTION_VOLUME_UP:    # it's the volume power +  on my remote
             self.setVolume('UP')
 
-        elif action == ACTION_VOLUME_DOWN:
+        elif action == ACTION_VOLUME_DOWN:  # it's the volume power -  on my remote
             self.setVolume('DOWN')
 
 
