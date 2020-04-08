@@ -198,7 +198,6 @@ def singleton(cls):
 
     return wrapper
 
-
 #@singleton
 class fenetreMenu(pyxbmct.AddonFullWindow):
 
@@ -235,18 +234,14 @@ class fenetreMenu(pyxbmct.AddonFullWindow):
         self.welcome()
         self.set_navigation_lateral()
         self.connexionEvent()
-        self.connexionEventVolume()
         self.population()
+
+        self.backgroundFonction()
+
         self.connectControlElements()
 
         xbmc.log('FIN de _init_', xbmc.LOGDEBUG)
 
-
-        #self.initialisationServeurPlayeur()
-        #self.testCapaciteServeur()
-        #self.set_artwork_size()
-
-        # on  mouve mouse or keyboard key -> self.list_Menu_Navigation (the main navigation througth the Menus)
 
     def onAction(self, action):
         """
@@ -263,10 +258,7 @@ class fenetreMenu(pyxbmct.AddonFullWindow):
             # pour ne pas sortir
             # sortir uniquement si menu racine ou init
             xbmc.log('Action Previous_menu' , xbmc.LOGNOTICE)
-            if self.getFocus() == self.listMenu_Racine or self.getFocus() == self.listMenu_Initialisation:
-                self.quit()
-            else:
-                pass
+            self.quit()
 
         elif action == ACTION_NAV_BACK:
             xbmc.log('Action nav_back' , xbmc.LOGNOTICE)
@@ -281,6 +273,20 @@ class fenetreMenu(pyxbmct.AddonFullWindow):
             else:
                 self.label_ContextFuture.setVisible(False)
                 self.flagContextMenu = False
+
+        elif action == ACTION_PAUSE:  # currently it's the space on my keyboard
+            xbmc.log('Action Pause', xbmc.LOGNOTICE)
+            self.pause_play()
+
+        elif action == ACTION_PLAY or action == ACTION_PLAYER_PLAY:
+            xbmc.log('Action Play', xbmc.LOGNOTICE)
+            self.pause_play()
+
+        elif action == ACTION_VOLUME_UP:  # it's the volume power (- +)  on my remote
+            self.setVolume('UP')
+
+        elif action == ACTION_VOLUME_DOWN:
+            self.setVolume('DOWN')
 
 
         else:
@@ -379,6 +385,38 @@ class fenetreMenu(pyxbmct.AddonFullWindow):
         self.textureback_slider_duration = self.image_dir + '/slider_back.png'  # get from plugin audio spotify
         self.texture_slider_duration = self.image_dir + '/slider_button_new.png'
         self.image_list_focus = self.image_dir + '/MenuItemFO.png'        # get from myself
+        self.textureback_slider_volume = self.image_dir + '/slider_back.png'
+        self.texture_slider_volume = self.image_dir + '/slider_button_new.png'
+
+
+    def backgroundFonction(self):
+
+        # button pause :
+        self.bouton_pause = pyxbmct.Button(label='', focusTexture=self.image_button_pause,
+                                           noFocusTexture=self.image_button_pause)
+        self.placeControl(control=self.bouton_pause, row=NEUF / 2, column=int(SEIZE / 2) - 5, rowspan=6, columnspan=6)
+        self.bouton_pause.setVisible(False)
+        self.bouton_play = pyxbmct.Button(label='', focusTexture=self.image_button_play, noFocusTexture='')
+        self.placeControl(self.bouton_play, row=NEUF / 2, column=(SEIZE / 2) - 2, rowspan=6, columnspan=6)
+        self.bouton_play.setVisible(False)
+
+        # Slider Volume :
+        self.label_volume = pyxbmct.Label('', alignment=pyxbmct.ALIGN_CENTER)
+        self.placeControl(control=self.label_volume, row=(NEUF / 2) - 2, column=(SEIZE / 2) - 15, rowspan=2,
+                          columnspan=30)
+        self.slider_volume = pyxbmct.Slider(textureback=self.textureback_slider_volume,
+                                            texture=self.texture_slider_volume,
+                                            texturefocus=self.textureback_slider_volume, orientation=xbmcgui.HORIZONTAL)
+        self.placeControl(control=self.slider_volume, row=NEUF / 2, column=(SEIZE / 2) - 15, rowspan=3, columnspan=30)
+        self.label_volume.setVisible(False)
+        self.slider_volume.setVisible(False)
+
+        # future
+        self.label_ContextFuture = pyxbmct.Label('', textColor='0xFF808080')
+        self.placeControl(self.label_ContextFuture, NEUF / 2, (SEIZE / 2) - espace_col, 3 * espace_row, espace_col * 2)
+        self.label_ContextFuture.setVisible(False)
+
+
 
     def defineControlMenus(self):
         ''' Fix the size of itemlists in menus lists'''
@@ -508,9 +546,7 @@ class fenetreMenu(pyxbmct.AddonFullWindow):
         self.placeControl(self.listMenu_Fleur, row_depart , col_depart_menu_feuille + col_largeur_menu_branche  , \
                           row_hauteur_menu_branche , col_largeur_menu_branche )
 
-        # future
-        self.label_ContextFuture = pyxbmct.Label('', textColor='0xFF808080')
-        self.placeControl(self.label_ContextFuture,  NEUF / 2  ,  (SEIZE / 2 ) - espace_col  , 3 * espace_row , espace_col * 2 )
+
 
     def connectControlElements(self):
         # Connect the list to a function to display which list item is selected.
@@ -549,23 +585,7 @@ class fenetreMenu(pyxbmct.AddonFullWindow):
              pyxbmct.ACTION_MOVE_RIGHT],
             self.list_Menu_Navigation)
 
-    def connexionEventVolume(self):
-        self.connectEventList(
-            [ACTION_VOLAMP_DOWN,
-             ACTION_VOLAMP_UP,
-             ACTION_VOLUME_DOWN,
-             ACTION_VOLUME_UP] ,
-            self.actionVolume)
 
-    def actionVolume(self):
-        xbmc.log('Action Volume', xbmc.LOGNOTICE)
-        if not self.flagVolumeDisplay:
-            self.label_ContextFuture.setLabel('developpement futur pour le Volume')
-            self.label_ContextFuture.setVisible(True)
-            self.flagVolumeDisplay = True
-        else:
-            self.label_ContextFuture.setVisible(False)
-            self.flagVolumeDisplay = False
 
     def population(self):
         # todo dois je créer toutes les sous-listes ici ? ou bien attendre dans le menu
@@ -687,6 +707,7 @@ class fenetreMenu(pyxbmct.AddonFullWindow):
 
         else :
             self.playerid = self.dictionnairedesplayers[itemPosition + 1]['playerid']
+            outils.WhatAreThePlayers.playerSelection = self.playerid
             try:
                 self.listMenu_Initialisation.setVisible(False)
                 self.listMenu_Racine.setVisible(True)
@@ -2141,3 +2162,60 @@ class fenetreMenu(pyxbmct.AddonFullWindow):
         itemdeListe_4 = xbmcgui.ListItem()
         itemdeListe_4.setLabel('this capability')
         menu.addItem(itemdeListe_4)
+
+    # quelques fonctions communes à d'autres répétées ici
+    #
+    def pause_play(self):
+        #self.get_playerid()
+        #self.get_ident_server()
+        #self.connectInterface()
+
+        if not self.flagStatePause:
+            self.bouton_pause.setVisible(True)
+            self.flagStatePause = True
+            requete = self.playerid + ' pause 1'
+            self.InterfaceCLI.sendtoCLISomething(requete)
+            reponse = self.InterfaceCLI.receptionReponseEtDecodage()
+            del reponse
+
+        else:
+
+            requete = self.playerid + ' pause 0'
+            self.InterfaceCLI.sendtoCLISomething(requete)
+            reponse = self.InterfaceCLI.receptionReponseEtDecodage()
+            if 'pause' in reponse:
+                self.bouton_pause.setVisible(False)
+                self.flagStatePause = False
+            del reponse
+
+    def setVolume(self, UpOrDown):
+        # need to know the actual volume in percent
+        #self.get_playerid()
+        #self.get_ident_server()
+        #self.connectInterface()
+        requete = self.playerid + ' mixer volume ?'
+        self.InterfaceCLI.sendtoCLISomething(requete)
+        reponse = self.InterfaceCLI.receptionReponseEtDecodage()
+        temp = reponse.split('volume|')
+        volumePercent = float(temp[1])
+        self.slider_volume.setPercent(volumePercent)
+        self.label_volume.setLabel('Volume on ' + self.playerid + ' - - -  ' + str(volumePercent) + ' %')
+
+        self.label_volume.setVisible(True)
+        self.slider_volume.setVisible(True)
+
+        if UpOrDown == 'UP':
+            volumePercent = volumePercent + 5.
+            if volumePercent >= 100:
+                volumePercent = 100
+
+        elif UpOrDown == 'DOWN':
+            volumePercent = volumePercent - 5.
+            if volumePercent < 0 :
+                volumePercent = 0
+        else:
+            pass
+        requete = self.playerid + ' mixer volume ' + str(volumePercent)
+        self.InterfaceCLI.sendtoCLISomething(requete)
+        reponse = self.InterfaceCLI.receptionReponseEtDecodage()
+        self.slider_volume.setPercent(volumePercent)
