@@ -2053,7 +2053,7 @@ class fenetreMenu(pyxbmct.AddonFullWindow):
 
                     if playlist_index == '0' :
                         xbmc.log('Titre : ' + titre + ' - Titre_index_O : ' + Titre_of_index_0 , xbmc.LOGNOTICE)
-                        if not Titre_of_index_0 == titre :
+                        if not ( Titre_of_index_0 == titre ):
                             self.frameRandomPlay.listMenu_playlist.reset()
                             Titre_of_index_0 =  titre
 
@@ -2061,16 +2061,16 @@ class fenetreMenu(pyxbmct.AddonFullWindow):
                     tracktampon.setLabel(titre)
                     tracktampon.setProperty('track_id', track_id)
                     tracktampon.setProperty('index', playlist_index)
+                    nameOfFileArtwork = self.get_artwork(playlist_index, track_id)
+                    tracktampon.setArt({'thumb': nameOfFileArtwork})
 
-                    try:
-                        dejaexistant = self.frameRandomPlay.listMenu_playlist.getListItem(int(playlist_index))
-                    except RuntimeError:
-                        # dont exist so add it in the list and try to get some more info about song
-                        nameOfFileArtwork = self.get_artwork(playlist_index , track_id)
-                        tracktampon.setArt({'thumb': nameOfFileArtwork})
+                    size_of_listMenu_playlist = self.frameRandomPlay.listMenu_playlist.size()
+
+                    if int(playlist_index) >= size_of_listMenu_playlist:
                         self.frameRandomPlay.listMenu_playlist.addItem(tracktampon)
                         # put again the playing item because lost by addItem
                         self.frameRandomPlay.listMenu_playlist.selectItem(int(playlist_current_index_title))
+
             except ValueError:
                 pass
 
