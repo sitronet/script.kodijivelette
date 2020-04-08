@@ -42,15 +42,11 @@ __language__ = __settings__.getLocalizedString
 def translation(message_id, default=False):
     try:
         if not __language__(message_id) and default:
-            # xbmc.log('language default', xbmc.LOGNOTICE)
             xbmc.log('traduction absente : ' + str(message_id), xbmc.LOGNOTICE)
             return default
-        xbmc.log('language traduit', xbmc.LOGNOTICE)
-        xbmc.log(__language__(message_id), xbmc.LOGNOTICE)
-        # xbmc.log(ADDON.getLocalizedString(message_id), xbmc.LOGNOTICE)
-        # self.addon.getLocalizedString(message_id)
+        xbmc.log('language traduit', xbmc.LOGDEBUG)
+        xbmc.log(__language__(message_id), xbmc.LOGDEBUG)
         return __language__(message_id).encode('utf-8')
-        # return  ADDON.getLocalizedString(message_id).encode('utf-8')
     except:
         return __language__(message_id)
 
