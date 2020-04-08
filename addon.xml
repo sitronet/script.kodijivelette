@@ -11,7 +11,7 @@
 		<import addon="script.module.pyxbmct" version="1.3.1" />
 	</requires>
 
-	<extension point="xbmc.python.script" library="testit.py">
+	<extension point="xbmc.python.script" library="testit.py"/>
 
 	<extension point="xbmc.addon.metadata">
 		<summary lang="en">This script provides view and basic controls of music being played on squeezebox (like transporter) via a Logitech Media Server</summary>
@@ -20,10 +20,10 @@
 		<source>https://github.com/sitronet/script.kodijivelette</source>
 		<platform>all</platform>
 		<assets>
-			<fanart>resources/skins/Default/media/icon.png</fanart>
+			<fanart>docs/screenshot/icon.png</fanart>
           	<screenshot>docs/screenshot/screenshot001.png</screenshot>
-          	<screenshot>docs/screenshot/screenshot002.png</screenshot>
-          	<screenshot>docs/screenshot/screenshot003.png</screenshot>
+          	<screenshot>docs/screenshot/screenshot009.png</screenshot>
+          	<screenshot>docs/screenshot/screenshot010.png</screenshot>
         </assets>
 	</extension>
 </addon>
