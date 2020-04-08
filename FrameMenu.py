@@ -2085,20 +2085,20 @@ class fenetreMenu(pyxbmct.AddonFullWindow):
             self.InterfaceCLI.sendtoCLISomething('album ?')
             reponse = self.InterfaceCLI.receptionReponseEtDecodage()
             album = reponse.split('album|').pop()
-            self.frameRandomPlay.labelAlbum.reset()
-            self.frameRandomPlay.labelAlbum.addLabel(label='[B]' + album + '[/B]')
+            #self.frameRandomPlay.labelAlbum.reset()
+            self.frameRandomPlay.labelAlbum.setLabel(label='[B]' + album + '[/B]')
 
             self.InterfaceCLI.sendtoCLISomething('artist ?')
             reponse = self.InterfaceCLI.receptionReponseEtDecodage()
             artist = reponse.split('artist|').pop()
-            self.frameRandomPlay.labelArtist.reset()
-            self.frameRandomPlay.labelArtist.addLabel(label='[B]' + artist + '[/B]')
+            #self.frameRandomPlay.labelArtist.reset()
+            self.frameRandomPlay.labelArtist.setLabel(label='[B]' + artist + '[/B]')
 
             self.InterfaceCLI.sendtoCLISomething('title ?')
             reponse = self.InterfaceCLI.receptionReponseEtDecodage()
             artist = reponse.split('title|').pop()
-            self.frameRandomPlay.labelTitle.reset()
-            self.frameRandomPlay.labelTitle.addLabel(label='[B]' + artist + '[/B]')
+            #self.frameRandomPlay.labelTitle.reset()
+            self.frameRandomPlay.labelTitle.setLabel(label='[B]' + artist + '[/B]')
 
         # else:
         #     # here subscribe doesn't work
