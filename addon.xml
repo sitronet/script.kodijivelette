@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+
 <addon id="script.kodijivelette"
 	   name="Kodijivelette, Squeeze view and basic control"
-	   version="0.0.f01"
+	   version="0.0.f02"
 	   provider-name="rondrach">
 
 	<requires>
@@ -11,26 +12,18 @@
 	</requires>
 
 	<extension point="xbmc.python.script" library="testit.py">
-		<provides>executable</provides>
-	</extension>
 
 	<extension point="xbmc.addon.metadata">
 		<summary lang="en">This script provides view and basic controls of music being played on squeezebox (like transporter) via a Logitech Media Server</summary>
-		<description lang="en">a basic script to display and control the squeeze box information of the music playing from a Logitech Media Server,
-		</description>
-
+		<description lang="en">a basic script to display and control the squeeze box information of the music playing from a Logitech Media Server</description>
 		<language></language>
-
 		<source>https://github.com/sitronet/script.kodijivelette</source>
-
 		<platform>all</platform>
-
 		<assets>
 			<fanart>resources/skins/Default/media/icon.png</fanart>
-          	<screenshot>docs/screenshots/screenshot001.png</screenshot>
-          	<screenshot>docs/screenshots/screenshot002.png</screenshot>
-          	<screenshot>docs/screenshots/screenshot003.png</screenshot>
+          	<screenshot>docs/screenshot/screenshot001.png</screenshot>
+          	<screenshot>docs/screenshot/screenshot002.png</screenshot>
+          	<screenshot>docs/screenshot/screenshot003.png</screenshot>
         </assets>
-
 	</extension>
 </addon>
