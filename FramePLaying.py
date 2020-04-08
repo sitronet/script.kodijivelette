@@ -235,8 +235,8 @@ class SlimIsPlaying(pyxbmct.AddonFullWindow):
         self.placeControl(control=self.slider_volume , row = NEUF / 2  , column = ( SEIZE / 2 ) - 15  , rowspan = 3 , columnspan = 30  )
         self.label_volume.setVisible(False)
         self.slider_volume.setVisible(False)
-        # zone de contrôle des actions
 
+        # zone de contrôle des actions
         self.connect(self.bouton_pause, self.pause_play)
         #self.connect(self.bouton_play, self.enleverpause)
 
@@ -279,7 +279,7 @@ class SlimIsPlaying(pyxbmct.AddonFullWindow):
             xbmc.log('Action Play', xbmc.LOGNOTICE)
             self.pause_play()
 
-        elif action == ACTION_VOLUME_UP :
+        elif action == ACTION_VOLUME_UP : # it's the volume power (- +)  on my remote
             self.setVolume('UP')
         elif action == ACTION_VOLUME_DOWN:
             self.setVolume('DOWN')
