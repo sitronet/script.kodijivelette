@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <addon id="script.kodijivelette"
 	   name="Kodijivelette, Squeeze view and basic control"
-	   version="0.0.f00"
+	   version="0.0.f01"
 	   provider-name="rondrach">
 
 	<requires>
