@@ -487,7 +487,7 @@ class WhatAreThePlayers():  # pas utilisé , ou cela va servir ?
 
         # todo : à modifier le dialog , est-il nécessaire ? \
         # de plus pertube l'affichage lors du changement d'état dans les menus
-        xbmcgui.Dialog().ok('Looking for Player', line1)
+        # xbmcgui.Dialog().ok('Looking for Player', line1)
         #
         dictionnairedesPlayers[0]['count'] = nombredeplayers
         dictionnairedesPlayers[0]['Description'] = 'contient les players - le zero est réservé '
