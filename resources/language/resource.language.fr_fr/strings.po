@@ -129,7 +129,7 @@ msgstr "Bibliothèques distantes"
 
 msgctxt "#32072"
 msgid "players"
-msgstr "récepteurs"
+msgstr "platines"
 
 msgctxt "#32073"
 msgid "Music Source"
@@ -159,11 +159,11 @@ msgstr "Mixage des années"
 
 msgctxt "#32800"
 msgid "Activate Player"
-msgstr "Allumer le récepteur"
+msgstr "Allumer la platine"
 
 msgctxt "#32801"
 msgid "Deactivate Player"
-msgstr "Eteindre le récepteur"
+msgstr "Eteindre la platine"
 
 
 msgctxt "#32900"
@@ -221,6 +221,6 @@ msgstr "Quitter le programme"
 
 msgctxt "#32930"
 msgid "Select One player in the list below"
-msgstr "Choisir un récepteur musical dans la liste"
+msgstr "Choisir une platine musicale dans la liste"
 
 
