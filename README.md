@@ -1,6 +1,6 @@
 **KODIJIVELETTE**
 
-kodijive is intented to **watch on the kodi display the information about the streamed music from your multiroom SqueezeBox**.
+kodijive is intented to **watch on the kodi display (commonly a TV) the information about the streamed music from your multiroom SqueezeBox**.
 it is, normally, compliant with the last version of Logitech  media server formely named SqueezeCenter, Squeezebox Server
 or SlimServer
 As it communicate with the server, it need a server (sender the music) and a player (receiver the music) to be
