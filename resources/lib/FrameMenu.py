@@ -1962,6 +1962,7 @@ class fenetreMenu(pyxbmct.AddonFullWindow):
                                              compteur=compteur)
         old_current_index_title = ''
         Titre_of_index_0 = "absolutely_Nothing_Here,I_guess_this_title_does_not_really_exists"
+        flagResetListe = False
         while self.Abonnement.is_set():
             if xbmc.Monitor().waitForAbort(0.5):
                 self.Abonnement.clear()
@@ -2051,13 +2052,14 @@ class fenetreMenu(pyxbmct.AddonFullWindow):
                         if not ( Titre_of_index_0 == titre ):
                             self.frameRandomPlay.listMenu_playlist.reset()
                             Titre_of_index_0 =  titre
+                            flagResetListe = True
 
                     tracktampon = xbmcgui.ListItem()
                     tracktampon.setLabel(titre)
                     tracktampon.setProperty('track_id', track_id)
                     tracktampon.setProperty('index', playlist_index)
-                    nameOfFileArtwork = self.get_artwork(playlist_index, track_id)
-                    tracktampon.setArt({'thumb': nameOfFileArtwork})
+                    #nameOfFileArtwork = self.get_artwork(playlist_index, track_id)
+                    #tracktampon.setArt({'thumb': nameOfFileArtwork})
 
                     size_of_listMenu_playlist = self.frameRandomPlay.listMenu_playlist.size()
 
@@ -2065,6 +2067,15 @@ class fenetreMenu(pyxbmct.AddonFullWindow):
                         self.frameRandomPlay.listMenu_playlist.addItem(tracktampon)
                         # put again the playing item because lost by addItem
                         self.frameRandomPlay.listMenu_playlist.selectItem(int(playlist_current_index_title))
+
+                # once the list done, fil the artwork thumbs
+                if ( flagResetListe == True ):
+                    flagResetListe = False
+                    for i in range (0 , size_of_listMenu_playlist) :
+                        itemList = self.frameRandomPlay.listMenu_playlist.getListItem(i)
+                        track_id = itemList.getProperty('track_id')
+                        nameOfFileArtwork = self.get_artwork(index=i, artwork_track_id=track_id)
+                        itemList.setArt({'thumb':nameOfFileArtwork})
 
             except ValueError:
                 pass
@@ -2118,16 +2129,19 @@ class fenetreMenu(pyxbmct.AddonFullWindow):
                 and store it in a temporay directory .
 
         '''
-        filename = 'artwork.image_' + str(index) + '.tmp'
+        filename = 'artwork.image_' + str(index) + '_' + str(artwork_track_id) + '.tmp'
         completeNameofFile = os.path.join(savepath, filename)
-        xbmc.log('filename artwork : ' + str(completeNameofFile), xbmc.LOGDEBUG)
+        xbmc.log('filename artwork : ' + str(completeNameofFile), xbmc.LOGNOTICE)
         # http://<server>:<port>/music/<track_id>/cover.jpg
         urltoopen = 'http://' + self.lmsip + ':' + self.lmswebport + '/music/' + artwork_track_id + '/cover.jpg'
+
         try:
             urllib.urlretrieve(urltoopen, completeNameofFile)
         except IOError:
-            self.functionNotYetImplemented()
+            pass
+
         xbmc.log('nom du fichier image : ' + completeNameofFile, xbmc.LOGNOTICE)
+
         return completeNameofFile
         # fin fonction fin fonction get_icon, class Plugin_Generique
         # test
