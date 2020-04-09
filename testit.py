@@ -13,7 +13,7 @@ global tempsdeLecture
 import os
 import sys
 
-sys.path.append(os.path.join(os.path.dirname(__file__), "resources", "lib"))
+#sys.path.append(os.path.join(os.path.dirname(__file__), "resources", "lib"))
 
 if Kodi:
     import xbmc
@@ -21,7 +21,7 @@ if Kodi:
     import xbmcaddon
     import pyxbmct
 
-from resources.lib.outils import KODI_VERSION
+
 
 # from resources.lib.outils import KODI_VERSION
 # from outils import singleton
@@ -34,6 +34,7 @@ if Kodi:
     ARTWORK = xbmc.translatePath(os.path.join(ADDON.getAddonInfo('path'), 'resources', 'skins', 'Default', 'media'))
 
 from resources.lib import FrameMenu
+from resources.lib.outils import KODI_VERSION
 
 #__language__ = xbmc.Language(os.getcwd()).getLocalizedString
 __settings__ = xbmcaddon.Addon(id=ADDONID)
