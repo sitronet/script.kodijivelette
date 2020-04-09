@@ -25,7 +25,7 @@ if Kodi:
 
 # from resources.lib.outils import KODI_VERSION
 #
-from outils import singleton
+#from outils import singleton
 
 if Kodi:
     ADDON = xbmcaddon.Addon()
