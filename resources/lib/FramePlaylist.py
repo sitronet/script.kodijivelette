@@ -15,8 +15,7 @@ import time
 import urllib
 import os
 
-import testit
-from resources.lib import ConnexionClient, Ecoute, FrameMenu, FramePLaying, outils
+from resources.lib import ConnexionClient, Ecoute, outils
 from resources.lib.Ecoute import Souscription
 
 import json
