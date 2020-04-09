@@ -2,7 +2,7 @@
 
 <addon id="script.kodijivelette"
 	   name="Kodijivelette, Squeeze view and basic control"
-	   version="0.0.f05"
+	   version="0.0.f06"
 	   provider-name="rondrach">
 
 	<requires>
@@ -21,9 +21,9 @@
 		<platform>all</platform>
 		<assets>
 			<fanart>resources/fanart.jpg</fanart>
-          	<screenshot>docs/screenshot/screenshot000.png</screenshot>
-          	<screenshot>docs/screenshot/screenshot001.png</screenshot>
-          	<screenshot>docs/screenshot/screenshot010.png</screenshot>
+			<screenshot>docs/screenshot/screenshot000.png</screenshot>
+			<screenshot>docs/screenshot/screenshot001.png</screenshot>
+			<screenshot>docs/screenshot/screenshot010.png</screenshot>
         </assets>
 	</extension>
 </addon>
