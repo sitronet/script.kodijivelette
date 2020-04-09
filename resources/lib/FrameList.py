@@ -13,7 +13,7 @@ import time
 import urllib
 import os
 
-from resources.lib import ConnexionClient, Ecoute, FrameMenu, FramePLaying, outils
+from resources.lib import ConnexionClient, Ecoute, FramePLaying, outils
 from resources.lib.Ecoute import Souscription
 
 if Kodi:
