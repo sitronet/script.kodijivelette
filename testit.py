@@ -15,17 +15,18 @@ import sys
 
 sys.path.append(os.path.join(os.path.dirname(__file__), "resources", "lib"))
 
-
-from resources.lib.outils import KODI_VERSION
-#from outils import singleton
-
 if Kodi:
     import xbmc
     import xbmcgui
     import xbmcaddon
     import pyxbmct
 
+from resources.lib.outils import KODI_VERSION
 
+# from resources.lib.outils import KODI_VERSION
+# from outils import singleton
+
+if Kodi:
     ADDON = xbmcaddon.Addon()
     ADDONID = ADDON.getAddonInfo('id')
     ADDONNAME = ADDON.getAddonInfo('name')
@@ -53,7 +54,7 @@ def translation(message_id, default=False):
 
 if __name__ == '__main__':
 
-    fenetredesMenus = FrameMenu.fenetreMenu(translation(32000, 'Home'))
+    fenetredesMenus = FrameMenu.fenetreMenu(translation(32001, 'Home'))
     fenetredesMenus.doModal()
 
     del fenetredesMenus
