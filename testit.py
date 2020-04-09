@@ -16,7 +16,7 @@ import sys
 sys.path.append(os.path.join(os.path.dirname(__file__), "resources", "lib"))
 
 
-from outils import KODI_VERSION
+from resources.lib.outils import KODI_VERSION
 #from outils import singleton
 
 if Kodi:
@@ -32,7 +32,7 @@ if Kodi:
     ADDONVERSION = ADDON.getAddonInfo('version')
     ARTWORK = xbmc.translatePath(os.path.join(ADDON.getAddonInfo('path'), 'resources', 'skins', 'Default', 'media'))
 
-import FrameMenu
+from resources.lib import FrameMenu
 
 #__language__ = xbmc.Language(os.getcwd()).getLocalizedString
 __settings__ = xbmcaddon.Addon(id=ADDONID)
