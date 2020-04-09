@@ -13,13 +13,8 @@ import time
 import urllib
 import os
 
-import FramePLaying
-import FrameMenu
-import ConnexionClient
-from Ecoute import Souscription
-import outils
-import Ecoute
-
+from resources.lib import ConnexionClient, Ecoute, FrameMenu, FramePLaying, outils
+from resources.lib.Ecoute import Souscription
 
 if Kodi:
     import xbmc
@@ -575,13 +570,13 @@ class ViewListPlugin(pyxbmct.AddonFullWindow):
                     pass
 
                 try:
-                    self.jivelette.labelduree_jouee.setLabel(label=outils.getInHMS( dico['time']))
+                    self.jivelette.labelduree_jouee.setLabel(label=outils.getInHMS(dico['time']))
                     # self.labelduree_jouee.setLabel(label= outils.getInHMS(self, dico['time']))
                 except KeyError:
                     pass
 
                 try:
-                    self.jivelette.labelduree_fin.setLabel(label=outils.getInHMS( dico['duration']))
+                    self.jivelette.labelduree_fin.setLabel(label=outils.getInHMS(dico['duration']))
                     # self.labelduree_fin.setLabel(label= outils.getInHMS(self, dico['duration']))
                 except KeyError:
                     self.jivelette.labelduree_fin.setLabel(label=outils.getInHMS(0.0))

@@ -15,15 +15,9 @@ import time
 import urllib
 import os
 
-import FramePLaying
-import FrameMenu
 import testit
-import ConnexionClient
-from Ecoute import Souscription
-import outils
-import Ecoute
-
-
+from resources.lib import ConnexionClient, Ecoute, FrameMenu, FramePLaying, outils
+from resources.lib.Ecoute import Souscription
 
 import json
 
@@ -664,7 +658,7 @@ class PlaylistPlugin(pyxbmct.AddonFullWindow):
                 pass
 
             try:
-                self.labelduree_fin.setLabel(label=outils.getInHMS( dico['duration']))
+                self.labelduree_fin.setLabel(label=outils.getInHMS(dico['duration']))
                 # self.labelduree_fin.setLabel(label= outils.getInHMS(self, dico['duration']))
             except KeyError:
                 self.labelduree_fin.setLabel(label=outils.getInHMS(0.0))

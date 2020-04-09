@@ -24,17 +24,12 @@ import copy
 sys.path.append(os.path.join(os.path.dirname(__file__), "resources", "lib"))
 
 #from outils import WhereIsTheLMSServer
-from ConnexionClient import InterfaceCLIduLMS
-from outils import KODI_VERSION
-from Ecoute import Souscription
-import Ecoute
-import outils
-import FramePLaying
-import FramePlaylist
+from resources.lib.ConnexionClient import InterfaceCLIduLMS
+from resources.lib.outils import KODI_VERSION
+from resources.lib.Ecoute import Souscription
+from resources.lib import Ecoute, FramePLaying, FramePlaylist, outils, Plugin
 import json
 #from singleton_decorator import singleton
-
-import Plugin
 
 if Kodi:
     import xbmc
@@ -641,7 +636,7 @@ class fenetreMenu(pyxbmct.AddonFullWindow):
         #itemSelectionRacine = self.listMenu_Racine.getListItem(self.listMenu_Racine.getSelectedPosition()).getLabel()
 
         self.Abonnement.set()
-        self.jivelette = FramePLaying.SlimIsPlaying(title )
+        self.jivelette = FramePLaying.SlimIsPlaying(title)
         self.jivelette.show()
         time.sleep(0.5)
         self.update_now_is_playing()
@@ -731,7 +726,7 @@ class fenetreMenu(pyxbmct.AddonFullWindow):
         if itemSelectionRacine == translation(32040 , 'Now Playing'):
             # activer frame EcouteEnCours
             self.Abonnement.set() # need to renew subscribe after interupt
-            self.jivelette = FramePLaying.SlimIsPlaying(translation(32040 , 'Now Playing'))
+            self.jivelette = FramePLaying.SlimIsPlaying(translation(32040, 'Now Playing'))
 
             self.WindowPlaying = xbmcgui.getCurrentWindowId()
             xbmc.log('fenetre en cours n° : ' + str(self.WindowPlaying), xbmc.LOGDEBUG)
@@ -1055,7 +1050,7 @@ class fenetreMenu(pyxbmct.AddonFullWindow):
         reponse = self.InterfaceCLI.receptionReponseEtDecodage()
 
         self.Abonnement.set()
-        self.frameRandomPlay = FramePlaylist.PlaylistPlugin( translation( 32040 , 'Now playing ') + ' : '  + title)
+        self.frameRandomPlay = FramePlaylist.PlaylistPlugin(translation(32040, 'Now playing ') + ' : ' + title)
         self.frameRandomPlay.show()
         self.frameRandomPlay.listMenu_playlist.reset()
         self.update_random_mix_Playlist()
@@ -1873,14 +1868,14 @@ class fenetreMenu(pyxbmct.AddonFullWindow):
                     pass
 
                 try:
-                    self.jivelette.labelduree_jouee.setLabel(label= outils.getInHMS( dico['time']))
+                    self.jivelette.labelduree_jouee.setLabel(label= outils.getInHMS(dico['time']))
                 except KeyError:
                     pass
 
                 try:
-                    self.jivelette.labelduree_fin.setLabel(label= outils.getInHMS( dico['duration']))
+                    self.jivelette.labelduree_fin.setLabel(label= outils.getInHMS(dico['duration']))
                 except KeyError:
-                    self.jivelette.labelduree_fin.setLabel(label= outils.getInHMS( 0.0 ))
+                    self.jivelette.labelduree_fin.setLabel(label= outils.getInHMS(0.0))
 
                 try:
                     nouveautitre = dico['title']

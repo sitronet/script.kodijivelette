@@ -18,14 +18,7 @@ import urllib
 import os
 import time
 
-import FrameList
-import FrameMyMusic
-import FramePLaying
-import FramePlaylist
-import outils
-import ConnexionClient
-import Ecoute
-
+from resources.lib import ConnexionClient, Ecoute, FrameList, FrameMyMusic, FramePLaying, FramePlaylist, outils
 
 TAGS = 'aCdejJKlstuwxy'
 

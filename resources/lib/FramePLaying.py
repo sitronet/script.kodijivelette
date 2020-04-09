@@ -26,9 +26,7 @@ import random
 import threading
 import time
 
-import FrameMenu
-import outils
-import ConnexionClient
+from resources.lib import ConnexionClient, FrameMenu, outils
 
 sys.path.append(os.path.join(os.path.dirname(__file__), "resources", "lib"))
 
