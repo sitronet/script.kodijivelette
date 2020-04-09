@@ -20,9 +20,9 @@
 		<source>https://github.com/sitronet/script.kodijivelette</source>
 		<platform>all</platform>
 		<assets>
-			<fanart>docs/screenshot/icon.png</fanart>
+			<fanart>resources/fanart.jpg</fanart>
+          	<screenshot>docs/screenshot/screenshot000.png</screenshot>
           	<screenshot>docs/screenshot/screenshot001.png</screenshot>
-          	<screenshot>docs/screenshot/screenshot009.png</screenshot>
           	<screenshot>docs/screenshot/screenshot010.png</screenshot>
         </assets>
 	</extension>
