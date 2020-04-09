@@ -8,6 +8,7 @@ import threading
 import xbmc
 
 TIME_OF_LOOP_SUBSCRIBE = '5' # initial 10 but long time to exit
+                             # also delay for the refreshed duration playing
 
 class Souscription(threading.Thread):
     dataExchangeAbonnement =''
@@ -45,7 +46,7 @@ class Souscription(threading.Thread):
         self.InterfaceCLI.sendtoCLISomething(self.playerid + " status - 1 subscribe:" + TIME_OF_LOOP_SUBSCRIBE)
 
     def subscriptionLongue(self):
-        xbmc.log("Souscription", xbmc.LOGNOTICE)
+        xbmc.log("Souscription Longue", xbmc.LOGNOTICE)
         self.InterfaceCLI.sendtoCLISomething(self.playerid + " status 0 200 subscribe:" + TIME_OF_LOOP_SUBSCRIBE)
 
     def resiliersouscription(self):
