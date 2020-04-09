@@ -401,7 +401,7 @@ class WhatAreThePlayers():  # pas utilisé , ou cela va servir ?
             xbmcgui.Dialog().ok( ADDON_ID, line1 , line2 )
             # no player
             #informationText.append('no player to listen...Exit program')
-            xbmc.log(" pas de receiver pour jouer de la musique", xbmc.LOGNOTICE)
+            xbmc.log(" pas de platine pour jouer de la musique", xbmc.LOGNOTICE)
             xbmc.Monitor().waitForAbort(5)
             exit(35)
 
