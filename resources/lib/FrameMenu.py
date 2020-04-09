@@ -203,6 +203,7 @@ class fenetreMenu(pyxbmct.AddonFullWindow):
         self.Window_is_playing  = 0
         self.flagContextMenu = False
         self.flagVolumeDisplay = False
+        self.flagStatePause = False
         self.recevoirEnAttente = threading.Event()
         self.recevoirEnAttente.clear()
         self.demandedeStop = threading.Event()
@@ -259,7 +260,7 @@ class fenetreMenu(pyxbmct.AddonFullWindow):
             xbmc.log('Action nav_back' , xbmc.LOGNOTICE)
             self.quit()
 
-        elif action == ACTION_CONTEXT_MENU:
+        elif action == xbmcgui.ACTION_CONTEXT_MENU:     # it's a strange icon key on my remote
             xbmc.log('Action ContextMenu', xbmc.LOGNOTICE)
             if not self.flagContextMenu:
                 self.label_ContextFuture.setLabel('developpement futur')
@@ -277,10 +278,10 @@ class fenetreMenu(pyxbmct.AddonFullWindow):
             xbmc.log('Action Play', xbmc.LOGNOTICE)
             self.pause_play()
 
-        elif action == ACTION_VOLUME_UP:    # it's the volume power +  on my remote
+        elif action == ACTION_VOLUME_UP:    # it's the volume key Vol+  on my remote
             self.setVolume('UP')
 
-        elif action == ACTION_VOLUME_DOWN:  # it's the volume power -  on my remote
+        elif action == ACTION_VOLUME_DOWN:  # it's the volume key Vol-  on my remote
             self.setVolume('DOWN')
 
 
@@ -2197,11 +2198,25 @@ class fenetreMenu(pyxbmct.AddonFullWindow):
                 self.flagStatePause = False
             del reponse
 
+    @singleton
     def setVolume(self, UpOrDown):
         # need to know the actual volume in percent
         #self.get_playerid()
         #self.get_ident_server()
         #self.connectInterface()
+
+        def onAction(self, action):
+            if action == xbmcgui.ACTION_PREVIOUS_MENU:
+                self.label_volume.setVisible(False)
+                self.slider_volume.setVisible(False)
+
+            elif action == ACTION_VOLUME_UP:    # it's the volume key Vol+  on my remote
+                self.setVolume('UP')
+
+            elif action == ACTION_VOLUME_DOWN:  # it's the volume key Vol-  on my remote
+                self.setVolume('DOWN')
+            
+        
         requete = self.playerid + ' mixer volume ?'
         self.InterfaceCLI.sendtoCLISomething(requete)
         reponse = self.InterfaceCLI.receptionReponseEtDecodage()
@@ -2228,3 +2243,6 @@ class fenetreMenu(pyxbmct.AddonFullWindow):
         self.InterfaceCLI.sendtoCLISomething(requete)
         reponse = self.InterfaceCLI.receptionReponseEtDecodage()
         self.slider_volume.setPercent(volumePercent)
+        
+            
+
