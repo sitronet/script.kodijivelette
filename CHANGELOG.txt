@@ -1,3 +1,7 @@
+Version 0.0.f12:
+move class child Volume et contextmenu
+add fonction to nowplaying
+
 Version 0.0.f11 :
 Ajout fonction réglage Volume avec popup de réglage
 + ajout popup de ContextMenu Action

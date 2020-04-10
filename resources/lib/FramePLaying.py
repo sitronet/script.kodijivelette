@@ -277,23 +277,18 @@ class SlimIsPlaying(pyxbmct.AddonFullWindow):
             xbmc.log('Action Play', xbmc.LOGNOTICE)
             self.pause_play()
 
-        elif action == ACTION_VOLUME_UP : # it's the volume power (- +)  on my remote
-            self.setVolume('UP')
-        elif action == ACTION_VOLUME_DOWN:
-            self.setVolume('DOWN')
+        elif action == ACTION_VOLUME_DOWN or ACTION_VOLUME_UP:
+            xbmc.log('Action Volume' , xbmc.LOGNOTICE)
+            self.promptVolume()
+        
+        elif action == ACTION_PREVIOUS_MENU:
+            xbmc.log('Action previous Menu', xbmc.LOGNOTICE)
+            self.promptContextMenu()
 
         else:
             xbmc.log('else condition onAction' , xbmc.LOGNOTICE)
             self._executeConnected(action, self.actions_connected)
 
-    def connexionEventVolume(self):
-        # Connect key and mouse events for list navigation feedback.
-        self.connectEventList(
-            [ACTION_VOLUME_UP,
-             ACTION_VOLAMP_UP,
-             ACTION_VOLUME_DOWN,
-             ACTION_VOLAMP_DOWN],
-            self.setVolume)
 
     def quit_now_playing(self):# todo : à tester
         self.WindowPlayinghere = xbmcgui.getCurrentWindowId()
@@ -367,12 +362,15 @@ class SlimIsPlaying(pyxbmct.AddonFullWindow):
         reponse = self.InterfaceCLI.receptionReponseEtDecodage()
         self.slider_volume.setPercent(volumePercent)
 
-
-
-
-
-
-
+    def promptVolume(self):
+        volumeFrame = outils.VolumeFrameChild()
+        volumeFrame.doModal()
+        del volumeFrame
+        
+    def promptContextMenu(self):
+        contextMenuFrame = outils.ContextMenuFrameChild()
+        contextMenuFrame.doModal()
+        del contextMenuFrame
 
     #slider_duration    self.slider_volume.setPercent(pourcentage)
 
