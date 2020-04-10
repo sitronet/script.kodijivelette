@@ -1,28 +1,24 @@
+--------------------------------------------------------------
 Version 0.0.f12:
 move class child Volume et contextmenu
-add fonction to nowplaying
-
+add fonction volume to nowplaying
+--------------------------------------------------------------
 Version 0.0.f11 :
 Ajout fonction réglage Volume avec popup de réglage
 + ajout popup de ContextMenu Action
-
-
+--------------------------------------------------------------
 Version 0.0.f10 :
 - Correction de divers bugs et message de logs
 - en particulier récriture de update Random Mix (FrameMenu.py) pour les playlists
 - nouvelle structure des fichiers pour convenir aux recommandations de kodi team
-
 --------------------------------------------------------------
 Version 0.0.e :
 Ajout artwork to the itemlist for the Random mix
-
 --------------------------------------------------------------
 Version 0.0.d :
 Correction bug si timeout dans ConnectionClient.py :
     lors d'un time out -> Exception , pose d'un catch exception
 Modification de label (welcome and init : informationLabel) -> AlignementCenter
-
-
 --------------------------------------------------------------
 Version 0.0.c :
 - Add translation for French and English_US and en_GB language to the root and mains Menus
@@ -34,8 +30,6 @@ Version 0.0.c :
 - In The FramePlaying.py :
     - Add function Volume Slider when action Volume Up/Down on remote
     - Add Pause/Play function when action Pause on remote (space bar)
-
-
 --------------------------------------------------------------
 Version 0.0.a :
 Premice of skeleton
