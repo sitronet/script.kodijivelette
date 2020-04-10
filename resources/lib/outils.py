@@ -280,8 +280,6 @@ class WhereIsTheLMSServer:
             data = bytes('eIPAD\x00NAME\x00JSON\x00UUID\x00VERS\x00', 'ascii') #python 3.7
         except TypeError:
             data = bytes('eIPAD\x00NAME\x00JSON\x00UUID\x00VERS\x00\JVID\x00')  # python 2.7
-        #print type(data)
-
 
         # création du socket UDP
         if Kodi:
@@ -377,15 +375,17 @@ class WhatAreThePlayers():  # pas utilisé , ou cela va servir ?
     def combienDePlayers(self):
         pass
 
-    def set_playerSelectionID(self, playerid):
-        self.playerSelectionID = playerid
-
-    def get_playerSelectionID(self):
+    def getPlayerSelectionID(self):
         return self.playerSelectionID
 
-    def set_playerSelectionName(self, playerName):
+    def getPlayerSelectionName(self):
+        return self.playerSelectionName
+
+    def setPlayerSelectionName(self, playerName):
         self.playerSelectionName = playerName
 
+    def setPlayerSelectionID(self , playerid ):
+        self.playerSelectionID = playerid
 
     def get_volume_player(self):
         pass
@@ -602,8 +602,8 @@ class VolumeFrameChild(pyxbmct.BlankDialogWindow):  # this one is transparent ba
         Size_W_ChildSelf = 400
         Size_H_ChildSelf = 200
         SIZESCREEN_HEIGHT = xbmcgui.getScreenHeight()  # exemple  # 1080
-        SIZESCREEN_WIDTH = xbmcgui.getScreenWidth()  # 1920
-        xbmc.log('size screen VolumeParent : ' + str(SIZESCREEN_WIDTH) + ' x ' + str(SIZESCREEN_HEIGHT), xbmc.LOGNOTICE)
+        SIZESCREEN_WIDTH = xbmcgui.getScreenWidth()  # exemple 1920
+        xbmc.log('size screen FrameParentVolume : ' + str(SIZESCREEN_WIDTH) + ' x ' + str(SIZESCREEN_HEIGHT), xbmc.LOGNOTICE)
         # remember we fit the parent to 64 columns  x 32 rows
         self.setGeometry(width_=Size_W_ChildSelf, height_=Size_H_ChildSelf,
                          rows_=5, columns_=10,
@@ -755,7 +755,7 @@ class ContextMenuFrameChild(pyxbmct.AddonDialogWindow):  # this one is transpare
         xbmc.log('fin init child ContextMenu Frame', xbmc.LOGDEBUG)
 
     def set_info_controls(self):
-        self.label_context = pyxbmct.Label('-------------------Development future----------------',
+        self.label_context = pyxbmct.Label('-------------------Development future---------------------',
                                            alignment=pyxbmct.ALIGN_CENTER)
         self.placeControl(control=self.label_context, row=0, column=0, rowspan=1, columnspan=10)
         # self.slider_volume = pyxbmct.Slider(textureback=self.textureback_slider_volume,
@@ -886,7 +886,6 @@ def recherchonsleServeur(self):
                 'port du CLI du LogitechMediaServeur : ' + str(self.rechercheduserveur.LMSCLIport) + '\n'
         line7 = "End scanning Network. Continue ..."
 
-        # todo : désactiver pour passer directement
         xbmcgui.Dialog().ok('Network Discovery', line1 )
 
     else:
@@ -895,10 +894,7 @@ def recherchonsleServeur(self):
         line7 = "End scanning Network. Exit ...Error N° 32"
         xbmcgui.Dialog().ok('Network Discovery', line1, line7 )
 
-        #informationText.append('Fail ... no server found')
-        #self.update_textbox(informationText)
         xbmc.Monitor().waitForAbort(1)
-        self.stop()
         exit(32)
     return
 

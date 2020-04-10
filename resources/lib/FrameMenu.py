@@ -618,7 +618,7 @@ class fenetreMenu(pyxbmct.AddonFullWindow):
 
         # Set initial focus
         #self.setFocus(self.listMenu_Racine)
-        self.setFocus(self.listMenu_Initialisation)
+
 
     def move_through_sub_menu(self):
         # on verra plus tard si nécessaire Todo
@@ -685,7 +685,8 @@ class fenetreMenu(pyxbmct.AddonFullWindow):
         itemPosition = self.listMenu_Initialisation.getSelectedPosition()
         xbmc.log('item is : ' + str(itemSelection), xbmc.LOGNOTICE)
         if itemSelection ==  translation(32920 , 'Init the Server'):
-            self.initialisationServeurPlayeur()
+            self.initialisationServeur()
+            self.initialisationPlayeur()
             self.testCapaciteServeur()
             self.set_artwork_size()
             #self.listMenu_Initialisation.setVisible(False)
@@ -708,9 +709,9 @@ class fenetreMenu(pyxbmct.AddonFullWindow):
 
         self.playerid = self.dictionnairedesplayers[itemPosition + 1]['playerid']
         xbmc.log('playerid : ' + str(self.playerid) , xbmc.LOGNOTICE)
-        outils.WhatAreThePlayers.set_playerSelectionID(self.playerid)
+        outils.WhatAreThePlayers.setPlayerSelectionID(self.playerid)
         self.playername = self.dictionnairedesplayers[itemPosition + 1]['name']
-        outils.WhatAreThePlayers.set_playerSelectionName(self.playername)
+        outils.WhatAreThePlayers.setPlayerSelectionName(self.playername)
         try:
             self.listMenu_Initialisation.setVisible(False)
             self.listMenu_Racine.setVisible(True)
@@ -1626,13 +1627,7 @@ class fenetreMenu(pyxbmct.AddonFullWindow):
         self.Information_label.setLabel( translation(32931, 'Welcome to the most simple Squeeze Box Display : Kodi Jivelette'))
 
 
-    def initialisationServeurPlayeur(self):
-
-        # use the same list, just remove the previous items (ie init and quit)
-        self.listMenu_Initialisation.removeItem(1)
-        self.listMenu_Initialisation.removeItem(0)
-        self.Information_label.setLabel( translation(32930, 'Select One player in the list below'))
-        outils.recherchonsleServeur(self)
+    def initialisationServeur(self):
 
         # maintenant nous connaissons le serveur Idem mainBoucle -> todo revoir logique
         # on lance le thread de connexion permanente avec le serveur. # todo retravailler les events
@@ -1658,12 +1653,17 @@ class fenetreMenu(pyxbmct.AddonFullWindow):
             # we cannot be here because the loop above should not break
             xbmc.log('thread is not alive -> error 33 ' , xbmc.LOGDEBUG)
             exit(33)
+        outils.recherchonsleServeur(self)
+
 
         # start here the communication with server througth the self.InterfaceCLI previously started
         # first is to know the players :
-        self.initialisationPlayeur()
 
     def initialisationPlayeur(self):
+        # use the same list, just remove the previous items (ie init and quit)
+        self.listMenu_Initialisation.removeItem(1)
+        self.listMenu_Initialisation.removeItem(0)
+        self.Information_label.setLabel(translation(32930, 'Select One player in the list below'))
         # ici on va couper pour faire une fonction de recherche des players
         self.Players = outils.WhatAreThePlayers()
         self.dictionnairedesplayers = dict()
