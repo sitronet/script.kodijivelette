@@ -697,22 +697,34 @@ class fenetreMenu(pyxbmct.AddonFullWindow):
             self.quit()
 
         else :
-            self.playerid = self.dictionnairedesplayers[itemPosition + 1]['playerid']
-            outils.WhatAreThePlayers.playerSelection = self.playerid
-            try:
-                self.listMenu_Initialisation.setVisible(False)
-                self.listMenu_Racine.setVisible(True)
-                self.listMenu_MyMusic.setVisible(False)
-                self.listMenu_Branches.setVisible(False)
-                self.listMenu_Extras.setVisible(False)
-                self.listMenu_Feuilles.setVisible(False)
-                self.listMenu_Feuilles_all_Artists.setVisible(False)
+            self.selectPlayer()
 
-                self.listMenu_Fleur.setVisible(False)
-                self.setFocus(self.listMenu_Racine)
-                self.Information_label.setVisible(False)
-            except:
-                pass
+    def selectPlayer(self):
+
+        itemSelection = self.listMenu_Initialisation.getListItem(
+                self.listMenu_Initialisation.getSelectedPosition()).getLabel()
+
+        itemPosition = self.listMenu_Initialisation.getSelectedPosition()
+
+        self.playerid = self.dictionnairedesplayers[itemPosition + 1]['playerid']
+        xbmc.log('playerid : ' + str(self.playerid) , xbmc.LOGNOTICE)
+        outils.WhatAreThePlayers.set_playerSelectionID(self.playerid)
+        self.playername = self.dictionnairedesplayers[itemPosition + 1]['name']
+        outils.WhatAreThePlayers.set_playerSelectionName(self.playername)
+        try:
+            self.listMenu_Initialisation.setVisible(False)
+            self.listMenu_Racine.setVisible(True)
+            self.listMenu_MyMusic.setVisible(False)
+            self.listMenu_Branches.setVisible(False)
+            self.listMenu_Extras.setVisible(False)
+            self.listMenu_Feuilles.setVisible(False)
+            self.listMenu_Feuilles_all_Artists.setVisible(False)
+
+            self.listMenu_Fleur.setVisible(False)
+            self.setFocus(self.listMenu_Racine)
+            self.Information_label.setVisible(False)
+        except:
+            pass
 
 
     def navigationFromMenuRacine(self):
@@ -1127,6 +1139,8 @@ class fenetreMenu(pyxbmct.AddonFullWindow):
             # recherche d'un player actif et si actif vrai . actif = isplaying
             self.actif, index_dictionnairedesPlayers, self.playerid = self.Players.playerActif(
                 self.dictionnairedesplayers)
+            self.initialisationPlayeur()
+            self.navigationFromMenuInitialisation()
 
     def listMenu_Radios_update(self): #todo  pour test à supprimer
         xbmc.log('test event' , xbmc.LOGNOTICE)
@@ -1647,7 +1661,9 @@ class fenetreMenu(pyxbmct.AddonFullWindow):
 
         # start here the communication with server througth the self.InterfaceCLI previously started
         # first is to know the players :
+        self.initialisationPlayeur()
 
+    def initialisationPlayeur(self):
         # ici on va couper pour faire une fonction de recherche des players
         self.Players = outils.WhatAreThePlayers()
         self.dictionnairedesplayers = dict()
