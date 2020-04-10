@@ -648,10 +648,10 @@ class VolumeFrameChild(pyxbmct.BlankDialogWindow):  # this one is transparent ba
     def onAction(self, action):
         if action == xbmcgui.ACTION_PREVIOUS_MENU:
             self.close()
-        elif action == ACTION_VOLUME_UP:  # it's the volume key Vol+  on my remote
+        elif action == xbmcgui.ACTION_VOLUME_UP:  # it's the volume key Vol+  on my remote
             self.setVolume('UP')
 
-        elif action == ACTION_VOLUME_DOWN:  # it's the volume key Vol-  on my remote
+        elif action == xbmcgui.ACTION_VOLUME_DOWN:  # it's the volume key Vol-  on my remote
             self.setVolume('DOWN')
 
     def getVolume(self):
