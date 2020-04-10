@@ -370,11 +370,21 @@ class WhatAreThePlayers():  # pas utilisé , ou cela va servir ?
 
     def __init__(self):
         self.listePlayers = []
-        self.playerSelection = ''
+        self.playerSelectionID = ''
+        self.playerSelectionName = ''
         self.dictionnairedesPlatines = {}
 
     def combienDePlayers(self):
         pass
+
+    def set_playerSelectionID(self, playerid):
+        self.playerSelectionID = playerid
+
+    def get_playerSelectionID(self):
+        return self.playerSelectionID
+
+    def set_playerSelectionName(self, playerName):
+        self.playerSelectionName = playerName
 
 
     def get_volume_player(self):
