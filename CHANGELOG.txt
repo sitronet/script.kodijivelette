@@ -1,3 +1,14 @@
+Version 0.0.f11 :
+Ajout fonction réglage Volume avec popup de réglage
++ ajout popup de ContextMenu Action
+
+
+Version 0.0.f10 :
+- Correction de divers bugs et message de logs
+- en particulier récriture de update Random Mix (FrameMenu.py) pour les playlists
+- nouvelle structure des fichiers pour convenir aux recommandations de kodi team
+
+--------------------------------------------------------------
 Version 0.0.e :
 Ajout artwork to the itemlist for the Random mix
 
