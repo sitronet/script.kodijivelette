@@ -360,6 +360,7 @@ class WhatAreThePlayers():  # pas utilisé , ou cela va servir ?
     def __init__(self):
         self.listePlayers = []
         self.playerSelection = ''
+        self.dictionnairedesPlatines = {}
 
     def combienDePlayers(self):
         pass
@@ -479,11 +480,11 @@ class WhatAreThePlayers():  # pas utilisé , ou cela va servir ?
             dictionnairedesPlayers[x]['playerindex'] = playerindex
             xbmc.log('le simple dico d un player : ' + str(dictionnairedesPlayers[x]), xbmc.LOGNOTICE)
 
-        line1 = 'Found at least one player : ' + '\n' + \
-                'nom du player : ' + dictionnairedesPlayers[x]['name'] + '\n' + \
-                ' playerid : ' + dictionnairedesPlayers[x]['playerid'] + '\n' + \
-                ' model : ' + dictionnairedesPlayers[x]['modelname'] + '\n'
-        line2 = "Cool"
+        # line1 = 'Found at least one player : ' + '\n' + \
+        #        'nom du player : ' + dictionnairedesPlayers[x]['name'] + '\n' + \
+        #        ' playerid : ' + dictionnairedesPlayers[x]['playerid'] + '\n' + \
+        #        ' model : ' + dictionnairedesPlayers[x]['modelname'] + '\n'
+        # line2 = "Cool"
 
         # todo : à modifier le dialog , est-il nécessaire ? \
         # de plus pertube l'affichage lors du changement d'état dans les menus
@@ -508,6 +509,7 @@ class WhatAreThePlayers():  # pas utilisé , ou cela va servir ?
           'playerindex': '2', 'seq_no': '0', 'connected': '1', 'isplayer': '1', 'model': 'receiver', 'isplaying': '0',
           'name': 'Squeezebox Receiver'}]
         '''
+        self.dictionnairedesPlatines = dictionnairedesPlayers
         return dictionnairedesPlayers
 
 
