@@ -375,15 +375,19 @@ class WhatAreThePlayers():  # pas utilisé , ou cela va servir ?
     def combienDePlayers(self):
         pass
 
-    def getPlayerSelectionID(self):
+    @property
+    def playerSelectionID(self):
         return self.playerSelectionID
 
-    def getPlayerSelectionName(self):
+    @property
+    def playerSelectionName(self):
         return self.playerSelectionName
 
+    @playerSelectionName.setter
     def setPlayerSelectionName(self, playerName):
         self.playerSelectionName = playerName
 
+    @playerSelectionID.setter
     def setPlayerSelectionID(self , playerid ):
         self.playerSelectionID = playerid
 
@@ -416,7 +420,7 @@ class WhatAreThePlayers():  # pas utilisé , ou cela va servir ?
         #informationText = ['nbre players : ' + count_str ]    #  text that will be show on the screen in the informational box
         #self.update_textbox(informationText)
           # so we know and print  the number of players what next ?
-        xbmc.log("il y a " + count_str + "receivers , cool ", xbmc.LOGNOTICE)
+        xbmc.log("il y a " + count_str + " receivers , cool ", xbmc.LOGNOTICE)
         if count_int == 0:
             line1 = " No receiver to listen to music."
             line2 = " ...Exit...Error n° 35 "
@@ -428,7 +432,7 @@ class WhatAreThePlayers():  # pas utilisé , ou cela va servir ?
             exit(35)
 
         InterfaceCLI.sendtoCLISomething('players 0 ' + count_str  ) # recherchons les players dont nous savons le nbre
-        self.recevoirEnAttente.wait(10)
+        self.recevoirEnAttente.wait(1)
         recu_ext = InterfaceCLI.dataExchange                        # la réponse est dans recu_ext
         InterfaceCLI.dataExchange =''
         self.recevoirEnAttente.clear()
@@ -570,9 +574,9 @@ class WhatAreThePlayers():  # pas utilisé , ou cela va servir ?
 
     def get_unplayeractif(self):
         xbmc.log('request of one player :  ' + str(self.unplayeractif) ,xbmc.LOGNOTICE)
-        if self.playerSelection:
+        if self.playerSelectionID:
             # this one must be selected by the user in the beginning of the program
-            return self.playerSelection
+            return self.playerSelectionID
         else:   # in case the player selected is empty we return an other one.
                 # this case must not happen, but we never know a wrong program....
             return self.unplayeractif
