@@ -612,7 +612,7 @@ class VolumeFrameChild(pyxbmct.BlankDialogWindow):  # this one is transparent ba
         self.setGeometry(width_=Size_W_ChildSelf, height_=Size_H_ChildSelf,
                          rows_=5, columns_=10,
                          pos_x=int(640 - (Size_W_ChildSelf // 2)),
-                         pos_y=int(360 - 40))
+                         pos_y= 1 )
 
         self.set_info_controls()
         self.get_playerid()
@@ -624,12 +624,13 @@ class VolumeFrameChild(pyxbmct.BlankDialogWindow):  # this one is transparent ba
         self.connect(pyxbmct.ACTION_NAV_BACK, self.close)
         self.connect(pyxbmct.ACTION_PREVIOUS_MENU, self.close)
 
-        # self.connectEventList([pyxbmct.ACTION_MOVE_LEFT,
-        #               pyxbmct.ACTION_MOUSE_LEFT_CLICK,
-        #               pyxbmct.ACTION_MOVE_RIGHT],
-        #              self.slider_update)
+        self.connectEventList([pyxbmct.ACTION_MOVE_LEFT,
+                               pyxbmct.ACTION_MOUSE_LEFT_CLICK,
+                               pyxbmct.ACTION_MOVE_RIGHT
+                               ], self.slider_update
+                              )
 
-        # self.setFocus(self.slider_volume)
+        self.setFocus(self.slider_volume)
 
         xbmc.log('fin init child Volume Frame', xbmc.LOGDEBUG)
 
@@ -683,13 +684,18 @@ class VolumeFrameChild(pyxbmct.BlankDialogWindow):  # this one is transparent ba
 
     def setVolume(self, UpOrDown):
 
+        stringLabel = 'Volume : '
         requete = self.playerid + ' mixer volume ?'
         self.InterfaceCLI.sendtoCLISomething(requete)
         reponse = self.InterfaceCLI.receptionReponseEtDecodage()
         temp = reponse.split('volume|')
-        volumePercent = float(temp[1])
+        try:
+            volumePercent = float(temp[1])
+        except IndexError:
+            volumePercent = float(0)
+            stringLabel = 'Volume Error : '
         self.slider_volume.setPercent(volumePercent)
-        self.label_volume.setLabel('Volume : ' + str(volumePercent) + ' %')
+        self.label_volume.setLabel(stringLabel + str(volumePercent) + ' %')
 
         if UpOrDown == 'UP':
             volumePercent = volumePercent + 5.
@@ -728,7 +734,7 @@ class ContextMenuFrameChild(pyxbmct.AddonDialogWindow):  # this one is transpare
 
     def __init__(self):
         # super(VolumeFrameChild, self).__init__(title) # title for AddonDialogWindow or AddonFullWindow
-        super(ContextMenuFrameChild, self).__init__()
+        super(ContextMenuFrameChild, self).__init__('ContextMenu Key pressed')
         # get image back
         self.image_dir = ARTWORK  # path to pictures used in the program
         self.cover_jpg = self.image_dir + '/music.png'

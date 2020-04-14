@@ -18,7 +18,7 @@ import urllib
 import os
 import time
 
-from resources.lib import ConnexionClient, Ecoute, FrameList, FrameMyMusic, FramePLaying,  outils
+from resources.lib import ConnexionClient, Ecoute, FrameList, FrameMyMusic, FramePLaying,  outils ,  FrameMenuFavorites
 
 TAGS = 'aCdejJKlstuwxy'
 
@@ -470,14 +470,18 @@ class Plugin_Favorites(Plugin_Generique):
         self.origine.listMenu_Branches.reset()
 
         # creation  d'une nouvelle fenêtre
-        self.longListing = FrameList.ViewListPlugin(plugin)
-        self.longListing.show()
+        #self.longListing = FrameList.ViewListPlugin(plugin)
+        #self.longListing.show()
         # self.longListing.doModal()
+        # remplacé pour test  (Todo)
+        self.longListing = FrameMenuFavorites.FavoritesMenu()
+        self.longListing.show()
 
         # for indice in (1,2, 3 ,4):
         #    self.longListing.ArrayOfMenu[indice].reset()
-        self.longListing.ArrayOfMenu[1].reset()
+        #self.longListing.ArrayOfMenu[1].reset()
         # self.origine.listMenu_Fleur.reset()
+        self.longListing.listMenu_1.reset()
 
         self.origine.InterfaceCLI.sendtoCLISomething( plugin + ' items')
         nbre_a_traiter = self.origine.InterfaceCLI.receptionReponseEtDecodage().split('count:')
@@ -616,7 +620,7 @@ class Plugin_Favorites(Plugin_Generique):
 
             # then launch now is playing FramePlaying
             self.Abonnement.set() # need to renew subscribe after interupt
-            self.jivelette = FramePLaying.SlimIsPlaying(labelajouer)
+            self.jivelette = FramePLaying.SlimIsPlaying()
 
             self.WindowPlaying = xbmcgui.getCurrentWindowId()
             xbmc.log('fenetre en cours n° : ' + str(self.WindowPlaying), xbmc.LOGNOTICE)

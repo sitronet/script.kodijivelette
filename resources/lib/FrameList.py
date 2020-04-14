@@ -294,7 +294,7 @@ class ViewListPlugin(pyxbmct.AddonFullWindow):
 
                 # then launch now is playing FramePlaying
                 self.Abonnement.set() # need to renew subscribe after interupt
-                self.jivelette = FramePLaying.SlimIsPlaying(labelajouer)
+                self.jivelette = FramePLaying.SlimIsPlaying()
 
                 self.WindowPlaying = xbmcgui.getCurrentWindowId()
                 xbmc.log('fenetre en cours n° : ' + str(self.WindowPlaying), xbmc.LOGNOTICE)

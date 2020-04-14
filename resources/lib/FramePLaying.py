@@ -26,7 +26,10 @@ import random
 import threading
 import time
 
-from resources.lib import ConnexionClient , outils
+from resources.lib import ConnexionClient
+from resources.lib import outils
+from resources.lib import pyxbmctExtended
+
 
 sys.path.append(os.path.join(os.path.dirname(__file__), "resources", "lib"))
 
@@ -96,34 +99,63 @@ def singleton(cls):
 
     return wrapper
 
-#@singleton : singleton doesn't work ->  TypeError: super() argument 1 must be type, not function
-# no idea what that's is
-class SlimIsPlaying(pyxbmct.AddonFullWindow):
 
+class MySkin(pyxbmct.Skin):
+    '''
+    original source is :
+    @property
+    def main_bg_img(self):
+        return os.path.join(self.images, 'AddonWindow', 'SKINDEFAULT.jpg')
+
+    @property
+    def background_img(self):
+        return os.path.join(self.images, 'AddonWindow', 'ContentPanel.png')
+    '''
+
+    @property
+    def background_img(self):
+        #return xbmc.translatePath(os.path.join(ADDON.getAddonInfo('path'), 'resources', 'skins', 'Default', 'media','pcp_allegro.png'))
+        #return xbmc.translatePath(os.path.join(ADDON.getAddonInfo('path'), 'resources', 'skins', 'Default', 'media','pcp_encore.png'))
+        #return xbmc.translatePath(os.path.join(ADDON.getAddonInfo('path'), 'resources', 'skins', 'Default', 'media','pcp_harmony.png'))
+        #return xbmc.translatePath(os.path.join(ADDON.getAddonInfo('path'), 'resources', 'skins', 'Default', 'media','pcp_nocturne.png'))
+        #return xbmc.translatePath(os.path.join(ADDON.getAddonInfo('path'), 'resources', 'skins', 'Default', 'media', 'pcp_quartet.png'))
+        #return xbmc.translatePath(os.path.join(ADDON.getAddonInfo('path'), 'resources', 'skins', 'Default', 'media', 'pcp_sonata.png'))
+        #return xbmc.translatePath(os.path.join(ADDON.getAddonInfo('path'), 'resources', 'skins', 'Default', 'media', 'pcp_symphony.png'))
+        return xbmc.translatePath(os.path.join(ADDON.getAddonInfo('path'), 'resources', 'skins', 'Default', 'media', 'pcp_vibrato.png'))
+        #return xbmc.translatePath(os.path.join(ADDON.getAddonInfo('path'), 'resources', 'skins', 'Default', 'media', 'fond-noir.jpg'))
+
+    @property
+    def title_background_img(self):
+        return xbmc.translatePath(os.path.join(ADDON.getAddonInfo('path'), 'resources', 'skins', 'Default', 'media','pcp_vibrato.png'))
+
+    @property
+    def main_bg_img(self):
+        #return xbmc.translatePath(os.path.join(ADDON.getAddonInfo('path'), 'resources', 'skins', 'Default', 'media','fond-noir.jpg'))
+        return xbmc.translatePath(os.path.join(ADDON.getAddonInfo('path'), 'resources', 'skins', 'Default', 'media','pcp_vibrato.png'))
+
+
+pyxbmct.addonwindow.skin = MySkin()
+
+
+class SlimIsPlaying(pyxbmctExtended.BackgroundDialogWindow):
+#class SlimIsPlaying(pyxbmct.AddonFullWindow):
     def __init__(self, *args ):
-        title = args[0]
-        super(SlimIsPlaying, self).__init__( title)
+        #title = args[0] # for AddonFullWindow
+        #super(SlimIsPlaying, self).__init__( title)
+        # xbmc.log( ' param : ' + title  , xbmc.LOGNOTICE)
+
+        super(SlimIsPlaying, self).__init__()
+
+        self.WindowPlaying = xbmcgui.getCurrentWindowId()
+        xbmc.log('fenetre de class SlimIsPlaying n° : ' + str(self.WindowPlaying), xbmc.LOGDEBUG)
+        xbmc.log('Create Instance Slim is Now Playing KodiJivelette...' , xbmc.LOGNOTICE)
 
         self.threadRunning = True
         self.flagStatePause = False
 
-        xbmc.log( ' param : ' + title  , xbmc.LOGNOTICE)
-
-        self.WindowPlaying = xbmcgui.getCurrentWindowId()
-        xbmc.log('fenetre de class SlimIsPlaying n° : ' + str(self.WindowPlaying), xbmc.LOGDEBUG)
-
-        # the Event : c'est là que cela se complique , doit-on communiquer avec le thread  interfaceduCLI (socket qui
-        # envoie et reçoit  ?
-        # ou bien communiquer simplement entre les fonctions dans le programme appelant ?
-        # selon le modèle de conception de communication inter process : la programmation du code va changer
-        # alors faire Attention et décrire le modèle et la logique retenue
-
-        xbmc.log('Create Instance Slim is Now Playing KodiJivelette...' , xbmc.LOGNOTICE)
-
         SIZESCREEN_HEIGHT = xbmcgui.getScreenHeight()            # exemple  # 1080
         SIZESCREEN_WIDTH = xbmcgui.getScreenWidth()                         # 1920
-
-        # replaced by pyxbmct but need for the size cover until the fix
+        # Replaced by pyxbmct but need for the size cover until the fix
         self.GRIDSCREEN_Y, Reste = divmod(SIZESCREEN_HEIGHT, 10)            # 108
         self.GRIDSCREEN_X, Reste = divmod(SIZESCREEN_WIDTH, 10)             # 192
 

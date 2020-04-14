@@ -56,7 +56,9 @@ def translation(message_id, default=False):
 
 if __name__ == '__main__':
 
-    fenetredesMenus = FrameMenu.fenetreMenu(translation(32001, 'Home'))
+    #fenetredesMenus = FrameMenu.fenetreMenu(translation(32001, 'Home'))
+    fenetredesMenus = FrameMenu.fenetreMenu()
+
     fenetredesMenus.doModal()
 
     del fenetredesMenus

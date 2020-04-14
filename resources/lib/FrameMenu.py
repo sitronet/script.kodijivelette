@@ -31,6 +31,8 @@ from resources.lib import Ecoute, FramePLaying, FramePlaylist, outils, Plugin
 import json
 #from singleton_decorator import singleton
 
+from resources.lib import pyxbmctExtended
+
 if Kodi:
     import xbmc
     import xbmcgui
@@ -140,8 +142,6 @@ ACTION_VOLUME_DOWN = 89
 ACTION_VOLUME_UP = 88
 
 
-
-
 class MySkin(pyxbmct.Skin):
     '''
     original source is :
@@ -172,7 +172,7 @@ class MySkin(pyxbmct.Skin):
 
     @property
     def main_bg_img(self):
-        return xbmc.translatePath(os.path.join(ADDON.getAddonInfo('path'), 'resources', 'skins', 'Default', 'media','fond-noir.jpg'))
+        return xbmc.translatePath(os.path.join(ADDON.getAddonInfo('path'), 'resources', 'skins', 'Default', 'media','pcp_vibrato.png'))
 
 
 pyxbmct.addonwindow.skin = MySkin()
@@ -193,11 +193,16 @@ def singleton(cls):
     return wrapper
 
 #@singleton
+#class fenetreMenu(pyxbmct.AddonFullWindow):    # background (skin) header+ title
+#class fenetreMenu(pyxbmct.AddonDialogWindow):  # background (skin) header+ title + on the top screen
+#class fenetreMenu(pyxbmct.BlankDialogWindow):  # transparent without header+title and on top
+#class fenetreMenu(pyxbmct.BlankFullWindow):    # black background without header+title (cannot change background)
+#class fenetreMenu(pyxbmctExtended.AddonFullWindowWT)  # background (skin) without header+title
 class fenetreMenu(pyxbmct.AddonFullWindow):
 
     def __init__(self,*args, **kwargs):
-        title = args[0]
-        super(fenetreMenu, self).__init__(title)
+        #title = args[0]
+        super(fenetreMenu, self).__init__()
 
         self.Window_is_playing  = xbmcgui.getCurrentWindowId()
         self.flagContextMenu = False
@@ -357,7 +362,7 @@ class fenetreMenu(pyxbmct.AddonFullWindow):
             self.screenx = SIZE_WIDTH_pyxbmct
             self.screeny = SIZE_HEIGHT_pyxbmct
         #pyxbmct :
-        self.setGeometry(self.screenx  , self.screeny , NEUF, SEIZE)
+        self.setGeometry(width_=self.screenx, height_=self.screeny, rows_=NEUF, columns_=SEIZE)
         xbmc.log('Size of Frame Menu fix to : ' + str(self.screenx) + ' x ' + str(self.screeny), xbmc.LOGNOTICE)
 
         # size of the cover must be  a square
@@ -652,7 +657,10 @@ class fenetreMenu(pyxbmct.AddonFullWindow):
         #itemSelectionRacine = self.listMenu_Racine.getListItem(self.listMenu_Racine.getSelectedPosition()).getLabel()
 
         self.Abonnement.set()
-        self.jivelette = FramePLaying.SlimIsPlaying(title)
+        # With AddonFullWindow
+        #self.jivelette = FramePLaying.SlimIsPlaying(title)
+        # With BlankAddonWindow (no title)
+        self.jivelette = FramePLaying.SlimIsPlaying()
         self.jivelette.show()
         time.sleep(0.5)
         self.update_now_is_playing()
@@ -783,7 +791,12 @@ class fenetreMenu(pyxbmct.AddonFullWindow):
         if itemSelectionRacine == translation(32040 , 'Now Playing'):
             # activer frame EcouteEnCours
             self.Abonnement.set() # need to renew subscribe after interupt
-            self.jivelette = FramePLaying.SlimIsPlaying(translation(32040, 'Now Playing'))
+            # With AddonFullWindow
+            # self.jivelette = FramePLaying.SlimIsPlaying(title)
+            #self.jivelette = FramePLaying.SlimIsPlaying(translation(32040, 'Now Playing'))
+
+            # With BlankAddonWindow (no title)
+            self.jivelette = FramePLaying.SlimIsPlaying()
 
             self.WindowPlaying = xbmcgui.getCurrentWindowId()
             xbmc.log('fenetre en cours n° : ' + str(self.WindowPlaying), xbmc.LOGDEBUG)
