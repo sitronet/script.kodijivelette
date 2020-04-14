@@ -519,7 +519,7 @@ class fenetreMenu(pyxbmct.AddonFullWindow):
 
         row_depart = 1
         self.espace_row = 30
-        self.espace_col = 10
+        self.espace_col = 18
         hauteur_menu = 25
         col_depart_menu_branche = self.espace_col + 1
         row_hauteur_menu_branche = 30
