@@ -95,7 +95,12 @@ class FavoritesMenu(pyxbmct.BlankDialogWindow):
         # pyxbmct :
         largeur = 300
         hauteur = 500
-        self.setGeometry(largeur, hauteur, 2 , 10 , (1280 // 2)  - largeur , (720 // 2)  - (hauteur // 2) )
+        self.setGeometry(width_= largeur,
+                         height_= hauteur,
+                         rows_= 2 ,
+                         columns_= 10 ,
+                         pos_x= (1280 // 2)  - largeur ,
+                         pos_y= (720 // 2)  - (hauteur // 2) )
         xbmc.log('Size of Screen pyxbmct fix to : ' + str(largeur) + ' x ' + str(hauteur), xbmc.LOGNOTICE)
 
         self.image_dir = ARTWORK  # path to pictures used in the program
