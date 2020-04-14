@@ -223,4 +223,7 @@ msgctxt "#32930"
 msgid "Select One player in the list below"
 msgstr "Choisir une platine musicale dans la liste"
 
+msgctxt "#32931"
+msgid "Welcome to this Squeeze Box Display"
+msgstr "Bienvenue dans l'afficheur Squeeze Box"
 
