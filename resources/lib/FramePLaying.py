@@ -51,8 +51,13 @@ if Kodi:
     # screen 16:9 so to have grid square fix to 16-9 on 1280 x 720 max of pyxbmct
     SIZE_WIDTH_pyxbmct = 1280
     SIZE_HEIGHT_pyxbmct = 720
-    SEIZE = 16 * 4  #32 16 option
-    NEUF =   9 * 4  #18 or 9
+    SEIZE = 16 #* 4  #32 16 option -> 64
+    NEUF =   9 #* 4  #18 or 9 -> 36
+    # pgcd (720,1280) = 80
+    # so if the grid is composed with square tiles , tiles must be 80 x 80
+    # and SEIZE = 16 , NEUF = 9
+    # 16 x 80 = 1280
+    # 9 x 80 = 720
 
     # Kodi key action codes.
     # More codes available in xbmcgui module
@@ -173,7 +178,7 @@ class SlimIsPlaying(pyxbmctExtended.BackgroundDialogWindow):
 
         # sizecover must be  a square
         #SIZECOVER_X  = int(self.GRIDSCREEN_X * 2.5)  # need to ask artWork size from server, adapt to the size screen
-        SIZECOVER_X = int(self.screenx / SEIZE * 28 )
+        SIZECOVER_X = (SEIZE // 2) - 6
         self.sizecover_x = SIZECOVER_X
         #SIZECOVER_Y = self.GRIDSCREEN_Y * 3  # and reserve a sized frame to covers,attention SIZECOVER_X != SIZECOVER_Y
         xbmc.log('Taille pochette : ' + str(SIZECOVER_X) + ' x ' + str(SIZECOVER_X) , xbmc.LOGNOTICE)
@@ -204,7 +209,11 @@ class SlimIsPlaying(pyxbmctExtended.BackgroundDialogWindow):
 
         # reserve pour afficher cover.jpg
         self.pochette = pyxbmct.Image(self.cover_jpg)
-        self.placeControl(self.pochette, 3 , int(SEIZE / 2) , 28 , 28 )  # to fix
+        self.placeControl(control=self.pochette,
+                          row= 3 ,
+                          column= int(SEIZE / 2) ,
+                          rowspan= self.sizecover_x ,
+                          columnspan= self.sizecover_x )  # todo to fix
         self.pochette.setImage(self.cover_jpg)
 
         # title of radio , apps songs ...
@@ -231,7 +240,12 @@ class SlimIsPlaying(pyxbmctExtended.BackgroundDialogWindow):
 
         # Slider de la durée
         self.slider_duration = pyxbmct.Slider(textureback=self.textureback_slider_duration)
-        self.placeControl(self.slider_duration, ligneButton - 2  , int((SEIZE / 2) + 5 )  , 1 , 18 , pad_x=1)
+        self.placeControl(control=self.slider_duration,
+                          row= ligneButton - 2  ,
+                          column= SEIZE // 2  ,
+                          rowspan= 1 ,
+                          columnspan= self.sizecover_x ,
+                          pad_x= 1)
         #self.slider_duration = pyxbmct.Slider(textureback=self.textureback_slider_duration, buttonTexture=self.texture_slider_duration)
         #self.placeControl(self.slider_duration, ligneButton - 2  , int((SEIZE / 2) + 5 )  , 1 , 18 , pad_x = 5 , pad_y = 5 )
 
@@ -239,9 +253,21 @@ class SlimIsPlaying(pyxbmctExtended.BackgroundDialogWindow):
 
         # labels des durée
         self.labelduree_jouee = pyxbmct.Label('')
-        self.placeControl(control=self.labelduree_jouee, row=ligneButton - 2 , column=int( SEIZE /2 ),  rowspan= 2 , columnspan = 5 , pad_x = 5 , pad_y = 5 )
+        self.placeControl(control=self.labelduree_jouee,
+                          row=ligneButton - 2 ,
+                          column=SEIZE // 2,
+                          rowspan= 2 ,
+                          columnspan = 5 ,
+                          pad_x = 5 ,
+                          pad_y = 5 )
         self.labelduree_fin = pyxbmct.Label('')
-        self.placeControl(control=self.labelduree_fin,row= ligneButton - 2 , column=int( SEIZE /2 + 25), rowspan=2 ,columnspan= 4 , pad_x = 5 , pad_y = 5 )
+        self.placeControl(control=self.labelduree_fin,
+                          row= ligneButton - 2 ,
+                          column= SEIZE - 8 ,
+                          rowspan=2 ,
+                          columnspan= 4 ,
+                          pad_x = 5 ,
+                          pad_y = 5 )
 
         # no connect key
 
@@ -272,8 +298,6 @@ class SlimIsPlaying(pyxbmctExtended.BackgroundDialogWindow):
 
         self.connexionEvent()
 
-        self.connect(pyxbmct.ACTION_NAV_BACK, self.quit_now_playing) # rather self.close
-        self.connect(pyxbmct.ACTION_PREVIOUS_MENU, self.quit_now_playing) # rather self.close
 
     def connexionEvent(self):
         # Connect key and mouse events for list navigation feedback.
