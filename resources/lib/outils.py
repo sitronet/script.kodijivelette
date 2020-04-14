@@ -604,14 +604,15 @@ class VolumeFrameChild(pyxbmct.BlankDialogWindow):  # this one is transparent ba
 
         # take care of pos_x & pos_y
         Size_W_ChildSelf = 400
-        Size_H_ChildSelf = 200
+        Size_H_ChildSelf = 80
         SIZESCREEN_HEIGHT = xbmcgui.getScreenHeight()  # exemple  # 1080
         SIZESCREEN_WIDTH = xbmcgui.getScreenWidth()  # exemple 1920
         xbmc.log('size screen FrameParentVolume : ' + str(SIZESCREEN_WIDTH) + ' x ' + str(SIZESCREEN_HEIGHT), xbmc.LOGNOTICE)
         # remember we fit the parent to 64 columns  x 32 rows
-        self.setGeometry(width_=Size_W_ChildSelf, height_=Size_H_ChildSelf,
-                         rows_=5, columns_=10,
-                         pos_x=int(640 - (Size_W_ChildSelf // 2)),
+        self.setGeometry(width_= Size_W_ChildSelf, height_=Size_H_ChildSelf,
+                         rows_= 2,
+                         columns_= 10,
+                         pos_x= int(640 - (Size_W_ChildSelf // 2)),
                          pos_y= 1 )
 
         self.set_info_controls()
