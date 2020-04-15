@@ -222,26 +222,26 @@ class SlimIsPlaying(pyxbmctExtended.BackgroundDialogWindow):
         self.pochette = pyxbmct.Image(self.cover_jpg)
         self.placeControl(control=self.pochette,
                           row= 3 ,
-                          column= SEIZE // 2 ,
+                          column= ( SEIZE // 2 ) - 2 ,
                           rowspan= 28 ,
                           columnspan= 29 )  # todo to fix
         self.pochette.setImage(self.cover_jpg)
 
         # title of radio , apps songs ...
         self.labeltitre_1 = pyxbmct.FadeLabel( font= 'font50caps_title' , textColor ='0xFF888888' )
-        self.placeControl(self.labeltitre_1,  8 , 4 , 3 , 27 )
+        self.placeControl(self.labeltitre_1,  8 , 4 , 3 , 25 )
         self.labeltitre_1.addLabel('')
 
         self.labeltitre_2 = pyxbmct.FadeLabel( font = 'font13', textColor ='0xFF888888' )
-        self.placeControl(self.labeltitre_2, 12 , 4 , 2 , 27 )
+        self.placeControl(self.labeltitre_2, 12 , 4 , 2 , 25 )
         self.labeltitre_1.addLabel('')
 
         self.labelAlbum = pyxbmct.FadeLabel( font = 'font13', textColor ='0xFF888888' )
-        self.placeControl(self.labelAlbum, 14 , 4 , 2 , 27 )
+        self.placeControl(self.labelAlbum, 14 , 4 , 2 , 25 )
         self.labelAlbum.addLabel('')
 
         self.labelArtist = pyxbmct.FadeLabel( font = 'font13', textColor ='0xFF888888' )
-        self.placeControl(self.labelArtist, 16 , 4 , 2 , 27 )
+        self.placeControl(self.labelArtist, 16 , 4 , 2 , 25 )
         self.labelArtist.addLabel('')
 
         # la boite de texte 2 carrés de large sur 8 de hauteur (test avec 3 -> pas assez d'espace)
@@ -252,10 +252,10 @@ class SlimIsPlaying(pyxbmctExtended.BackgroundDialogWindow):
         # Slider de la durée
         self.slider_duration = pyxbmct.Slider(textureback=self.textureback_slider_duration)
         self.placeControl(control=self.slider_duration,
-                          row= ligneButton - 2  ,
-                          column= SEIZE // 2  ,
+                          row= ligneButton - 2 ,
+                          column= ( SEIZE // 2 )  - 2 ,
                           rowspan= 1 ,
-                          columnspan= self.sizecover_x ,
+                          columnspan= 29 ,
                           pad_x= 1)
         #self.slider_duration = pyxbmct.Slider(textureback=self.textureback_slider_duration, buttonTexture=self.texture_slider_duration)
         #self.placeControl(self.slider_duration, ligneButton - 2  , int((SEIZE / 2) + 5 )  , 1 , 18 , pad_x = 5 , pad_y = 5 )
@@ -266,7 +266,7 @@ class SlimIsPlaying(pyxbmctExtended.BackgroundDialogWindow):
         self.labelduree_jouee = pyxbmct.Label('')
         self.placeControl(control=self.labelduree_jouee,
                           row=ligneButton - 2 ,
-                          column=SEIZE // 2,
+                          column= ( SEIZE // 2 ) - 2 ,
                           rowspan= 2 ,
                           columnspan = 5 ,
                           pad_x = 5 ,
@@ -274,7 +274,7 @@ class SlimIsPlaying(pyxbmctExtended.BackgroundDialogWindow):
         self.labelduree_fin = pyxbmct.Label('')
         self.placeControl(control=self.labelduree_fin,
                           row= ligneButton - 2 ,
-                          column= ( SEIZE // 2 ) + (self.sizecover_x - 2)  ,
+                          column= ( SEIZE // 2 ) - 2  + ( 29 - 3 ) ,
                           rowspan=2 ,
                           columnspan= 4 ,
                           pad_x = 5 ,
