@@ -368,7 +368,7 @@ class fenetreMenu(pyxbmct.AddonFullWindow):
         # size of the cover must be  a square
         #SIZECOVER_X  = int(self.GRIDSCREEN_X * 2.5)  # need to ask artWork size from server, adapt to the size screen
         SIZECOVER_X = int(self.screenx / SEIZE * 28 )
-        self.sizecover_x = SIZECOVER_X
+        self.sizecover_x = SIZECOVER_X          # 1720 / 64 * 28 = 560 pixels
         #SIZECOVER_Y = self.GRIDSCREEN_Y * 3  # and reserve a sized frame to covers,attention SIZECOVER_X != SIZECOVER_Y
         xbmc.log('Taille pochette : ' + str(SIZECOVER_X) + ' x ' + str(SIZECOVER_X) , xbmc.LOGNOTICE)
 
