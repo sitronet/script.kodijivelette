@@ -253,9 +253,9 @@ class SlimIsPlaying(pyxbmctExtended.BackgroundDialogWindow):
         self.slider_duration = pyxbmct.Slider(textureback=self.textureback_slider_duration)
         self.placeControl(control=self.slider_duration,
                           row= ligneButton - 2 ,
-                          column= ( SEIZE // 2 )  - 2 ,
+                          column= ( SEIZE // 2 )  ,
                           rowspan= 1 ,
-                          columnspan= 29 ,
+                          columnspan= 29 - 4 ,
                           pad_x= 1)
         #self.slider_duration = pyxbmct.Slider(textureback=self.textureback_slider_duration, buttonTexture=self.texture_slider_duration)
         #self.placeControl(self.slider_duration, ligneButton - 2  , int((SEIZE / 2) + 5 )  , 1 , 18 , pad_x = 5 , pad_y = 5 )
