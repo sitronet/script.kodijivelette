@@ -1,3 +1,6 @@
+version 0.0.f14:
+new presentation of Now is playing (Without header and title)
+
 --------------------------------------------------------------
 Version 0.0.f12:
 move class child Volume et contextmenu
