@@ -1121,7 +1121,9 @@ class fenetreMenu(pyxbmct.AddonFullWindow):
         reponse = self.InterfaceCLI.receptionReponseEtDecodage()
 
         self.Abonnement.set()
-        self.frameRandomPlay = FramePlaylist.PlaylistPlugin(translation(32040, 'Now playing ') + ' : ' + title)
+        #self.frameRandomPlay = FramePlaylist.PlaylistPlugin(translation(32040, 'Now playing ') + ' : ' + title)
+        self.frameRandomPlay = FramePlaylist.PlaylistPlugin()
+
         self.frameRandomPlay.show()
         self.frameRandomPlay.listMenu_playlist.reset()
         self.update_random_mix_Playlist()

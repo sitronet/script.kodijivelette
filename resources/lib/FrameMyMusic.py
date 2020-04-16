@@ -75,11 +75,11 @@ def singleton(cls):
     return wrapper
 
 #@singleton
-class MyMusicPlugin(pyxbmct.AddonFullWindow):
+class MyMusicPlugin(pyxbmctExtended.BackgroundDialogWindow):
 
     def __init__(self, *args , **kwargs ):
-        title = args[0]
-        super(MyMusicPlugin, self).__init__( title)
+        #title = args[0]
+        super(MyMusicPlugin, self).__init__()
 
         self.recevoirEnAttente = threading.Event()
         self.recevoirEnAttente.clear()

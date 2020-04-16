@@ -210,7 +210,8 @@ class Plugin_Generique():
         xbmc.log( 'menu fleur , cmd & id ' + cmd + ' ' + item_id , xbmc.LOGNOTICE)
 
         # creation  d'une nouvelle fenêtre
-        self.longListing = FrameList.ViewListPlugin(labeldetete)
+        #self.longListing = FrameList.ViewListPlugin(labeldetete)
+        self.longListing = FrameList.ViewListPlugin()
         self.longListing.show()
         #self.longListing.doModal()
 
@@ -411,7 +412,8 @@ class Plugin_Generique():
 
 
     def functionNotYetImplemented(self):
-        self.erreur = FrameList.ViewListPlugin('Error inside the code')
+        #self.erreur = FrameList.ViewListPlugin('Error inside the code')
+        self.erreur = FrameList.ViewListPlugin()
 
         self.erreur.title_label.setLabel('Nobody is perfect')
 
@@ -838,7 +840,9 @@ class MyMusic(Plugin_Generique):
         #labeldetete = itemdelisteOrigine.getLabel()
 
         # affichage nouvelle fenêtre:
-        self.myMusic = FrameMyMusic.MyMusicPlugin(artist)
+        #self.myMusic = FrameMyMusic.MyMusicPlugin(artist)
+        self.myMusic = FrameMyMusic.MyMusicPlugin()
+
         self.myMusic.listMenu_allArtists.reset()
 
         self.myMusic.show()

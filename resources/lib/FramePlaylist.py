@@ -85,11 +85,11 @@ def singleton(cls):
     return wrapper
 
 #@singleton
-class PlaylistPlugin(pyxbmct.AddonFullWindow):
+class PlaylistPlugin(pyxbmctExtended.BackgroundDialogWindow):
 
     def __init__(self, *args , **kwargs ):
-        title = args[0]
-        super(PlaylistPlugin, self).__init__( title)
+        #title = args[0]
+        super(PlaylistPlugin, self).__init__()
 
         self.recevoirEnAttente = threading.Event()
         self.recevoirEnAttente.clear()
