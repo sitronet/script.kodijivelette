@@ -15,6 +15,8 @@ import os
 
 from resources.lib import ConnexionClient, Ecoute, FramePLaying, outils
 from resources.lib.Ecoute import Souscription
+from resources.lib import pyxbmctExtended
+
 
 if Kodi:
     import xbmc
@@ -70,10 +72,10 @@ def singleton(cls):
     return wrapper
 
 #@singleton
-class ViewListPlugin(pyxbmctExtended.BackgroundDialogWindow):
+class ViewListPlugin(pyxbmct.AddonFullWindow):
 
     def __init__(self, *args , **kwargs ):
-        title = args[0]
+        #title = args[0]
         super(ViewListPlugin, self).__init__()
 
         self.recevoirEnAttente = threading.Event()
@@ -83,23 +85,23 @@ class ViewListPlugin(pyxbmctExtended.BackgroundDialogWindow):
         self.WindowPlaying = xbmcgui.getCurrentWindowId()
         xbmc.log('fenetre de class ViewListPlugin n° : ' + str(self.WindowPlaying), xbmc.LOGNOTICE)
         xbmc.log('Create Instance ViewListPlugin KodiJivelette...' , xbmc.LOGNOTICE)
-        self.playerid = ''
 
         self.geometrie()
         xbmc.log('geometrie set', xbmc.LOGNOTICE)
         self.controlMenus()
-        xbmc.log('control set', xbmc.LOGNOTICE)
+        xbmc.log('control Menu set', xbmc.LOGNOTICE)
         self.set_navigation()
         xbmc.log('navigation  set', xbmc.LOGNOTICE)
 
+        self.get_playerid()
+
+        self.connect(self.listMenu_1, lambda: self.launchPlayingItem(menudeprovenance='listMenu_1'))
+        self.connect(self.listMenu_2, lambda: self.launchPlayingItem(menudeprovenance='listMenu_2'))
+
         self.connexionEvent()
 
-        self.connect(self.listMenu_1, lambda : self.launchPlayingItem(menudeprovenance='listMenu_1'))
-        self.connect(self.listMenu_2, lambda : self.launchPlayingItem(menudeprovenance='listMenu_2'))
-
-
-        self.connect(pyxbmct.ACTION_NAV_BACK, self.quit_listing) # rather self.close
-        self.connect(pyxbmct.ACTION_PREVIOUS_MENU, self.quit_listing) # rather self.close
+        #self.connect(pyxbmct.ACTION_NAV_BACK, self.quit_listing) # rather self.close
+        #self.connect(pyxbmct.ACTION_PREVIOUS_MENU, self.quit_listing) # rather self.close
 
 
     def geometrie(self):
@@ -115,8 +117,9 @@ class ViewListPlugin(pyxbmctExtended.BackgroundDialogWindow):
         xbmc.log('Real Size of Screen : ' + str(self.screenx) + ' x ' + str(self.screeny), xbmc.LOGNOTICE)
 
         if self.screenx > SIZE_WIDTH_pyxbmct:
-            self.screenx = SIZE_WIDTH_pyxbmct
+            self.screenx = SIZE_WIDTH_pyxbmct -100  # try
             self.screeny = SIZE_HEIGHT_pyxbmct
+
 
         #pyxbmct :
         self.setGeometry(self.screenx  , self.screeny , NEUF, SEIZE)
@@ -197,8 +200,8 @@ class ViewListPlugin(pyxbmctExtended.BackgroundDialogWindow):
             xbmc.log('nav_back' , xbmc.LOGNOTICE)
             self.quit_listing()
         else:
-            xbmc.log('else condition onAction' , xbmc.LOGNOTICE)
-            self._executeConnected(action, self.actions_connected)
+            xbmc.log('else condition onAction in FrameList' , xbmc.LOGNOTICE)
+        #    self._executeConnected(action, self.actions_connected)
 
     def quit_listing(self):# todo : à tester
             self.WindowPlayinghere = xbmcgui.getCurrentWindowId()
@@ -234,7 +237,21 @@ class ViewListPlugin(pyxbmctExtended.BackgroundDialogWindow):
         
     def   list_Menu_Navigation(self):
         # todo écrire quoi faire quanq un item est sélectionné dans le listemenu
-        pass
+        # todo écrire quoi faire quand on bouge les flèches , la souris
+        # à priori on veut juste naviguer entre les élements
+        # ou bien selectionner l'action sur le menu
+        # ce qui est fait par le connect
+        if self.getFocus() == self.listMenu_1:
+            self.itemSelection1 = self.listMenu_1.getListItem(
+                self.listMenu_1.getSelectedPosition()).getLabel()
+            self.title_label.setLabel(self.itemSelection1)
+        elif self.getFocus() == self.listMenu_2:
+            self.itemSelection1 = self.listMenu_2.getListItem(
+                self.listMenu_2.getSelectedPosition()).getLabel()
+            self.title_label.setLabel(self.itemSelection1)
+
+
+
 
     def launchPlayingItem(self, menudeprovenance):
         ''' when an app or a radio is selected  launch the command to play
@@ -245,6 +262,7 @@ class ViewListPlugin(pyxbmctExtended.BackgroundDialogWindow):
         except (=not audio or hasitem true)  we need to dig more -> open listmenu_2
 
         '''
+        xbmc.log('entrée dans la function launchPlayingItem', xbmc.LOGNOTICE  )
 
         self.get_playerid()
         self.get_ident_server()
@@ -308,7 +326,7 @@ class ViewListPlugin(pyxbmctExtended.BackgroundDialogWindow):
                 #self.jivelette.doModal()
                 del self.jivelette
             else:
-                # cancel asked
+                xbmc.log('not audio', xbmc.LOGNOTICE)
                 pass
 
         else:
@@ -649,7 +667,7 @@ class ViewListPlugin(pyxbmctExtended.BackgroundDialogWindow):
 
     def get_playerid(self):
         self.Players = outils.WhatAreThePlayers()
-        self.playerid = self.Players.get_unplayeractif()
+        self.playerid = self.Players.playerSelectionID
 
     def get_ident_server(self):
         self.Server = outils.WhereIsTheLMSServer()

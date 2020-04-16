@@ -1,3 +1,8 @@
+version 0.0.g00:
+Modificaton de toutes les fenêtres pour avoir sans header ,
+juste un essai
+
+--------------------------------------------------------------
 version 0.0.f14:
 new presentation of Now is playing (Without header and title)
 

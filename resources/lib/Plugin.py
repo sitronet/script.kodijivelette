@@ -212,7 +212,7 @@ class Plugin_Generique():
         # creation  d'une nouvelle fenêtre
         #self.longListing = FrameList.ViewListPlugin(labeldetete)
         self.longListing = FrameList.ViewListPlugin()
-        self.longListing.show()
+        #self.longListing.show()
         #self.longListing.doModal()
 
         #for indice in (1,2, 3 ,4):
@@ -374,9 +374,9 @@ class Plugin_Generique():
                     self.longListing.listMenu_1.addItem(item)
                     #self.origine.listMenu_Fleur.addItem(item)
 
-            self.longListing.listMenu_1.setVisible(True)
-            #self.longListing.doModal()
-            xbmc.Monitor().waitForAbort()
+            #self.longListing.listMenu_1.setVisible(True)
+            self.longListing.doModal()
+            #xbmc.Monitor().waitForAbort()
             del self.longListing
 
         # fin fonction fin fonction le_menu_fleurs, class Plugin_Generique

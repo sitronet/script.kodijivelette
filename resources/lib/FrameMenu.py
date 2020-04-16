@@ -286,7 +286,7 @@ class fenetreMenu(pyxbmct.AddonFullWindow):
 
 
         else:
-            xbmc.log('else condition onAction ' + repr(action)  , xbmc.LOGNOTICE)
+            xbmc.log('else condition onAction in FrameMenu' + repr(action)  , xbmc.LOGNOTICE)
             self._executeConnected(action, self.actions_connected)
 
     def quit(self):
@@ -520,32 +520,44 @@ class fenetreMenu(pyxbmct.AddonFullWindow):
         row_depart = 1
         self.espace_row = 30
         self.espace_col = 18
-        hauteur_menu = 25
         col_depart_menu_branche = self.espace_col + 1
         row_hauteur_menu_branche = 30
-        col_largeur_menu_branche = 15
-        col_depart_menu_feuille = col_depart_menu_branche + col_largeur_menu_branche + 2
+        col_largeur_menu_branche = 18
+        col_depart_menu_feuille = col_depart_menu_branche + col_largeur_menu_branche
         col_largeur_menu_feuille = col_largeur_menu_branche + 10
         row_hauteur_menu_feuille = row_hauteur_menu_branche
 
         # init
         
-        self.placeControl(self.listMenu_Initialisation_server,  NEUF / 2  ,  (SEIZE / 2 ) - self.espace_col  , self.espace_row, self.espace_col * 2 )
+        self.placeControl(self.listMenu_Initialisation_server,
+                          NEUF // 2  ,
+                          (SEIZE // 2 ) - self.espace_col //2 ,
+                          self.espace_row,
+                          self.espace_col  )
 
-        self.placeControl(self.listMenu_Initialisation_players, NEUF / 2, (SEIZE / 2) - self.espace_col, self.espace_row,
-                          self.espace_col * 2)
+        self.placeControl(self.listMenu_Initialisation_players,
+                          NEUF // 2,
+                          (SEIZE // 2) - self.espace_col // 2 ,
+                          self.espace_row,
+                          self.espace_col )
 
-        self.placeControl(self.listMenu_Racine , row_depart , 0, self.espace_row, self.espace_col)
+        self.placeControl(self.listMenu_Racine ,
+                          row_depart ,
+                          0,
+                          self.espace_row,
+                          self.espace_col)
 
         # Add items to the list
         self.listMenu_Initialisation_server.addItems(self.ListePourInitialisationServer)
-        #self.listMenu_Initialisation_players.addItems(self.ListePourInitialisationPlayers)
         self.listMenu_Racine.addItems(self.listeRacinePourMenuRacine)
         self.listMenu_Extras.addItems(self.listeExtraPourMenuExtras)
 
         # I try to paste the control here if not raise un error
-        self.placeControl(self.listMenu_MyMusic, row_depart, col_depart_menu_branche, \
-                          row_hauteur_menu_branche, col_largeur_menu_branche)
+        self.placeControl(self.listMenu_MyMusic,
+                          row_depart,
+                          col_depart_menu_branche,
+                          row_hauteur_menu_branche,
+                          col_largeur_menu_branche)
 
         self.placeControl(self.listMenu_Branches , row_depart, col_depart_menu_branche, \
                           row_hauteur_menu_branche, col_largeur_menu_branche)
@@ -2162,6 +2174,8 @@ class fenetreMenu(pyxbmct.AddonFullWindow):
                     size_of_listMenu_playlist = self.frameRandomPlay.listMenu_playlist.size()
 
                     if int(playlist_index) >= size_of_listMenu_playlist:
+                        nameOfFileArtwork = self.get_artwork(index=playlist_index, artwork_track_id=track_id)
+                        tracktampon.setArt({'thumb': nameOfFileArtwork})
                         self.frameRandomPlay.listMenu_playlist.addItem(tracktampon)
                         # put again the playing item because lost by addItem
                         self.frameRandomPlay.listMenu_playlist.selectItem(int(playlist_current_index_title))

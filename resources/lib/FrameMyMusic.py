@@ -17,6 +17,8 @@ import os
 
 from resources.lib import ConnexionClient, Ecoute, outils
 from resources.lib.Ecoute import Souscription
+from resources.lib import pyxbmctExtended
+
 
 import json
 
@@ -89,7 +91,6 @@ class MyMusicPlugin(pyxbmctExtended.BackgroundDialogWindow):
         xbmc.log('fenetre de class MyMusicPlugin n° : ' + str(self.WindowPlaying), xbmc.LOGNOTICE)
         xbmc.log('Create Instance MyMusicPlugin KodiJivelette...' , xbmc.LOGNOTICE)
         self.playerid = ''
-        self.mustQuit = False
 
         self.geometrie()
         xbmc.log('geometrie set', xbmc.LOGNOTICE)
@@ -103,7 +104,6 @@ class MyMusicPlugin(pyxbmctExtended.BackgroundDialogWindow):
         self.connect(self.listMenu_allArtists, lambda : self.detailAlbums(menudeprovenance='listMenu_allArtists'))
         self.connect(self.listMenu_detailAlbums, lambda : self.listeTracks(menudeprovenance='listMenu_detailAlbums'))
         self.connect(self.listMenu_playlist, self.detailItemPlaylist)
-        self.connect(self.bouton_exit, self.exit_this_frame)
 
         self.connect(pyxbmct.ACTION_NAV_BACK, self.quit_listing) # rather self.close
         self.connect(pyxbmct.ACTION_PREVIOUS_MENU, self.quit_listing) # rather self.close
@@ -129,7 +129,6 @@ class MyMusicPlugin(pyxbmctExtended.BackgroundDialogWindow):
 
         self.cover_jpg = self.image_dir + '/music.png'  # pour le démarrage then updated
         self.image_background = self.image_dir + '/fond-noir.jpg'  # in next release could be change by users
-        self.image_progress = self.image_dir + '/ajax-loader-bar.gif'  # not yet used, get from speedtest
         self.image_button_pause = self.image_dir + '/pause.png'  # get from Xsqueeze
         self.image_button_stop = self.image_dir + '/stop.png'  # get from Xsqueeze
         self.image_button_play = self.image_dir + '/play.png'  # get from Xsqueeze
@@ -143,7 +142,8 @@ class MyMusicPlugin(pyxbmctExtended.BackgroundDialogWindow):
         self.setGeometry(self.screenx  , self.screeny , NEUF, SEIZE)
         xbmc.log('Size of Screen pyxbmct fix to : ' + str(self.screenx) + ' x ' + str(self.screeny), xbmc.LOGNOTICE)
         # cover when playing
-        SIZECOVER_X = int(self.screenx / SEIZE * 28 )
+        #SIZECOVER_X = int(self.screenx / SEIZE * 28 )
+        SIZECOVER_X = (SEIZE // 2) - 6
         self.sizecover_x = SIZECOVER_X
         #SIZECOVER_Y = self.GRIDSCREEN_Y * 3  # and reserve a sized frame to covers,attention SIZECOVER_X != SIZECOVER_Y
         xbmc.log('Taille pochette : ' + str(SIZECOVER_X) + ' x ' + str(SIZECOVER_X) , xbmc.LOGNOTICE)
@@ -156,22 +156,43 @@ class MyMusicPlugin(pyxbmctExtended.BackgroundDialogWindow):
         self.cover_jpg = self.image_dir + '/vinyl.png'      # pour le démarrage then updated
 
         # need some adjustment
+        # reserve pour afficher cover.jpg
         self.pochette = pyxbmct.Image(self.cover_jpg)
-        #self.pochette = pyxbmct.Image()
-        self.placeControl(self.pochette, 3 , int(SEIZE / 2) + 1 , 28 , 28 )  # to fix
+        self.placeControl(control=self.pochette,
+                          row=3,
+                          column=(SEIZE // 2) - 2,
+                          rowspan=28,
+                          columnspan=29)  # todo to fix
         self.pochette.setImage(self.cover_jpg)
 
         # Slider de la durée
-        self.slider_duration = pyxbmct.Slider()
-        self.placeControl(self.slider_duration, ligneButton - 2  , int((SEIZE / 2) + 5 )  , 1 , 18 , pad_x = 1 , pad_y = 5 )
+        self.slider_duration = pyxbmct.Slider(textureback=self.textureback_slider_duration)
+        self.placeControl(control=self.slider_duration,
+                          row=ligneButton - 2,
+                          column=(SEIZE // 2),
+                          rowspan=1,
+                          columnspan=29 - 4,
+                          pad_x=1)
+
         self.slider_duration.setPercent(SLIDER_INIT_VALUE)
 
         # labels des durée
-        self.labelduree_jouee = pyxbmct.Label('')
-        self.placeControl(control=self.labelduree_jouee, row=ligneButton - 2 , column=int( SEIZE /2 ),  rowspan= 2 , columnspan = 5 , pad_x = 5 , pad_y = 5 )
-        self.labelduree_fin = pyxbmct.Label('')
-        self.placeControl(control=self.labelduree_fin,row= ligneButton - 2 , column=int( SEIZE /2 + 25), rowspan=2 ,columnspan= 3 , pad_x = 5 , pad_y = 5 )
-
+        self.labelduree_jouee = pyxbmct.Label('',textColor ='0xFF808080')
+        self.placeControl(control=self.labelduree_jouee,
+                          row=ligneButton - 2,
+                          column=(SEIZE // 2) - 2,
+                          rowspan=2,
+                          columnspan=5,
+                          pad_x=5,
+                          pad_y=5)
+        self.labelduree_fin = pyxbmct.Label('',textColor ='0xFF888888')
+        self.placeControl(control=self.labelduree_fin,
+                          row=ligneButton - 2,
+                          column=(SEIZE // 2) - 2 + (29 - 3),
+                          rowspan=2,
+                          columnspan=4,
+                          pad_x=5,
+                          pad_y=5)
 
 
 
@@ -202,10 +223,6 @@ class MyMusicPlugin(pyxbmctExtended.BackgroundDialogWindow):
         self.listMenu_allArtists.addItem('.')
         self.listMenu_playlist.addItem('.')
 
-        self.bouton_exit = pyxbmct.Button('Exit this frame')
-        self.placeControl(self.bouton_exit , 35 , 1  , 2 , 8 ) # on the left bottom of the screen
-
-
     def connexionEvent(self):
             # Connect key and mouse events for list navigation feedback.
             self.connectEventList(
@@ -232,7 +249,7 @@ class MyMusicPlugin(pyxbmctExtended.BackgroundDialogWindow):
             xbmc.log('nav_back' , xbmc.LOGNOTICE)
             self.quit_listing()
         else:
-            xbmc.log('else condition onAction' , xbmc.LOGNOTICE)
+            xbmc.log('else condition onAction in FrameMyMusic' , xbmc.LOGNOTICE)
             self._executeConnected(action, self.actions_connected)
 
     def quit_listing(self):# todo : à tester
@@ -247,10 +264,6 @@ class MyMusicPlugin(pyxbmctExtended.BackgroundDialogWindow):
         self.threadRunning = False
         self.close()
 
-    def exit_this_frame(self):
-        self.mustQuit = True
-
-
     def set_navigation(self):
 
         # Set navigation between controls (Button, list or slider)
@@ -262,20 +275,20 @@ class MyMusicPlugin(pyxbmctExtended.BackgroundDialogWindow):
         #self.listMenu_allArtists.controlLeft(self.listMenu_detailAlbums)
         self.listMenu_detailAlbums.controlLeft(self.listMenu_allArtists)
 
-        self.listMenu_allArtists.controlLeft(self.bouton_exit)
-        self.listMenu_playlist.controlLeft(self.bouton_exit)
-        self.bouton_exit.controlRight(self.listMenu_playlist)
-        self.bouton_exit.controlLeft(self.listMenu_playlist)
-        self.bouton_exit.controlUp(self.listMenu_playlist)
-        self.bouton_exit.controlDown(self.listMenu_allArtists)
-
-
         # Set initial focus , don't forget to fill an item before setfocus
         self.setFocus(self.listMenu_allArtists)
         
     def   list_Menu_Navigation(self):
         # todo écrire quoi faire quanq un item est sélectionné dans le listemenu
-        pass
+        if self.getFocus() == self.listMenu_allArtists:
+            self.itemSelection = self.listMenu_playlist.getListItem(
+                self.listMenu_playlist.getSelectedPosition()).getLabel()
+            self.title_label.setLabel(self.itemSelection)
+
+        elif self.getFocus() == self.listMenu_detailAlbums:
+            self.itemSelectiondetail = self.listMenu_detailAlbums.getListItem(
+                                self.listMenu_detailAlbums.getSelectedPosition()).getLabel()
+            self.title_label.setLabel(self.itemSelectiondetail)
 
     def launchArtists(self, menudeprovenance='allArtists'):
         pass
@@ -536,12 +549,6 @@ class MyMusicPlugin(pyxbmctExtended.BackgroundDialogWindow):
         dialogSongInfo = xbmcgui.Dialog()
         dialogSongInfo.textviewer('Song Info : ' + labelajouer , textInfo )
 
-
-        pass
-
-    #self.functionNotYetImplemented()
-
-
     def functionNotYetImplemented(self):
         '''
         print in a menu (n°4) of the screen
@@ -788,3 +795,16 @@ class MyMusicPlugin(pyxbmctExtended.BackgroundDialogWindow):
             self.pochette.setImage(completeNameofFile) # fonction d'xbmcgui
             #os.remove(completeNameofFile)  # suppression du fichier
             # fin fonction update_cover
+
+    def futureFunction(self):
+        pass
+
+    def promptVolume(self):
+        volumeFrame = outils.VolumeFrameChild()
+        volumeFrame.doModal()
+        del volumeFrame
+
+    def promptContextMenu(self):
+        contextMenuFrame = outils.ContextMenuFrameChild()
+        contextMenuFrame.doModal()
+        del contextMenuFrame

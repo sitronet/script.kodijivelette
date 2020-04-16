@@ -118,3 +118,16 @@ msgstr "Init Server"
 msgctxt "#32930"
 msgid "Select One player in the list below"
 msgstr "Select One Squeezebox player in the list below"
+
+msgctxt "#32921"
+msgid "Quit the program"
+msgstr ""
+
+
+msgctxt "#32930"
+msgid "Select One player in the list below"
+msgstr ""
+
+msgctxt "#32931"
+msgid "Welcome to this Squeeze Box Display"
+msgstr ""

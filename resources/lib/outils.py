@@ -23,6 +23,8 @@ import random
 import os
 
 from resources.lib.ConnexionClient import InterfaceCLIduLMS
+from resources.lib import pyxbmctExtended
+
 
 Kodi = True
 if Kodi:
@@ -678,7 +680,10 @@ class VolumeFrameChild(pyxbmct.BlankDialogWindow):  # this one is transparent ba
         self.InterfaceCLI.sendtoCLISomething(requete)
         reponse = self.InterfaceCLI.receptionReponseEtDecodage()
         temp = reponse.split('volume|')
-        volumePercent = float(temp[1])
+        try:
+            volumePercent = float(temp[1])
+        except IndexError:
+            volumePercent = float(0)
         # self.slider_volume.setInt( int(volumePercent) , 0 , 5 , 100 )
         self.slider_volume.setPercent(volumePercent)
         self.label_volume.setLabel('Volume : ' + str(volumePercent) + ' %')
@@ -722,7 +727,9 @@ class VolumeFrameChild(pyxbmct.BlankDialogWindow):  # this one is transparent ba
 
     def get_playerid(self):
         self.Players = WhatAreThePlayers()
-        self.playerid = self.Players.get_unplayeractif()
+        #self.playerid = self.Players.get_unplayeractif()
+        self.playerid = self.Players.playerSelectionID
+
 
     def get_ident_server(self):
         self.Server = WhereIsTheLMSServer()
@@ -785,6 +792,62 @@ class ContextMenuFrameChild(pyxbmct.AddonDialogWindow):  # this one is transpare
 
     def context_update(self):
         pass
+
+class ContextActionFrameChild(pyxbmctExtended.BackgroundDialogWindow):  # this one is transparent background and resized
+    # class VolumeFrameChild(pyxbmct.BlankFullWindow):  # this one is black background all the screen
+
+    def __init__(self):
+        # super(VolumeFrameChild, self).__init__(title) # title for AddonDialogWindow or AddonFullWindow
+        super(ContextMenuFrameChild, self).__init__()
+        # get image back
+        self.image_dir = ARTWORK  # path to pictures used in the program
+        self.cover_jpg = self.image_dir + '/music.png'
+
+        Size_W_ChildSelf = 400
+        Size_H_ChildSelf = 400
+        SIZESCREEN_HEIGHT = xbmcgui.getScreenHeight()  # exemple  # 1080
+        SIZESCREEN_WIDTH = xbmcgui.getScreenWidth()  # 1920
+        self.setGeometry(width_=Size_W_ChildSelf, height_=Size_H_ChildSelf,
+                         rows_=10, columns_=10,
+                         pos_x=int(640 - (Size_W_ChildSelf // 2)),
+                         pos_y=int(360 - Size_H_ChildSelf))
+        # self.setGeometry(width_=Size_W_ChildSelf, height_=Size_H_ChildSelf,
+        #                 rows_=10, columns_=10,
+        #                 pos_x= -1,
+        #                 pos_y= -1 )
+        self.set_info_controls()
+
+        # Connect a key action (Backspace) to close the window.
+        self.connect(pyxbmct.ACTION_NAV_BACK, self.close)
+        self.connect(pyxbmct.ACTION_PREVIOUS_MENU, self.close)
+
+        self.connectEventList([pyxbmct.ACTION_MOVE_LEFT,
+                               pyxbmct.ACTION_MOVE_RIGHT,
+                               pyxbmct.ACTION_MOUSE_DRAG,
+                               pyxbmct.ACTION_MOUSE_LEFT_CLICK],
+                              self.context_update)
+        xbmc.log('fin init child ContextMenu Frame', xbmc.LOGDEBUG)
+
+    def set_info_controls(self):
+        self.label_context = pyxbmct.Label('-------------------Development future---------------------',
+                                           alignment=pyxbmct.ALIGN_CENTER)
+        self.placeControl(control=self.label_context, row=0, column=0, rowspan=1, columnspan=10)
+        # self.slider_volume = pyxbmct.Slider(textureback=self.textureback_slider_volume,
+        #                               texture=self.texture_slider_volume,
+        #                                texturefocus=self.textureback_slider_volume, orientation=xbmcgui.HORIZONTAL)
+        self.button_context = pyxbmct.Button('Bouton', focusTexture=self.cover_jpg, noFocusTexture=self.cover_jpg)
+        self.placeControl(control=self.button_context, row=4, column=0, rowspan=2, columnspan=2)
+
+        self.label_context_basdroite = pyxbmct.Label('BD')
+        self.placeControl(control=self.label_context_basdroite, row=10, column=0, rowspan=1, columnspan=1)
+        self.label_context_basgauche = pyxbmct.Label('BG')
+        self.placeControl(control=self.label_context_basgauche, row=10, column=9, rowspan=1, columnspan=1)
+
+        self.setFocus(self.button_context)
+
+    def context_update(self):
+        pass
+
 
 ##############################################################################
     # Convert number of seconds to summat nice for screen 00:00 etc

@@ -215,9 +215,6 @@ class SlimIsPlaying(pyxbmctExtended.BackgroundDialogWindow):
 
         self.image_list_focus = self.image_dir + '/MenuItemFO.png'  # myself
 
-        self.textureback_slider_volume = self.image_dir + '/slider_back.png'
-        self.texture_slider_volume = self.image_dir + '/slider_button_new.png'
-
         # reserve pour afficher cover.jpg
         self.pochette = pyxbmct.Image(self.cover_jpg)
         self.placeControl(control=self.pochette,
@@ -280,7 +277,6 @@ class SlimIsPlaying(pyxbmctExtended.BackgroundDialogWindow):
                           pad_x = 5 ,
                           pad_y = 5 )
 
-        # no connect key
 
         # réserver la boite pour les infos sur le player, à ajuster selon retour expérience.
         self.playerbox = pyxbmct.TextBox()
@@ -294,23 +290,9 @@ class SlimIsPlaying(pyxbmctExtended.BackgroundDialogWindow):
         self.placeControl(self.bouton_play , row = NEUF / 2 , column= (SEIZE / 2 ) - 2  , rowspan= 6 , columnspan= 6 )
         self.bouton_play.setVisible(False)
 
-        # Slider Volume :
-        self.label_volume = pyxbmct.Label('' , alignment=pyxbmct.ALIGN_CENTER)
-        self.placeControl(control=self.label_volume, row= ( NEUF / 2 )- 2 , column= ( SEIZE /2 ) - 15  , rowspan=2, columnspan=30)
-        self.slider_volume = pyxbmct.Slider(textureback=self.textureback_slider_volume, texture=self.texture_slider_volume,
-                                            texturefocus=self.textureback_slider_volume, orientation=xbmcgui.HORIZONTAL)
-        self.placeControl(control=self.slider_volume ,
-                          row = NEUF / 2  ,
-                          column = ( SEIZE / 2 ) - 15  ,
-                          rowspan = 3 ,
-                          columnspan = 30  )
-        self.label_volume.setVisible(False)
-        self.slider_volume.setVisible(False)
-
+        #  connect key
         # zone de contrôle des actions
         self.connect(self.bouton_pause, self.pause_play)
-        #self.connect(self.bouton_play, self.enleverpause)
-
         self.connexionEvent()
 
 
@@ -348,17 +330,17 @@ class SlimIsPlaying(pyxbmctExtended.BackgroundDialogWindow):
             xbmc.log('Action Play', xbmc.LOGNOTICE)
             self.pause_play()
 
-        elif action == ACTION_VOLUME_DOWN or ACTION_VOLUME_UP:
+        elif ( action == ACTION_VOLUME_DOWN )  or ( action == ACTION_VOLUME_UP ) :
             xbmc.log('Action Volume' , xbmc.LOGNOTICE)
             self.promptVolume()
         
-        elif action == ACTION_PREVIOUS_MENU:
+        elif action == xbmcgui.ACTION_CONTEXT_MENU:
             xbmc.log('Action previous Menu', xbmc.LOGNOTICE)
             self.promptContextMenu()
 
         else:
-            xbmc.log('else condition onAction' , xbmc.LOGNOTICE)
-            self._executeConnected(action, self.actions_connected)
+            xbmc.log('else condition onAction in FramePlaying' , xbmc.LOGNOTICE)
+            #self._executeConnected(action, self.actions_connected)
 
 
     def quit_now_playing(self):# todo : à tester
@@ -398,40 +380,6 @@ class SlimIsPlaying(pyxbmctExtended.BackgroundDialogWindow):
 
     def futureFunction(self):
         pass
-
-    def setVolume(self, UpOrDown):
-
-
-        # need to know the actual volume in percent
-        self.get_playerid()
-        self.get_ident_server()
-        self.connectInterface()
-        requete = self.playerid + ' mixer volume ?'
-        self.InterfaceCLI.sendtoCLISomething(requete)
-        reponse = self.InterfaceCLI.receptionReponseEtDecodage()
-        temp = reponse.split('volume|')
-        volumePercent = float(temp[1])
-        self.slider_volume.setPercent(volumePercent)
-        self.label_volume.setLabel('Volume on ' + self.playerid + ' - - -  ' + str(volumePercent) + ' %')
-
-        self.label_volume.setVisible(True)
-        self.slider_volume.setVisible(True)
-
-        if UpOrDown == 'UP':
-            volumePercent = volumePercent + 5.
-            if volumePercent >= 100:
-                volumePercent = 100
-
-        elif UpOrDown == 'DOWN':
-            volumePercent = volumePercent - 5.
-            if volumePercent < 0 :
-                volumePercent = 0
-        else:
-            pass
-        requete = self.playerid + ' mixer volume ' + str(volumePercent)
-        self.InterfaceCLI.sendtoCLISomething(requete)
-        reponse = self.InterfaceCLI.receptionReponseEtDecodage()
-        self.slider_volume.setPercent(volumePercent)
 
     def promptVolume(self):
         volumeFrame = outils.VolumeFrameChild()
@@ -476,18 +424,10 @@ class SlimIsPlaying(pyxbmctExtended.BackgroundDialogWindow):
         urlcover = 'http://' + lmsip + ':' + lmswebport + \
                    '/music/current/cover.jpg?player=' + playerid    # or self.playerID ?
         xbmc.log(urlcover, xbmc.LOGNOTICE)
-        # bug on libreelec -> file system is read-only
-        # so save in /tmp , construct the complete path
-        # os.tmpfile() ??
-        #savepath = xbmc.translatePath('special://temp')
-        #savepath = '/tmp/'
-        # savepath = 'special://temp'       # doesn't work
         filename = 'pochette' + str(compteur) + '.tmp'
         completeNameofFile = os.path.join(savepath , filename )
         xbmc.log('filename tmp : ' + str(completeNameofFile), xbmc.LOGNOTICE)
         urllib.urlretrieve(urlcover , completeNameofFile)
-        # mise à jour de la pochette sur l'écran
-        # fonctionne une seule fois , pourquoi ?
         self.pochette.setImage(completeNameofFile) # fonction d'xbmcgui
         #os.remove(completeNameofFile)  # suppression du fichier
         # fin fonction update_cover

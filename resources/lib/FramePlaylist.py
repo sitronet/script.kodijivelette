@@ -17,6 +17,8 @@ import os
 
 from resources.lib import ConnexionClient, Ecoute, outils
 from resources.lib.Ecoute import Souscription
+from resources.lib import pyxbmctExtended
+
 
 import json
 
@@ -99,22 +101,16 @@ class PlaylistPlugin(pyxbmctExtended.BackgroundDialogWindow):
         xbmc.log('fenetre de class PlaylistPlugin n° : ' + str(self.WindowPlaying), xbmc.LOGNOTICE)
         xbmc.log('Create Instance PlaylistPlugin KodiJivelette...' , xbmc.LOGNOTICE)
         self.playerid = ''
-        self.mustQuit = False
-
         self.geometrie()
         xbmc.log('geometrie set', xbmc.LOGNOTICE)
         self.controlMenus()
         xbmc.log('control set', xbmc.LOGNOTICE)
-        self.set_navigation()
         xbmc.log('navigation  set', xbmc.LOGNOTICE)
 
         self.connexionEvent()
-
         self.connect(self.listMenu_playlist, self.selectActionofItem)
-        self.connect(self.bouton_exit, self.exit_this_frame)
+        self.set_navigation()
 
-        self.connect(pyxbmct.ACTION_NAV_BACK, self.quit_listing) # rather self.close
-        self.connect(pyxbmct.ACTION_PREVIOUS_MENU, self.quit_listing) # rather self.close
 
         # initialisation diverses :
         self.connectInterface()
@@ -141,7 +137,7 @@ class PlaylistPlugin(pyxbmctExtended.BackgroundDialogWindow):
         xbmc.log('Real Size of Screen : ' + str(self.screenx) + ' x ' + str(self.screeny), xbmc.LOGNOTICE)
 
         if self.screenx > SIZE_WIDTH_pyxbmct:
-            self.screenx = SIZE_WIDTH_pyxbmct
+            self.screenx = SIZE_WIDTH_pyxbmct  # try
             self.screeny = SIZE_HEIGHT_pyxbmct
 
         self.image_dir = ARTWORK  # path to pictures used in the program (future development, todo)
@@ -163,7 +159,7 @@ class PlaylistPlugin(pyxbmctExtended.BackgroundDialogWindow):
         self.setGeometry(self.screenx  , self.screeny , NEUF, SEIZE)
         xbmc.log('Size of Screen pyxbmct fix to : ' + str(self.screenx) + ' x ' + str(self.screeny), xbmc.LOGNOTICE)
         # cover when playing
-        SIZECOVER_X = int(self.screenx / SEIZE * 28 )
+        SIZECOVER_X = (SEIZE // 2) - 6  #  int(self.screenx / SEIZE * 28 )
         self.sizecover_x = SIZECOVER_X
         #SIZECOVER_Y = self.GRIDSCREEN_Y * 3  # and reserve a sized frame to covers,attention SIZECOVER_X != SIZECOVER_Y
         xbmc.log('Taille pochette : ' + str(SIZECOVER_X) + ' x ' + str(SIZECOVER_X) , xbmc.LOGNOTICE)
@@ -174,34 +170,75 @@ class PlaylistPlugin(pyxbmctExtended.BackgroundDialogWindow):
         self.image_dir = ARTWORK    # path to pictures used in the program
 
         self.cover_jpg = self.image_dir + '/vinyl.png'      # pour le démarrage then updated
-
-        # need some adjustment
+        # reserve pour afficher cover.jpg
         self.pochette = pyxbmct.Image(self.cover_jpg)
-        #self.pochette = pyxbmct.Image()
-        self.placeControl(self.pochette, 1 , int(SEIZE / 2) + 1 , 28 , 28 )  # to fix
-        #self.pochette.setImage(self.cover_jpg)
+        self.placeControl(control=self.pochette,
+                          row=1,
+                          column=(SEIZE // 2) - 2,
+                          rowspan=28,
+                          columnspan=29)  # todo to fix
+        self.pochette.setImage(self.cover_jpg)
 
         # Slider de la durée
-        self.slider_duration = pyxbmct.Slider()
-        self.placeControl(self.slider_duration, ligneButton - 4 , int((SEIZE / 2) + 5 )  , 1 , 18 , pad_x = 5 , pad_y = 5 )
+        self.slider_duration = pyxbmct.Slider(textureback=self.textureback_slider_duration)
+        self.placeControl(control= self.slider_duration,
+                          row= ligneButton - 4 ,
+                          column= ( SEIZE // 2 ) + 2   ,
+                          rowspan=1 ,
+                          columnspan= 21 ,
+                          pad_x = 5 ,
+                          pad_y = 5 )
         self.slider_duration.setPercent(SLIDER_INIT_VALUE)
 
         # labels des durée
         self.labelduree_jouee = pyxbmct.Label('')
-        self.placeControl(control=self.labelduree_jouee, row=ligneButton - 4 , column=int( SEIZE /2 ),  rowspan= 2 , columnspan = 5 , pad_x = 5 , pad_y = 5 )
+        self.placeControl(control=self.labelduree_jouee,
+                          row=ligneButton - 4 ,
+                          column=( SEIZE // 2 ) - 2,
+                          rowspan= 2 ,
+                          columnspan = 5 ,
+                          pad_x = 5 ,
+                          pad_y = 5 )
         self.labelduree_fin = pyxbmct.Label('')
-        self.placeControl(control=self.labelduree_fin,row= ligneButton - 4 , column=int( SEIZE /2 + 25), rowspan=2 ,columnspan= 3 , pad_x = 5 , pad_y = 5 )
+        self.placeControl(control=self.labelduree_fin,
+                          row= ligneButton - 4 ,
+                          column=( SEIZE // 2 ) + 23 ,
+                          rowspan=2 ,
+                          columnspan= 3 ,
+                          pad_x = 5 ,
+                          pad_y = 5 )
 
-        self.labelAlbum = pyxbmct.Label(label='' , font='font13', textColor='0xFF888888', alignment=pyxbmct.ALIGN_CENTER)
-        self.placeControl(self.labelAlbum, row=ligneButton - 2 , column= int( SEIZE /2 ) , rowspan= 1, columnspan=27)
+        self.labelAlbum = pyxbmct.Label(label='' ,
+                                        font='font13',
+                                        textColor='0xFF888888',
+                                        alignment=pyxbmct.ALIGN_CENTER)
+        self.placeControl(self.labelAlbum,
+                          row=ligneButton - 2 ,
+                          column= ( SEIZE // 2 ) ,
+                          rowspan= 1,
+                          columnspan=27 )
         self.labelAlbum.setLabel('Album')
 
-        self.labelArtist = pyxbmct.Label(label='' , font='font13', textColor='0xFF888888', alignment=pyxbmct.ALIGN_CENTER)
-        self.placeControl(self.labelArtist, row=ligneButton - 1 , column= int( SEIZE /2 ) , rowspan= 1, columnspan=27)
+        self.labelArtist = pyxbmct.Label(label='' ,
+                                         font='font13',
+                                         textColor='0xFF888888',
+                                         alignment=pyxbmct.ALIGN_CENTER )
+        self.placeControl(self.labelArtist,
+                          row=ligneButton - 1 ,
+                          column= ( SEIZE // 2 ) ,
+                          rowspan= 1,
+                          columnspan=27 )
         self.labelArtist.setLabel('Artist')
 
-        self.labelTitle = pyxbmct.Label(label='' , font='font13', textColor='0xFF888888', alignment=pyxbmct.ALIGN_CENTER)
-        self.placeControl(self.labelTitle, row=ligneButton - 0 , column= int( SEIZE /2 ) , rowspan= 1, columnspan=27)
+        self.labelTitle = pyxbmct.Label(label='' ,
+                                        font='font13',
+                                        textColor='0xFF888888',
+                                        alignment=pyxbmct.ALIGN_CENTER )
+        self.placeControl(self.labelTitle,
+                          row=ligneButton - 0 ,
+                          column= SEIZE // 2  ,
+                          rowspan= 1,
+                          columnspan=27 )
         self.labelTitle.setLabel('Title')
 
     def controlMenus(self):
@@ -216,16 +253,16 @@ class PlaylistPlugin(pyxbmctExtended.BackgroundDialogWindow):
         espace_col = SEIZE / 4
         hauteur_menu = 25
 
-        self.listMenu_playlist = pyxbmct.List(buttonFocusTexture=self.image_list_focus, _imageWidth= 40 , _imageHeight = 40 , _itemHeight=42)
+        self.listMenu_playlist = pyxbmct.List(buttonFocusTexture=self.image_list_focus,
+                                              _imageWidth= 40 ,
+                                              _imageHeight = 40 ,
+                                              _itemHeight= 42 )
 
         self.placeControl(self.listMenu_playlist , row_depart , col_depart  , espace_row, (SEIZE / 2) - 2 )
 
         # TRES IMPORTANT POUR AVOIR LE FOCUS
         # Add items to the list , need to ask the focus before filling the list from Plugin.Plugin
-        self.listMenu_playlist.addItem('nier')
-
-        self.bouton_exit = pyxbmct.Button('Exit this frame')
-        self.placeControl(self.bouton_exit , 35 , 1  , 2 , 8 ) # on the left bottom of the screen
+        self.listMenu_playlist.addItem('')
 
 
     def connexionEvent(self):
@@ -240,7 +277,6 @@ class PlaylistPlugin(pyxbmctExtended.BackgroundDialogWindow):
                  pyxbmct.ACTION_MOVE_RIGHT],
                 self.list_Menu_Navigation)
 
-
     def onAction(self, action):
         """
         Catch button actions.
@@ -248,13 +284,11 @@ class PlaylistPlugin(pyxbmctExtended.BackgroundDialogWindow):
         ``action`` is an instance of :class:`xbmcgui.Action` class.
         """
         if action == ACTION_PREVIOUS_MENU:
-            xbmc.log('Previous_menu' , xbmc.LOGNOTICE)
-            self.mustQuit = True
+            xbmc.log('Previous_menu', xbmc.LOGNOTICE)
             self.quit_listing()
 
         elif action == ACTION_NAV_BACK:
-            xbmc.log('nav_back' , xbmc.LOGNOTICE)
-            self.mustQuit = True
+            xbmc.log('nav_back', xbmc.LOGNOTICE)
             self.quit_listing()
 
         elif action == ACTION_PAUSE:  # currently it's the space on my keyboard
@@ -265,14 +299,21 @@ class PlaylistPlugin(pyxbmctExtended.BackgroundDialogWindow):
             xbmc.log('Action Play', xbmc.LOGNOTICE)
             self.pause_play()
 
-        elif action == ACTION_VOLUME_UP:
-            self.setVolume('UP')
-        elif action == ACTION_VOLUME_DOWN:
-            self.setVolume('DOWN')
+        elif action == ACTION_VOLUME_UP:  # it's the volume key Vol+  on my remote
+            xbmc.log('Action Volume', xbmc.LOGNOTICE)
+            self.promptVolume()
+
+        elif action == ACTION_VOLUME_DOWN:  # it's the volume key Vol-  on my remote
+            xbmc.log('Action Volume', xbmc.LOGNOTICE)
+            self.promptVolume()
+
+        elif action == xbmcgui.ACTION_CONTEXT_MENU:
+            xbmc.log('Action context Menu', xbmc.LOGNOTICE)
+            self.promptContextMenu()
 
         else:
-            xbmc.log('else condition onAction' , xbmc.LOGNOTICE)
-            self._executeConnected(action, self.actions_connected)
+            xbmc.log('else condition onAction in FramePlaylist', xbmc.LOGNOTICE)
+        #    self._executeConnected(action, self.actions_connected)
 
     def quit_listing(self):# todo : à tester
         self.WindowPlayinghere = xbmcgui.getCurrentWindowId()
@@ -285,10 +326,6 @@ class PlaylistPlugin(pyxbmctExtended.BackgroundDialogWindow):
         # self.subscribe.resiliersouscription() # -> AttributeError: 'SlimIsPlaying' object has no attribute subscribe
         self.threadRunning = False
         self.close()
-
-    def exit_this_frame(self):
-        self.mustQuit = True
-        self.quit_listing()
 
     def pause_play(self):
         self.get_playerid()
@@ -316,60 +353,22 @@ class PlaylistPlugin(pyxbmctExtended.BackgroundDialogWindow):
     def futureFunction(self):
         pass
 
-    def setVolume(self, UpOrDown):
-
-
-        # need to know the actual volume in percent
-        self.get_playerid()
-        self.get_ident_server()
-        self.connectInterface()
-        requete = self.playerid + ' mixer volume ?'
-        self.InterfaceCLI.sendtoCLISomething(requete)
-        reponse = self.InterfaceCLI.receptionReponseEtDecodage()
-        temp = reponse.split('volume|')
-        volumePercent = float(temp[1])
-        self.slider_volume.setPercent(volumePercent)
-        self.label_volume.setLabel('Volume on ' + self.playerid + ' - - -  ' + str(volumePercent) + ' %')
-
-        self.label_volume.setVisible(True)
-        self.slider_volume.setVisible(True)
-
-        if UpOrDown == 'UP':
-            volumePercent = volumePercent + 5.
-            if volumePercent >= 100:
-                volumePercent = 100
-
-        elif UpOrDown == 'DOWN':
-            volumePercent = volumePercent - 5.
-            if volumePercent < 0 :
-                volumePercent = 0
-        else:
-            pass
-        requete = self.playerid + ' mixer volume ' + str(volumePercent)
-        self.InterfaceCLI.sendtoCLISomething(requete)
-        reponse = self.InterfaceCLI.receptionReponseEtDecodage()
-        self.slider_volume.setPercent(volumePercent)
-
-
-
     def set_navigation(self):
 
         # Set navigation between controls (Button, list or slider)
         # Control has to be added to a window first if not raise RuntimeError
-
-        self.listMenu_playlist.controlLeft(self.bouton_exit)
-
-        self.bouton_exit.controlRight(self.listMenu_playlist)
-        self.bouton_exit.controlLeft(self.listMenu_playlist)
-        self.bouton_exit.controlUp(self.listMenu_playlist)
-
-
         # Set initial focus , don't forget to fill an item before setfocus
         self.setFocus(self.listMenu_playlist)
         
-    def   list_Menu_Navigation(self):
-        # todo écrire quoi faire quanq un item est sélectionné dans le listemenu
-        pass
+    def list_Menu_Navigation(self):
+        # todo écrire quoi faire quand on bouge les flèches , la souris
+        # à priori on veut juste naviguer entre les élements
+        # ou bien selectionner l'action sur le menu
+        # ce qui est fait par le connect
+        if self.getFocus() == self.listMenu_playlist:
+            self.itemSelection = self.listMenu_playlist.getListItem(
+                self.listMenu_playlist.getSelectedPosition()).getLabel()
+            self.title_label.setLabel(self.itemSelection)
 
     def randomPlaylist(self):
 
@@ -474,8 +473,6 @@ class PlaylistPlugin(pyxbmctExtended.BackgroundDialogWindow):
         self.InterfaceCLI.sendtoCLISomething(listenrequete)
         reponselisten = self.InterfaceCLI.receptionReponseEtDecodage()
 
-        # end random mix
-
      # fin fonction fillThePlaylist
 
     def selectActionofItem(self):
@@ -512,8 +509,6 @@ class PlaylistPlugin(pyxbmctExtended.BackgroundDialogWindow):
         self.InterfaceCLI.sendtoCLISomething(requete)
         reponse = self.InterfaceCLI.receptionReponseEtDecodage()
 
-
-
     def detailItemPlaylist(self):
 
         labelajouer = self.listMenu_playlist.getListItem(
@@ -522,7 +517,6 @@ class PlaylistPlugin(pyxbmctExtended.BackgroundDialogWindow):
         track_id = self.listMenu_playlist.getListItem(
                 self.listMenu_playlist.getSelectedPosition()).getProperty('track_id')
         xbmc.log('track_id info :' + track_id , xbmc.LOGNOTICE)
-
 
         requete = self.playerid + ' songinfo 0 100 track_id:' + str(track_id)
         self.InterfaceCLI.sendtoCLISomething(requete)
@@ -540,9 +534,6 @@ class PlaylistPlugin(pyxbmctExtended.BackgroundDialogWindow):
         dialogSongInfo = xbmcgui.Dialog()
         dialogSongInfo.textviewer('Song Info : ' + labelajouer , textInfo )
 
-
-        pass
-
     def affichequelquesInfos(self):
         labelajouer = self.listMenu_playlist.getListItem(
                 self.listMenu_playlist.getSelectedPosition()).getLabel()
@@ -559,9 +550,6 @@ class PlaylistPlugin(pyxbmctExtended.BackgroundDialogWindow):
         except ValueError:
             self.functionNotYetImplemented()
             return
-
-    #self.functionNotYetImplemented()
-
 
     def functionNotYetImplemented(self):
         '''
@@ -696,7 +684,8 @@ class PlaylistPlugin(pyxbmctExtended.BackgroundDialogWindow):
 
     def get_playerid(self):
         self.Players = outils.WhatAreThePlayers()
-        self.playerid = self.Players.get_unplayeractif()
+        #self.playerid = self.Players.get_unplayeractif()
+        self.playerid = self.Players.playerSelectionID
 
     def get_ident_server(self):
         self.Server = outils.WhereIsTheLMSServer()
@@ -778,3 +767,16 @@ class PlaylistPlugin(pyxbmctExtended.BackgroundDialogWindow):
             self.pochette.setImage(completeNameofFile) # fonction d'xbmcgui
             #os.remove(completeNameofFile)  # suppression du fichier
             # fin fonction update_cover
+
+    def futureFunction(self):
+        pass
+
+    def promptVolume(self):
+        volumeFrame = outils.VolumeFrameChild()
+        volumeFrame.doModal()
+        del volumeFrame
+
+    def promptContextMenu(self):
+        contextMenuFrame = outils.ContextMenuFrameChild()
+        contextMenuFrame.doModal()
+        del contextMenuFrame
