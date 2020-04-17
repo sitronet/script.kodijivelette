@@ -25,6 +25,7 @@ ADDON = xbmcaddon.Addon()
 #from pyxbmct.addonskin import Skin as skin
 
 class GenericSkin(pyxbmct.Skin):
+
     '''
     original source is :
     @property
@@ -36,9 +37,10 @@ class GenericSkin(pyxbmct.Skin):
         return os.path.join(self.images, 'AddonWindow', 'ContentPanel.png')
 
     '''
+    '''
     @property
     def background_img(self):
-        return xbmc.translatePath(os.path.join(ADDON.getAddonInfo('path'), 'resources', 'skins', 'Default', 'media', 'pcp_nocturne.png'))
+        return xbmc.translatePath(os.path.join(ADDON.getAddonInfo('path'), 'resources', 'skins', 'Default', 'media', 'pcp_vibrato.png'))
 
     @property
     def title_background_img(self):
@@ -46,7 +48,8 @@ class GenericSkin(pyxbmct.Skin):
 
     @property
     def main_bg_img(self):
-        return xbmc.translatePath(os.path.join(ADDON.getAddonInfo('path'), 'resources', 'skins', 'Default', 'media','pcp_sonata.png'))
+        return xbmc.translatePath(os.path.join(ADDON.getAddonInfo('path'), 'resources', 'skins', 'Default', 'media','pcp_vibrato.png'))
+    '''
 
 
 skin = GenericSkin()
@@ -202,7 +205,7 @@ class BackgroundDialogWindow(AddonWindowWithoutTitle, pyxbmct.DialogWindowMixin)
     """
     cpoy/paste of AddonDialogWindow(title='')
 
-    Addon UI container with a background.
+    Addon UI container with a background. similar to AddonDialogWindow without header and title
 
     .. note:: ``AddonDialogWindow`` instance is displayed on top of XBMC UI,
         including fullscreen video and music visualization.
