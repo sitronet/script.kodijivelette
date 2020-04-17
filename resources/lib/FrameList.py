@@ -72,7 +72,9 @@ def singleton(cls):
     return wrapper
 
 #@singleton
-class ViewListPlugin(pyxbmct.AddonFullWindow):
+#class ViewListPlugin(pyxbmct.AddonFullWindow):
+class ViewListPlugin(pyxbmctExtended.BackgroundDialogWindow):
+
 
     def __init__(self, *args , **kwargs ):
         #title = args[0]
@@ -117,7 +119,7 @@ class ViewListPlugin(pyxbmct.AddonFullWindow):
         xbmc.log('Real Size of Screen : ' + str(self.screenx) + ' x ' + str(self.screeny), xbmc.LOGNOTICE)
 
         if self.screenx > SIZE_WIDTH_pyxbmct:
-            self.screenx = SIZE_WIDTH_pyxbmct -100  # try
+            self.screenx = SIZE_WIDTH_pyxbmct  # try
             self.screeny = SIZE_HEIGHT_pyxbmct
 
 
@@ -163,6 +165,7 @@ class ViewListPlugin(pyxbmct.AddonFullWindow):
         # Add items to the list , need to ask the focus before filling the list from Plugin.Plugin
         test = [ 'test1' , 'test2' , 'test3' ]
         self.listMenu_1.addItems(test)
+        self.listMenu_1.setEnabled(True)
         #self.listMenu_2.addItems(test)
         #self.listMenu_3.addItems(test)
         #self.listMenu_4.addItems(test)
@@ -186,7 +189,6 @@ class ViewListPlugin(pyxbmct.AddonFullWindow):
                  pyxbmct.ACTION_MOVE_RIGHT],
                 self.list_Menu_Navigation)
 
-
     def onAction(self, action):
         """
         Catch button actions.
@@ -201,7 +203,7 @@ class ViewListPlugin(pyxbmct.AddonFullWindow):
             self.quit_listing()
         else:
             xbmc.log('else condition onAction in FrameList' , xbmc.LOGNOTICE)
-        #    self._executeConnected(action, self.actions_connected)
+            self._executeConnected(action, self.actions_connected)
 
     def quit_listing(self):# todo : à tester
             self.WindowPlayinghere = xbmcgui.getCurrentWindowId()
@@ -241,6 +243,8 @@ class ViewListPlugin(pyxbmct.AddonFullWindow):
         # à priori on veut juste naviguer entre les élements
         # ou bien selectionner l'action sur le menu
         # ce qui est fait par le connect
+        self.listMenu_1.setEnabled(True)
+
         if self.getFocus() == self.listMenu_1:
             self.itemSelection1 = self.listMenu_1.getListItem(
                 self.listMenu_1.getSelectedPosition()).getLabel()
@@ -249,8 +253,6 @@ class ViewListPlugin(pyxbmct.AddonFullWindow):
             self.itemSelection1 = self.listMenu_2.getListItem(
                 self.listMenu_2.getSelectedPosition()).getLabel()
             self.title_label.setLabel(self.itemSelection1)
-
-
 
 
     def launchPlayingItem(self, menudeprovenance):
