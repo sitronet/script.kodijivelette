@@ -286,7 +286,7 @@ class fenetreMenu(pyxbmct.AddonFullWindow):
 
 
         else:
-            xbmc.log('else condition onAction in FrameMenu' + repr(action)  , xbmc.LOGNOTICE)
+            xbmc.log('else condition onAction in FrameMenu' + str(action)  , xbmc.LOGNOTICE)
             self._executeConnected(action, self.actions_connected)
 
     def quit(self):
