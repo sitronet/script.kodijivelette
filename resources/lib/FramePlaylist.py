@@ -263,6 +263,7 @@ class PlaylistPlugin(pyxbmctExtended.BackgroundDialogWindow):
         # TRES IMPORTANT POUR AVOIR LE FOCUS
         # Add items to the list , need to ask the focus before filling the list from Plugin.Plugin
         self.listMenu_playlist.addItem('')
+        self.listMenu_playlist.setEnabled(True)
 
 
     def connexionEvent(self):
@@ -277,6 +278,9 @@ class PlaylistPlugin(pyxbmctExtended.BackgroundDialogWindow):
                  pyxbmct.ACTION_MOVE_RIGHT],
                 self.list_Menu_Navigation)
 
+    #def onControl(self, control):
+    #    print("Window.onControl(control=[%s])" % control)
+
     def onAction(self, action):
         """
         Catch button actions.
@@ -284,7 +288,7 @@ class PlaylistPlugin(pyxbmctExtended.BackgroundDialogWindow):
         ``action`` is an instance of :class:`xbmcgui.Action` class.
         """
         if action == ACTION_PREVIOUS_MENU:
-            xbmc.log('Previous_menu', xbmc.LOGNOTICE)
+            xbmc.log('Previous_menu' + str(action), xbmc.LOGNOTICE)
             self.quit_listing()
 
         elif action == ACTION_NAV_BACK:
@@ -300,7 +304,7 @@ class PlaylistPlugin(pyxbmctExtended.BackgroundDialogWindow):
             self.pause_play()
 
         elif action == ACTION_VOLUME_UP:  # it's the volume key Vol+  on my remote
-            xbmc.log('Action Volume', xbmc.LOGNOTICE)
+            xbmc.log('Action Volume' +  str(action), xbmc.LOGNOTICE)
             self.promptVolume()
 
         elif action == ACTION_VOLUME_DOWN:  # it's the volume key Vol-  on my remote
@@ -313,7 +317,7 @@ class PlaylistPlugin(pyxbmctExtended.BackgroundDialogWindow):
 
         else:
             xbmc.log('else condition onAction in FramePlaylist', xbmc.LOGNOTICE)
-        #    self._executeConnected(action, self.actions_connected)
+            self._executeConnected(action, self.actions_connected)
 
     def quit_listing(self):# todo : à tester
         self.WindowPlayinghere = xbmcgui.getCurrentWindowId()
