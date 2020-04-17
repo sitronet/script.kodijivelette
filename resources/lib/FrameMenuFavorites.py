@@ -187,7 +187,7 @@ class FavoritesMenu(pyxbmctExtended.BackgroundDialogWindow):
         xbmc.log('parametre : ' + str(item_id)  + ' commande :  ' + cmd + ' type : ' + audio_type + ' hasitems ? ' + hasitems  , xbmc.LOGNOTICE  )
 
         if audio_type == 'audio' and hasitems == '0':
-
+            # Todo : do a function to ask rather xbmcgui.Dialog()
             choix = xbmcgui.Dialog().select(heading= labelajouer, list= ['Play now', 'Play after the current song' ,  'Add to Playlist' ])
             if choix == 0:
                 requete = cmd + ' playlist play item_id:' + str(item_id)
