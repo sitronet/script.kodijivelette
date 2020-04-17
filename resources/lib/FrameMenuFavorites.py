@@ -77,7 +77,7 @@ if Kodi:
 sys.path.append(os.path.join(os.path.dirname(__file__), "resources", "lib"))
 
 
-class FavoritesMenu(pyxbmct.BlankDialogWindow):
+class FavoritesMenu(pyxbmctExtended.BackgroundDialogWindow):
 
     def __init__(self, *args ):
 
@@ -93,15 +93,27 @@ class FavoritesMenu(pyxbmct.BlankDialogWindow):
         self.threadRunning = True
 
         # pyxbmct :
-        largeur = 300
-        hauteur = 500
-        self.setGeometry(width_= largeur,
-                         height_= hauteur,
-                         rows_= 2 ,
-                         columns_= 10 ,
-                         pos_x= (1280 // 2)  - largeur ,
-                         pos_y= (720 // 2)  - (hauteur // 2) )
-        xbmc.log('Size of Screen pyxbmct fix to : ' + str(largeur) + ' x ' + str(hauteur), xbmc.LOGNOTICE)
+        SIZE_WIDTH_pyxbmct = 1280
+        SIZE_HEIGHT_pyxbmct = 720
+        SIZESCREEN_HEIGHT = xbmcgui.getScreenHeight()  # exemple  # 1080
+        SIZESCREEN_WIDTH = xbmcgui.getScreenWidth()
+        Size_W_ChildSelf = 300
+        Size_H_ChildSelf = 500
+        self.screenx = SIZESCREEN_WIDTH
+        self.screeny = SIZESCREEN_HEIGHT
+        xbmc.log('Size of Screen : ' + str(self.screenx) + ' x ' + str(self.screeny), xbmc.LOGNOTICE)
+        if self.screenx > SIZE_WIDTH_pyxbmct:
+            self.screenx = SIZE_WIDTH_pyxbmct
+            self.screeny = SIZE_HEIGHT_pyxbmct
+
+        self.setGeometry(width_=Size_W_ChildSelf,
+                         height_=Size_H_ChildSelf,
+                         rows_=10,
+                         columns_=10,
+                         pos_x= ( self.screenx // 2 ) - ( Size_W_ChildSelf // 2 ) ,
+                         pos_y= ( self.screeny // 2 ) - ( Size_H_ChildSelf // 2 ) )
+
+        xbmc.log('Size of Screen Favorites fix to : ' + str(Size_W_ChildSelf) + ' x ' + str(Size_H_ChildSelf), xbmc.LOGNOTICE)
 
         self.image_dir = ARTWORK  # path to pictures used in the program
         self.image_list_focus = self.image_dir + '/MenuItemFO.png'        # get from myself
