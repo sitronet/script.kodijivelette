@@ -2,23 +2,29 @@
 # -*- coding: utf-8 -*-
 
 '''
+Based on the pyXBMCt librairy see : https://github.com/romanvm/script.module.pyxbmct
 
+add two new class :  BackgroundDialogWindow and BackgroundFullWindow
+## Author: {'rondrach'}
+## Copyright: 'GPL-v2 , CECILL'
+## Credits: [{credit_list}]
+## License: {GPL-v2 , CECILL}
+## Version: 0.0.001
+## Mmaintainer: {maintainer}
+## Email: {contact_email}
+## Status: 'DEV'
 '''
 import os
-
 import xbmc
-import xbmcgui
 import xbmcaddon
+import xbmcgui
 import pyxbmct
 
 ADDON = xbmcaddon.Addon()
-ADDONID = ADDON.getAddonInfo('id')
-ADDONNAME = ADDON.getAddonInfo('name')
-ADDONVERSION = ADDON.getAddonInfo('version')
-ARTWORK = xbmc.translatePath(os.path.join(ADDON.getAddonInfo('path'), 'resources', 'skins', 'Default', 'media'))
 
+#from pyxbmct.addonskin import Skin as skin
 
-class MySkin(pyxbmct.Skin):
+class GenericSkin(pyxbmct.Skin):
     '''
     original source is :
     @property
@@ -28,30 +34,22 @@ class MySkin(pyxbmct.Skin):
     @property
     def background_img(self):
         return os.path.join(self.images, 'AddonWindow', 'ContentPanel.png')
-    '''
 
+    '''
     @property
     def background_img(self):
-        #return xbmc.translatePath(os.path.join(ADDON.getAddonInfo('path'), 'resources', 'skins', 'Default', 'media','pcp_allegro.png'))
-        #return xbmc.translatePath(os.path.join(ADDON.getAddonInfo('path'), 'resources', 'skins', 'Default', 'media','pcp_encore.png'))
-        #return xbmc.translatePath(os.path.join(ADDON.getAddonInfo('path'), 'resources', 'skins', 'Default', 'media','pcp_harmony.png'))
-        #return xbmc.translatePath(os.path.join(ADDON.getAddonInfo('path'), 'resources', 'skins', 'Default', 'media','pcp_nocturne.png'))
-        #return xbmc.translatePath(os.path.join(ADDON.getAddonInfo('path'), 'resources', 'skins', 'Default', 'media', 'pcp_quartet.png'))
-        #return xbmc.translatePath(os.path.join(ADDON.getAddonInfo('path'), 'resources', 'skins', 'Default', 'media', 'pcp_sonata.png'))
-        #return xbmc.translatePath(os.path.join(ADDON.getAddonInfo('path'), 'resources', 'skins', 'Default', 'media', 'pcp_symphony.png'))
-        return xbmc.translatePath(os.path.join(ADDON.getAddonInfo('path'), 'resources', 'skins', 'Default', 'media', 'pcp_vibrato.png'))
-        #return xbmc.translatePath(os.path.join(ADDON.getAddonInfo('path'), 'resources', 'skins', 'Default', 'media', 'fond-noir.jpg'))
+        return xbmc.translatePath(os.path.join(ADDON.getAddonInfo('path'), 'resources', 'skins', 'Default', 'media', 'pcp_nocturne.png'))
 
     @property
     def title_background_img(self):
-        return xbmc.translatePath(os.path.join(ADDON.getAddonInfo('path'), 'resources', 'skins', 'Default', 'media','pcp_vibrato.png'))
+        return xbmc.translatePath(os.path.join(ADDON.getAddonInfo('path'), 'resources', 'skins', 'Default', 'media','pcp_allegro.png'))
 
     @property
     def main_bg_img(self):
-        return xbmc.translatePath(os.path.join(ADDON.getAddonInfo('path'), 'resources', 'skins', 'Default', 'media','pcp_vibrato.png'))
+        return xbmc.translatePath(os.path.join(ADDON.getAddonInfo('path'), 'resources', 'skins', 'Default', 'media','pcp_sonata.png'))
 
 
-skin = MySkin()
+skin = GenericSkin()
 
 
 class AddonWindowWithoutTitle(pyxbmct.AbstractWindow):
@@ -75,13 +73,7 @@ class AddonWindowWithoutTitle(pyxbmct.AbstractWindow):
         super(AddonWindowWithoutTitle, self).__init__()
         self._setFrame()
 
-    def onControl(self, control):
-        """
-        Catch activated controls.
-        :param control: is an instance of :class:`xbmcgui.Control` class.
-        """
-        # type: (xbmcgui.Control) -> None
-        super(AddonWindowWithoutTitle, self).onControl(control)
+
 
     def _setFrame(self):
         """
@@ -148,58 +140,31 @@ class AddonWindowWithoutTitle(pyxbmct.AbstractWindow):
         self.background.setWidth(self._width)
         self.background.setHeight(self._height)
 
-        # self.window_close_button.setPosition(self.x + self._width - skin.close_btn_x_offset,
+        #self.window_close_button.setPosition(self.x + self._width - skin.close_btn_x_offset,
         #                                     self.y + skin.y_margin + skin.close_btn_y_offset)
 
-    def _raiseSetGeometryNotCalledError(self):
+    def _setGrid(self):
         """
-        Helper method that raises an AddonWindowError  that states that setGeometry needs to be called. Used by methods
-        that will fail if the window geometry is not defined.
-        :raises AddonWindowError
+        Set window grid layout of rows * columns.
+
+        This is a helper method not to be called directly.
         """
-        # type: () -> None
-        raise pyxbmct.AddonWindowError('Window geometry is not defined! Call setGeometry first.')
+        self.grid_x = self.x + skin.x_margin + self.win_padding
+        self.grid_y = self.y + skin.y_margin + skin.title_back_y_shift + skin.header_height + self.win_padding
+        self.tile_width = (self.width - 2 * (skin.x_margin + self.win_padding)) // self.columns
+        self.tile_height = ((self.height - skin.header_height - skin.title_back_y_shift -
+                             2 * (skin.y_margin + self.win_padding)) // self.rows)
 
-    def getGridX(self):
-        # type: () -> int
-        try:
-            val = self.x + self.win_padding
-        except AttributeError:
-            self._raiseSetGeometryNotCalledError()
-        return val + skin.x_margin
 
-    def getGridY(self):
-        # type: () -> int
-        try:
-            val = self.y + self.win_padding
-        except AttributeError:
-            self._raiseSetGeometryNotCalledError()
-        return val + skin.y_margin
 
-    def getGridWidth(self):
-        # type: () -> int
-        try:
-            val = self._width - 2 * self.win_padding
-        except AttributeError:
-            self._raiseSetGeometryNotCalledError()
-        return val - 2 * skin.x_margin
-
-    def getGridHeight(self):
-        # type: () -> int
-        try:
-            val = self._height - 2 * self.win_padding
-        except AttributeError:
-            self._raiseSetGeometryNotCalledError()
-        return val
-
-class BackgroundFullWindow(AddonWindowWithoutTitle, xbmcgui.Window):
+class BackgroundFullWindow(AddonWindowWithoutTitle, pyxbmct.FullWindowMixin):
     """
     Same as AddonFullWindow(title='') without Title and title-bar
     Addon UI container with a solid background.
-    ``BackgroundFullWindow`` instance is displayed on top of the main background image --
-    ``self.main_bg`` -- and can hide behind a fullscreen video or music viaualisation.
+    BackgroundFullWindow`` instance is displayed on top of the main background image
+     and can hide behind a fullscreen video or music viaualisation.
     Minimal example::
-        addon = BackgroundFullWindow('My Cool Addon')
+        addon = BackgroundFullWindow()
         addon.setGeometry(400, 300, 4, 3)
         addon.doModal()
     """
@@ -207,18 +172,18 @@ class BackgroundFullWindow(AddonWindowWithoutTitle, xbmcgui.Window):
     def __new__(cls, *args, **kwargs):
         return super(BackgroundFullWindow, cls).__new__(cls, *args, **kwargs)
 
-        #def _setFrame(self):
+    def _setFrame(self):
         """
         Set the image for for the fullscreen background.
         """
         # type: (str) -> None
         # Image for the fullscreen background.
-        #self.main_bg_img = skin.main_bg_img
+        self.main_bg_img = skin.main_bg_img
         # Fullscreen background image control.
-        #self.main_bg = xbmcgui.ControlImage(1, 1, 1280, 720, self.main_bg_img)
-        #self.addControl(self.main_bg)
-        #super(BackgroundFullWindow, self)._setFrame()
-        #pass
+        self.main_bg = xbmcgui.ControlImage(1, 1, 1280, 720, self.main_bg_img)
+        self.addControl(self.main_bg)
+        super(BackgroundFullWindow, self)._setFrame()
+
 
     def setBackground(self, image=''):
         """
@@ -228,21 +193,24 @@ class BackgroundFullWindow(AddonWindowWithoutTitle, xbmcgui.Window):
             self.setBackground('/images/bacground.png')
         """
         # type: (str) -> None
-        self.background_img.setImage(image)
+        #self.background_img.setImage(image)
+        self.main_bg.setImage(image)
 
 
-class BackgroundDialogWindow(AddonWindowWithoutTitle, xbmcgui.WindowDialog):
+
+class BackgroundDialogWindow(AddonWindowWithoutTitle, pyxbmct.DialogWindowMixin):
     """
     cpoy/paste of AddonDialogWindow(title='')
 
-    Addon UI container with a transparent background.
+    Addon UI container with a background.
 
     .. note:: ``AddonDialogWindow`` instance is displayed on top of XBMC UI,
         including fullscreen video and music visualization.
 
     Minimal example::
 
-        addon = AddonDialogWindow('My Cool Addon')
+        addon = BackgroundDialogWindow()
         addon.setGeometry(400, 300, 4, 3)
         addon.doModal()
     """
+    pass
