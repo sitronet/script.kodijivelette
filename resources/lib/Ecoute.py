@@ -13,7 +13,7 @@ TIME_OF_LOOP_SUBSCRIBE = '2' # initial 10 but long time to exit
 
 class Souscription(threading.Thread):
 
-    def __init__(self, InterfaceCli, playerid, Abonnement , recevoirEnAttente ):
+    def __init__(self, InterfaceCli, playerid):
         """
 
         :type evenement: threading.Event
@@ -22,7 +22,7 @@ class Souscription(threading.Thread):
         self.InterfaceCLI = InterfaceCli
         self.playerid = playerid
         self.EtatDuThread = False
-        self.recevoirEnAttente = recevoirEnAttente
+        #self.recevoirEnAttente = recevoirEnAttente
 
         #self.envoiEnAttente = envoiEnAttente
         #self.LMSCLIport=9090
@@ -31,7 +31,7 @@ class Souscription(threading.Thread):
         #self.terminator = '\r\n'
         self.recu = b''
         self.dataExchange = ''
-        self.Abonnement = Abonnement
+        #self.Abonnement = Abonnement
 
 
     def timeofloopsubscribre(self):
