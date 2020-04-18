@@ -208,7 +208,7 @@ class fenetreMenu(pyxbmct.AddonFullWindow):
         self.flagContextMenu = False
         self.flagVolumeDisplay = False
         self.flagStatePause = False
-        self.recevoirEnAttente = threading.Event()
+        self.recevoirEnAttente= threading.Event()
         self.recevoirEnAttente.clear()
         self.demandedeStop = threading.Event()
         self.demandedeStop.clear()
@@ -297,6 +297,13 @@ class fenetreMenu(pyxbmct.AddonFullWindow):
             self.Abonnement.clear()
             time.sleep(0.2)
             self.demandedeStop.set()
+            try:
+                if not self.InterfaceCLI.connexionAuServeurReussie:
+                    xbmc.log('Bad quit - Exit program   fonction quit() .', xbmc.LOGNOTICE)
+                    self.close()
+            except:
+                xbmc.log('direct quit - Exit program   fonction quit() .', xbmc.LOGNOTICE)
+                self.close()
             try:
                 self.InterfaceCLI.closeconnexionWithCLI()
                 time.sleep(0.2)
@@ -517,15 +524,15 @@ class fenetreMenu(pyxbmct.AddonFullWindow):
         self.placeControl(self.Information_label, (NEUF / 2) - 5 , ( SEIZE / 2 )- 10 , 1 , 20  )
 
 
-        row_depart = 1
+        self.row_depart = 1
         self.espace_row = 30
         self.espace_col = 18
-        col_depart_menu_branche = self.espace_col + 1
-        row_hauteur_menu_branche = 30
-        col_largeur_menu_branche = 18
-        col_depart_menu_feuille = col_depart_menu_branche + col_largeur_menu_branche
-        col_largeur_menu_feuille = col_largeur_menu_branche + 10
-        row_hauteur_menu_feuille = row_hauteur_menu_branche
+        self.col_depart_menu_branche = self.espace_col + 1
+        self.row_hauteur_menu_branche = 30
+        self.col_largeur_menu_branche = 18
+        self.col_depart_menu_feuille = self.col_depart_menu_branche + self.col_largeur_menu_branche
+        self.col_largeur_menu_feuille = self.col_largeur_menu_branche + 10
+        self.row_hauteur_menu_feuille = self.row_hauteur_menu_branche
 
         # init
         
@@ -542,7 +549,7 @@ class fenetreMenu(pyxbmct.AddonFullWindow):
                           self.espace_col )
 
         self.placeControl(self.listMenu_Racine ,
-                          row_depart ,
+                          self.row_depart ,
                           0,
                           self.espace_row,
                           self.espace_col)
@@ -554,31 +561,31 @@ class fenetreMenu(pyxbmct.AddonFullWindow):
 
         # I try to paste the control here if not raise un error
         self.placeControl(self.listMenu_MyMusic,
-                          row_depart,
-                          col_depart_menu_branche,
-                          row_hauteur_menu_branche,
-                          col_largeur_menu_branche)
+                          self.row_depart,
+                          self.col_depart_menu_branche,
+                          self.row_hauteur_menu_branche,
+                          self.col_largeur_menu_branche)
 
-        self.placeControl(self.listMenu_Branches , row_depart, col_depart_menu_branche, \
-                          row_hauteur_menu_branche, col_largeur_menu_branche)
+        self.placeControl(self.listMenu_Branches , self.row_depart, self.col_depart_menu_branche, \
+                          self.row_hauteur_menu_branche, self.col_largeur_menu_branche)
 
-        self.placeControl(self.listMenu_Extras, row_depart , col_depart_menu_branche, \
-                          row_hauteur_menu_branche, col_largeur_menu_branche)
+        self.placeControl(self.listMenu_Extras, self.row_depart , self.col_depart_menu_branche, \
+                          self.row_hauteur_menu_branche, self.col_largeur_menu_branche)
 
-        self.placeControl(self.listMenu_Feuilles, row_depart, col_depart_menu_feuille, \
-                          row_hauteur_menu_feuille,col_largeur_menu_feuille)
+        self.placeControl(self.listMenu_Feuilles, self.row_depart, self.col_depart_menu_feuille, \
+                          self.row_hauteur_menu_feuille,self.col_largeur_menu_feuille)
 
-        self.placeControl(self.listMenu_Feuilles_all_Artists, row_depart, col_depart_menu_feuille, \
-                          row_hauteur_menu_branche,col_largeur_menu_feuille)
+        self.placeControl(self.listMenu_Feuilles_all_Artists, self.row_depart, self.col_depart_menu_feuille, \
+                          self.row_hauteur_menu_branche,self.col_largeur_menu_feuille)
 
-        self.placeControl(self.listMenu_Feuilles_RandomMix, row_depart, col_depart_menu_feuille, \
-                          row_hauteur_menu_branche,col_largeur_menu_feuille)
+        self.placeControl(self.listMenu_Feuilles_RandomMix, self.row_depart, self.col_depart_menu_feuille, \
+                          self.row_hauteur_menu_branche,self.col_largeur_menu_feuille)
 
-        self.placeControl(self.listMenu_Feuilles_Extras, row_depart, col_depart_menu_feuille, \
-                          row_hauteur_menu_branche,col_largeur_menu_feuille)
+        self.placeControl(self.listMenu_Feuilles_Extras, self.row_depart, self.col_depart_menu_feuille, \
+                          self.row_hauteur_menu_branche,self.col_largeur_menu_feuille)
 
-        self.placeControl(self.listMenu_Fleur, row_depart , col_depart_menu_feuille + col_largeur_menu_branche  , \
-                          row_hauteur_menu_branche , col_largeur_menu_branche )
+        self.placeControl(self.listMenu_Fleur, self.row_depart , self.col_depart_menu_feuille + self.col_largeur_menu_branche  , \
+                          self.row_hauteur_menu_branche , self.col_largeur_menu_branche )
 
 
     def connectControlElements(self):
@@ -1251,13 +1258,7 @@ class fenetreMenu(pyxbmct.AddonFullWindow):
         navigation through menus
         '''
         # rappel des valeurs pour positionnement
-        row_depart = 1
-        self.espace_row = 20
-        self.espace_col = 10
-        hauteur_menu = 25
-        col_depart_menu_branche = self.espace_col + 1
-        row_hauteur_menu_branche = 30
-        col_largeur_menu_branche = 15
+
         # Update list_item label when navigating through the list.
         self.itemSelectionRacine = ''
         self.itemSelectionBranche = ''
@@ -1324,10 +1325,10 @@ class fenetreMenu(pyxbmct.AddonFullWindow):
                                                            # we will delete them later after try et rewriting the code
 
                     try:
-                        self.placeControl(self.listMenu_MyMusic, row_depart,
-                                                col_depart_menu_branche,
-                                                row_hauteur_menu_branche,
-                                                col_largeur_menu_branche)
+                        self.placeControl(self.listMenu_MyMusic, self.row_depart,
+                                                self.col_depart_menu_branche,
+                                                self.row_hauteur_menu_branche,
+                                                self.col_largeur_menu_branche)
                     except:
                         pass
                     self.listMenu_Initialisation_server.setVisible(False)
@@ -1354,10 +1355,10 @@ class fenetreMenu(pyxbmct.AddonFullWindow):
                 elif self.itemSelectionRacine == translation(32042 , 'I-Radio' ):
 
                     try:
-                        self.placeControl(self.listMenu_Branches, row_depart,
-                                      col_depart_menu_branche,
-                                      row_hauteur_menu_branche,
-                                      col_largeur_menu_branche)
+                        self.placeControl(self.listMenu_Branches, self.row_depart,
+                                      self.col_depart_menu_branche,
+                                      self.row_hauteur_menu_branche,
+                                      self.col_largeur_menu_branche)
                     except:
                         pass
 
@@ -1404,10 +1405,10 @@ class fenetreMenu(pyxbmct.AddonFullWindow):
                         pass
 
                     try:
-                        self.placeControl(self.listMenu_Branches, row_depart,
-                                      col_depart_menu_branche,
-                                      row_hauteur_menu_branche,
-                                      col_largeur_menu_branche)
+                        self.placeControl(self.listMenu_Branches, self.row_depart,
+                                      self.col_depart_menu_branche,
+                                      self.row_hauteur_menu_branche,
+                                      self.col_largeur_menu_branche)
                     except:
                         pass
 
@@ -1430,20 +1431,20 @@ class fenetreMenu(pyxbmct.AddonFullWindow):
                         pass
 
                     try:
-                        self.placeControl(self.listMenu_Branches, row_depart,
-                                      col_depart_menu_branche,
-                                      row_hauteur_menu_branche,
-                                      col_largeur_menu_branche)
+                        self.placeControl(self.listMenu_Branches, self.row_depart,
+                                      self.col_depart_menu_branche,
+                                      self.row_hauteur_menu_branche,
+                                      self.col_largeur_menu_branche)
                     except:
                         pass
 
                 elif self.itemSelectionRacine == translation(32045 , 'Extras'):    
 
                     try:
-                        self.placeControl(self.listMenu_Extras, row_depart,
-                                      col_depart_menu_branche,
-                                      row_hauteur_menu_branche,
-                                      col_largeur_menu_branche)
+                        self.placeControl(self.listMenu_Extras, self.row_depart,
+                                      self.col_depart_menu_branche,
+                                      self.row_hauteur_menu_branche,
+                                      self.col_largeur_menu_branche)
                     except:
                         pass
 
@@ -1741,7 +1742,19 @@ class fenetreMenu(pyxbmct.AddonFullWindow):
                                               self.envoiEnAttente,
                                               self.demandedeStop)
         self.InterfaceCLI.start()
-
+        while not self.InterfaceCLI.startDone:
+            time.sleep(0.1)
+        xbmc.log('Connexion vue dans fonction FrameMenu  : ' + str(self.InterfaceCLI.connexionAuServeurReussie), xbmc.LOGNOTICE)
+        if self.InterfaceCLI.connexionAuServeurReussie:
+            xbmc.log('Resultat Connexion  : Bon ' , xbmc.LOGNOTICE)
+        else:
+            xbmc.log('Resultat Connexion  : Mauvais ' , xbmc.LOGNOTICE)
+        if not self.InterfaceCLI.connexionAuServeurReussie:
+            # erreur sur la connexion
+            xbmc.log('Erreur Connexion echouée : '+ str(self.InterfaceCLI.connexionAuServeurReussie), xbmc.LOGNOTICE)
+            self.Information_label.setLabel('Error Connection Echec - Cannot Continue ')
+            #self.close()
+            exit(30) # raise error
         xbmc.log('type InterfaceCLI -> ' + str(type(self.InterfaceCLI)) , xbmc.LOGDEBUG)
 
         while not self.InterfaceCLI.EtatDuThread:  # on attend que le thread soit bien démarré j'aurais pu utiliser un event ?
@@ -1863,7 +1876,7 @@ class fenetreMenu(pyxbmct.AddonFullWindow):
         #xbmc.log('nouvelle fenetre de player n° : ' + str(self.Window_is_playing), xbmc.LOGDEBUG)
 
         # activation de la souscription au serveur process = Thread(target=crawl, args=[urls[ii], result, ii])
-        self.subscribe = Souscription(self.InterfaceCLI , self.playerid,  self.Abonnement, self.recevoirEnAttente )
+        self.subscribe = Souscription(self.InterfaceCLI , self.playerid )
         self.subscribe.subscription()
         # todo Q : comment faire la gestion de l'arret de la boucle de souscription ?
         #      A : fonction resiliersouscription()
@@ -1877,7 +1890,6 @@ class fenetreMenu(pyxbmct.AddonFullWindow):
             compteur = 1
             titreenlecture = ''
             self.breakBoucle_A = False
-            timeoutduVolume = time.time() + 20
             while (self.breakBoucle_A == False):  # Boucle A principale de Subscribe
 
                 if time.time() > timeoutdeTestdelaBoucle:
@@ -1885,10 +1897,6 @@ class fenetreMenu(pyxbmct.AddonFullWindow):
                     self.jivelette.bouton_pause.setVisible(False)
                     self.jivelette.bouton_play.setVisible(False)
                     break
-
-                if time.time() > timeoutduVolume:
-                    self.jivelette.label_volume.setVisible(False)
-                    self.jivelette.slider_volume.setVisible(False)
 
                 if not self.Abonnement.is_set:
                     break
@@ -2065,7 +2073,7 @@ class fenetreMenu(pyxbmct.AddonFullWindow):
         #xbmc.log('nouvelle fenetre de player n° : ' + str(self.Window_is_playing), xbmc.LOGDEBUG)
 
         # activation de la souscription au serveur process = Thread(target=crawl, args=[urls[ii], result, ii])
-        self.subscribe = Souscription(self.InterfaceCLI , self.playerid,  self.Abonnement, self.recevoirEnAttente )
+        self.subscribe = Souscription(self.InterfaceCLI , self.playerid )
         self.subscribe.subscriptionLongue()
         compteur = 0
         self.frameRandomPlay.update_coverbox(lmsip=self.lmsip, lmswebport=self.lmswebport, playerid=self.playerid,
