@@ -182,6 +182,8 @@ class FavoritesMenu(pyxbmctExtended.BackgroundDialogWindow):
 
         self.get_playerid()
         self.get_ident_server()
+        self.connectInterface()
+        self.InterfaceCLI.viderLeBuffer()
 
         labelajouer = self.listMenu_1.getListItem(self.listMenu_1.getSelectedPosition()).getLabel()
         cmd = self.listMenu_1.getListItem(self.listMenu_1.getSelectedPosition()).getProperty('cmd')
