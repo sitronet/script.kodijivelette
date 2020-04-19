@@ -48,6 +48,8 @@ class InterfaceCLIduLMS(threading.Thread):
         """
         threading.Thread.__init__(self)
         self.EtatDuThread = False
+        self.startDone = False
+        self.connexionAuServeurReussie = False
         self.demandedeStop = demandedeStop
         self.demandedeStop.clear()
         self.recevoirEnAttente = recevoirEnAttente
@@ -65,26 +67,38 @@ class InterfaceCLIduLMS(threading.Thread):
     def run(self):
         xbmc.log('lancement de la connexion' , xbmc.LOGNOTICE)
         #création du socket
-        self.connecttoCLI(self.LMSCLIip,self.LMSCLIport)
+        if self.connecttoCLI(self.LMSCLIip,self.LMSCLIport):
+            #doublon
+            self.connexionAuServeurReussie = True
+            xbmc.log('ConnexionClient Reussie : ' + str(self.connexionAuServeurReussie)  , xbmc.LOGNOTICE)
 
-        message = "login" + self.terminator
-        try:
-            self.socketdeConnexion.send(bytes(message, 'ascii'))
-        except TypeError:
-            self.socketdeConnexion.send(bytes(message))
-        time.sleep(0.2)
-        self.recevoirEnAttente.clear()
-        ReponseACK = self._receiveFromCLISomething()
-        if ReponseACK == b'login ******\x0d\x0a':
-            xbmc.log(" connexion ! , bonne reponse du serveur : " + ReponseACK.decode() , xbmc.LOGNOTICE)
-            self.EtatDuThread = True
+            message = "login" + self.terminator
+            try:
+                self.socketdeConnexion.send(bytes(message, 'ascii'))
+            except TypeError:
+                self.socketdeConnexion.send(bytes(message))
+            time.sleep(0.2)
+            self.recevoirEnAttente.clear()
+            ReponseACK = self._receiveFromCLISomething()
+            if ReponseACK == b'login ******\x0d\x0a':
+                xbmc.log(" connexion ! , bonne reponse du serveur : " + ReponseACK.decode() , xbmc.LOGNOTICE)
+                self.EtatDuThread = True
+                self.startDone = True
+            else:
+                xbmc.log("no connect, Echec !!!", xbmc.LOGNOTICE)
+                # il faudrait prévenir le lanceur qu'il atennde pas pour rien !!
+                # revoir la logique
+                self.EtatDuThread = False
+                self.startDone = True
         else:
-            xbmc.log("no connect, Echec !!!", xbmc.LOGNOTICE)
-            # il faudrait prévenir le lanceur qu'il atennde pas pour rien !!
-            # revoir la logique
+            xbmc.log("creation socket refusé", xbmc.LOGNOTICE)
             self.EtatDuThread = False
+            #doublon
+            self.connexionAuServeurReussie = False
+            self.startDone = True
+            return
 
-
+        self.EtatDuThread = True
         while not self.demandedeStop.is_set():      # boucle infinie jusqu'à demande d'arrêt par le prog principal
             self.SignalAUnConsommateurDataRecu()    # dans cette boucle juste un signal que des données sont recues
             #time.sleep(0.1)                         # et à lire par le consommateur
@@ -99,9 +113,18 @@ class InterfaceCLIduLMS(threading.Thread):
         self.LMSCLIip = host
         self.LMSCLIport = port
         self.socketdeConnexion = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        verif = self.socketdeConnexion.connect((self.LMSCLIip, self.LMSCLIport))
-        xbmc.log( ' socket créé : ' + str(verif) , xbmc.LOGNOTICE )
-        xbmc.log("connecté au serveur " + self.LMSCLIip + " sur l interface CLI ? : " + str(verif) , xbmc.LOGNOTICE)
+        try:
+            verif = self.socketdeConnexion.connect((self.LMSCLIip, self.LMSCLIport))
+            xbmc.log( ' socket créé : ' + str(verif) , xbmc.LOGNOTICE )
+            xbmc.log("connecté au serveur " + self.LMSCLIip + " sur l interface CLI ? : " + str(verif) , xbmc.LOGNOTICE)
+        except:
+            # connecxion refusée ou bien ???
+            xbmc.log('ConnecttoCLI : return False',xbmc.LOGNOTICE)
+            self.connexionAuServeurReussie = False
+            return False
+        xbmc.log('ConnecttoCLI : return True', xbmc.LOGNOTICE)
+        self.connexionAuServeurReussie = True
+        return True
 
     def sendtoCLISomething(self, message):
         message += self.terminator
@@ -144,7 +167,14 @@ class InterfaceCLIduLMS(threading.Thread):
         self.dataExchange = self._receiveFromCLISomething()
         #self.dataExchange = self.dataExchange + self._receiveFromCLISomething()
         self.recevoirEnAttente.set()
-        return  # cette fois en string !!
+        return
+
+    def dataAreWaiting(self):
+        if self.dataExchange == '':
+            return False
+        else:
+            return True
+
 
     def _closeconnexionWithCLI(self):
         #self.socketdeConnexion.unlink()
@@ -159,11 +189,12 @@ class InterfaceCLIduLMS(threading.Thread):
         self._closeconnexionWithCLI()
 
     def pluginCommandsAndQueries(self, plugin, start, nbre_par_reponse,  params ):
+        # not used , Todo Delete it
         #<radios|apps> <start> <itemsPerResponse> <taggedParameters>
         self.sendtoCLISomething(plugin + ' ' + start + ' ' +  nbre_par_reponse + ' ' + params + ' ')
 
     def receptionReponseEtDecodage(self): # à tester
-        self.recevoirEnAttente.wait()  # le time est grand car selon la taille la réponse peut tarder
+        self.recevoirEnAttente.wait()
         recu_ext = self.dataExchange
         self.dataExchange = ''
         self.recevoirEnAttente.clear()
@@ -175,7 +206,7 @@ class InterfaceCLIduLMS(threading.Thread):
         return trame_decode # trame sans les encodages web et avec séparateur espace changé pour '|'
 
     def receptionReponseEtDecodageavecCR(self): # à tester
-        self.recevoirEnAttente.wait()  # le time est grand car selon la taille la réponse peut tarder
+        self.recevoirEnAttente.wait()
         recu_ext = self.dataExchange
         self.dataExchange = ''
         self.recevoirEnAttente.clear()
@@ -185,3 +216,25 @@ class InterfaceCLIduLMS(threading.Thread):
         trame_decode = urllib.unquote(textA)  # on encode les caractères escape du web
         xbmc.log('trame récue décodée : ' + trame_decode, xbmc.LOGNOTICE)
         return trame_decode # trame sans les encodages web et avec séparateur espace changé pour '|'
+
+    def receptionReponseEtPoubelle(self):
+        self.recevoirEnAttente.wait()  # le time est grand car selon la taille la réponse peut tarder
+        recu_ext = self.dataExchange
+        xbmc.log('trame recue brute : ' + recu_ext, xbmc.LOGNOTICE)
+        del recu_ext
+        self.dataExchange = ''
+        self.recevoirEnAttente.clear()
+        return
+
+    def viderLeBuffer(self):
+        #self.recevoirEnAttente.wait(0.1) or while self.recevoirEnAttente.is_set(): ?
+        xbmc.log('trame détruite : ' + self.dataExchange , xbmc.LOGNOTICE)
+        self.dataExchange = ''
+        self.recevoirEnAttente.clear()
+        return
+
+    def sendAbsoluteQuit(self):     # not yet used but could be
+        self.dataExchange = 'MustQuit'
+        self.recevoirEnAttente.set()
+        xbmc.log('trame envoyée : ' + self.dataExchange , xbmc.LOGNOTICE)
+
