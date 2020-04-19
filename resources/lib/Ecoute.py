@@ -7,13 +7,14 @@ import threading
 
 import xbmc
 
-TIME_OF_LOOP_SUBSCRIBE = '2' # initial 10 but long time to exit
+TIME_OF_LOOP_SUBSCRIBE = '2' # initial 10 or 5 but long time to exit
                              # also delay for the refreshed duration playing
 
 
 class Souscription(threading.Thread):
+#class Souscription():
 
-    def __init__(self, InterfaceCli, playerid):
+    def __init__(self, InterfaceCli, playerid ):
         """
 
         :type evenement: threading.Event
@@ -22,7 +23,9 @@ class Souscription(threading.Thread):
         self.InterfaceCLI = InterfaceCli
         self.playerid = playerid
         self.EtatDuThread = False
+        # todo to check
         #self.recevoirEnAttente = recevoirEnAttente
+        #self.Abonnement = Abonnement
 
         #self.envoiEnAttente = envoiEnAttente
         #self.LMSCLIport=9090
@@ -31,10 +34,9 @@ class Souscription(threading.Thread):
         #self.terminator = '\r\n'
         self.recu = b''
         self.dataExchange = ''
-        #self.Abonnement = Abonnement
 
 
-    def timeofloopsubscribre(self):
+    def timeofloopsubscribe(self):
         return TIME_OF_LOOP_SUBSCRIBE
 
     def subscription(self):
@@ -53,14 +55,19 @@ class Souscription(threading.Thread):
 
     def resiliersouscription(self):
         # Todo : define two methode : one with param - , other with 0
-        self.InterfaceCLI.sendtoCLISomething(self.playerid + " status - 2 subscribe:- ")
+        self.InterfaceCLI.sendtoCLISomething(self.playerid + " status - 1 subscribe:- ")
+        return
+
+    def resilierSouscriptionWithoutAnswer(self):
+        # function when don't need to check/analyse the server's answer
+        self.resiliersouscription()
         self.InterfaceCLI.receptionReponseEtPoubelle()
         return
 
     def listen(self):
         xbmc.log("Listen 1 ", xbmc.LOGDEBUG)
         self.InterfaceCLI.sendtoCLISomething(self.playerid + " listen 1 ")
-        reponse = self.InterfaceCLI.receptionReponseEtDecodage
+        reponse = self.InterfaceCLI.receptionReponseEtDecodage()
         if 'listen 1' in reponse:
             return True
         else:
@@ -69,7 +76,7 @@ class Souscription(threading.Thread):
     def resilierListen(self):
         xbmc.log("Listen 0 ", xbmc.LOGDEBUG)
         self.InterfaceCLI.sendtoCLISomething(self.playerid + " listen 0 ")
-        poubelle = self.InterfaceCLI.receptionReponseEtDecodage()
+        #poubelle = self.InterfaceCLI.receptionReponseEtDecodage()
         del poubelle
 
 
