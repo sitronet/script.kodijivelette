@@ -27,6 +27,7 @@ class Plugin_Generique():
     def __init__(self, rappelons_nous_de_notre_origine):
 
         self.origine = rappelons_nous_de_notre_origine
+        self.origine.InterfaceCLI.viderLeBuffer()
 
 
     def le_menu_branche(self, plugin):
@@ -239,9 +240,12 @@ class Plugin_Generique():
             except IndexError:
                 self.functionNotYetImplemented()
                 return
-            texte_a_traiter_titre = texte_en_liste_a_traiter.pop()
-            texte_en_liste_a_traiter_titre = texte_a_traiter_titre.split('title:')
-            xbmc.log('texte_a_traiter titre: ' +  str(texte_en_liste_a_traiter_titre) , xbmc.LOGNOTICE )
+            try:
+                texte_a_traiter_titre = texte_en_liste_a_traiter.pop()
+                texte_en_liste_a_traiter_titre = texte_a_traiter_titre.split('title:')
+                xbmc.log('texte_a_traiter titre: ' +  str(texte_en_liste_a_traiter_titre) , xbmc.LOGNOTICE )
+            except IndexError:
+                pass
             # exemple :  ['00:04:20:17:1c:44|picks|items|0|count|item_id:c4bca76a.0|', "Andy's Picks"]
             try:
                 title = texte_en_liste_a_traiter_titre.pop()
@@ -691,6 +695,7 @@ class MyMusic(Plugin_Generique):
             #self.longListing.show()
             #self.longListing.listMenu_1.reset()
 
+            self.InterfaceCLI.viderLeBuffer()
             self.origine.InterfaceCLI.sendtoCLISomething('artists')
             nbre_a_traiter = self.origine.InterfaceCLI.receptionReponseEtDecodage().split('count:')
             try:
