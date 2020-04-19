@@ -101,9 +101,9 @@ class MyMusicPlugin(pyxbmctExtended.BackgroundDialogWindow):
 
         self.connexionEvent()
 
-        self.connect(self.listMenu_allArtists, lambda : self.detailAlbums(menudeprovenance='listMenu_allArtists'))
-        self.connect(self.listMenu_detailAlbums, lambda : self.listeTracks(menudeprovenance='listMenu_detailAlbums'))
-        self.connect(self.listMenu_playlist, self.detailItemPlaylist)
+        self.connect(self.listMenu_allArtists, lambda : self.f_detailAlbums(menudeprovenance='listMenu_allArtists'))
+        self.connect(self.listMenu_detailAlbums, lambda : self.f_listeTracks(menudeprovenance='listMenu_detailAlbums'))
+        self.connect(self.listMenu_playlist, self.f_detailItemPlaylist)
 
         self.connect(pyxbmct.ACTION_NAV_BACK, self.quit_listing) # rather self.close
         self.connect(pyxbmct.ACTION_PREVIOUS_MENU, self.quit_listing) # rather self.close
@@ -151,16 +151,13 @@ class MyMusicPlugin(pyxbmctExtended.BackgroundDialogWindow):
         ligneButton = NEUF - 3
         SLIDER_INIT_VALUE = 0
         # reserve pour afficher cover.jpg
-        self.image_dir = ARTWORK    # path to pictures used in the program
-
         self.cover_jpg = self.image_dir + '/vinyl.png'      # pour le démarrage then updated
-
         # need some adjustment
         # reserve pour afficher cover.jpg
         self.pochette = pyxbmct.Image(self.cover_jpg)
         self.placeControl(control=self.pochette,
                           row=3,
-                          column=(SEIZE // 2) - 2,
+                          column=(SEIZE // 2) ,
                           rowspan=28,
                           columnspan=29)  # todo to fix
         self.pochette.setImage(self.cover_jpg)
@@ -171,7 +168,7 @@ class MyMusicPlugin(pyxbmctExtended.BackgroundDialogWindow):
                           row=ligneButton - 2,
                           column=(SEIZE // 2),
                           rowspan=1,
-                          columnspan=29 - 4,
+                          columnspan=29 - 2,
                           pad_x=1)
 
         self.slider_duration.setPercent(SLIDER_INIT_VALUE)
@@ -180,7 +177,7 @@ class MyMusicPlugin(pyxbmctExtended.BackgroundDialogWindow):
         self.labelduree_jouee = pyxbmct.Label('',textColor ='0xFF808080')
         self.placeControl(control=self.labelduree_jouee,
                           row=ligneButton - 2,
-                          column=(SEIZE // 2) - 2,
+                          column=(SEIZE // 2) ,
                           rowspan=2,
                           columnspan=5,
                           pad_x=5,
@@ -188,7 +185,7 @@ class MyMusicPlugin(pyxbmctExtended.BackgroundDialogWindow):
         self.labelduree_fin = pyxbmct.Label('',textColor ='0xFF888888')
         self.placeControl(control=self.labelduree_fin,
                           row=ligneButton - 2,
-                          column=(SEIZE // 2) - 2 + (29 - 3),
+                          column=(SEIZE // 2) + (29 - 5),
                           rowspan=2,
                           columnspan=4,
                           pad_x=5,
@@ -261,6 +258,12 @@ class MyMusicPlugin(pyxbmctExtended.BackgroundDialogWindow):
         # FrameMenu.fenetreMenu.desabonner() -> TypeError: unbound method desabonner() must be called with fenetreMenu
         # instance as first argument (got nothing instead)
         # self.subscribe.resiliersouscription() # -> AttributeError: 'SlimIsPlaying' object has no attribute subscribe
+        self.connectInterface()
+        self.get_playerid()
+        self.subscribe = Ecoute.Souscription(self.InterfaceCLI, self.playerid)
+        self.subscribe.resiliersouscription()
+        # doit on récupérer la réponse ?
+        self.Abonnement.clear()
         self.threadRunning = False
         self.close()
 
@@ -294,7 +297,7 @@ class MyMusicPlugin(pyxbmctExtended.BackgroundDialogWindow):
         pass
 
 
-    def detailAlbums(self, menudeprovenance):
+    def f_detailAlbums(self, menudeprovenance):
         self.get_playerid()
         self.get_ident_server()
         self.connectInterface()
@@ -344,14 +347,22 @@ class MyMusicPlugin(pyxbmctExtended.BackgroundDialogWindow):
         except IndexError:
             self.functionNotYetImplemented()
             return
+        try:
+            texte_a_traiter_titre = texte_en_liste_a_traiter.pop()
+            texte_en_liste_a_traiter_entete = texte_a_traiter_titre.split('tags:' + TAGS + '|' )
+            xbmc.log('texte_a_traiter titre: ' +  str(texte_en_liste_a_traiter_entete) , xbmc.LOGNOTICE )
+        except IndexError:
+            item = xbmcgui.ListItem()
+            item.setLabel('Get an Error from Server! ')
+            self.listMenu_detailAlbums.addItem(item)
 
-        texte_a_traiter_titre = texte_en_liste_a_traiter.pop()
-        texte_en_liste_a_traiter_entete = texte_a_traiter_titre.split('tags:' + TAGS + '|' )
-        xbmc.log('texte_a_traiter titre: ' +  str(texte_en_liste_a_traiter_entete) , xbmc.LOGNOTICE )
+            return
         # exemple :
-
-        lesItemsTracksNormalised = texte_en_liste_a_traiter_entete[1]
-        xbmc.log('lesItemsTracksNormalised : ' + lesItemsTracksNormalised, xbmc.LOGNOTICE )
+        try:
+            lesItemsTracksNormalised = texte_en_liste_a_traiter_entete[1]
+            xbmc.log('lesItemsTracksNormalised : ' + lesItemsTracksNormalised, xbmc.LOGNOTICE )
+        except IndexError:
+            return
 
         try:
             lachainedesItemsTracks = lesItemsTracksNormalised.split('|') #
@@ -395,7 +406,6 @@ class MyMusicPlugin(pyxbmctExtended.BackgroundDialogWindow):
                 pass
 
             if clef == 'id':
-
 
                 if secondEtsuivant:
                     itemtampon.setLabel(indice + ' - ' + titre + ' - ' + year + ' : ' + duree + ' .')
@@ -444,13 +454,12 @@ class MyMusicPlugin(pyxbmctExtended.BackgroundDialogWindow):
         #sort the itemsTracks list by tracknum todo test this function or similar
         #sorted(itemsTracks, key=lambda tracknum: tracknum[1])   # sort by n° track not always true
 
-
         for item in itemsTracks:
             xbmc.log('ajout de item trackss dans menu detailAlbum  : ' + item.getLabel() , xbmc.LOGNOTICE)
             self.listMenu_detailAlbums.addItem(item)
+    # End of funcion f_detailAlbums
 
-
-    def listeTracks(self, menudeprovenance):
+    def f_listeTracks(self, menudeprovenance):
         
         if menudeprovenance ==  'listMenu_detailAlbums' :
             labelajouer = self.listMenu_detailAlbums.getListItem(self.listMenu_detailAlbums.getSelectedPosition()).getLabel()
@@ -525,14 +534,21 @@ class MyMusicPlugin(pyxbmctExtended.BackgroundDialogWindow):
             else:
                 # cancel asked
                 pass
+    # End of function f_listeTracks
 
-    def detailItemPlaylist(self):
+    def f_detailItemPlaylist(self):
+        # todo rewrite function to have a nice personnal textbox in a frame
+        # with selected item
 
         labelajouer = self.listMenu_playlist.getListItem(
                 self.listMenu_playlist.getSelectedPosition()).getLabel()
         track_id = self.listMenu_playlist.getListItem(
                 self.listMenu_playlist.getSelectedPosition()).getProperty('tracked_id')
-
+        self.connectInterface()
+        self.get_playerid()
+        self.subscribe = Ecoute.Souscription(self.InterfaceCLI, self.playerid)
+        self.subscribe.resiliersouscription()
+        self.InterfaceCLI.viderLeBuffer()
         requete = self.playerid + ' songinfo 0 100 track_id:' + str(track_id)
         self.InterfaceCLI.sendtoCLISomething(requete)
         reponse = self.InterfaceCLI.receptionReponseEtDecodage()
@@ -579,7 +595,7 @@ class MyMusicPlugin(pyxbmctExtended.BackgroundDialogWindow):
     # copier/coller de la fonction de FrameMenu.py
     def update_current_track_playing(self):
 
-        self.subscribe = Souscription(self.InterfaceCLI, self.playerid, self.Abonnement, self.recevoirEnAttente)
+        self.subscribe = Souscription(self.InterfaceCLI, self.playerid )
         self.subscribe.subscription()
         # todo Q : comment faire la gestion de l'arret de la boucle de souscription ?
         #      A : fonction resiliersouscription()
@@ -598,8 +614,9 @@ class MyMusicPlugin(pyxbmctExtended.BackgroundDialogWindow):
             if xbmc.Monitor().waitForAbort(0.5):
                 self.breakBoucle_A = True
                 self.Abonnement.clear()
+                break
             timeoutdeTestdelaBoucle = time.time() + 60 * 10  # 10 minutes from now -for testing
-            while (self.breakBoucle_A == False):  # Boucle A principale de Subscribe
+            while (self.breakBoucle_A == False):  # Boucle A principale de Subscribe ?same  as 'not self.breakBoucle_A'?
 
                 if time.time() > timeoutdeTestdelaBoucle:
                     xbmc.log('Timeout : break A  ', xbmc.LOGNOTICE)
@@ -610,16 +627,23 @@ class MyMusicPlugin(pyxbmctExtended.BackgroundDialogWindow):
                     self.Abonnement.clear()
 
                 # Todo : analyse du bloc
-
                 recupropre = self.InterfaceCLI.receptionReponseEtDecodage()
+
+                if 'subscribe:-' in recupropre:  # fin souscription the resiliersouscription is send by FramePlaying or
+                    # else diplaying
+                    # the FramePlaying  exits - function quit()
+                    self.breakBoucle_A = True  # must exit the loop A but doesn't exist here
+                    self.Abonnement.clear()  # must exit the main loop
+                    break
+
                 listeB = recupropre.split('subscribe:' + TIME_OF_LOOP_SUBSCRIBE + '|')  # on élimine le début de la trame
                 # attention doit correpondre à
                 # la même valeur de subscribe dans Ecoute.py
+
                 try:
                     textC = listeB[1]  # on conserve la deuximème trame après suscribe...
                 except IndexError:
                     break
-                    # pass
 
                 # mise à jour de la position de l'item dans le menu liste
                 indexdecurrentTitle = textC.find('cur_index:')
@@ -632,7 +656,7 @@ class MyMusicPlugin(pyxbmctExtended.BackgroundDialogWindow):
 
                 listeRetour = textC.split('|')  # on obtient une liste des items
                 dico = dict()  # pour chaque élement de la liste sous la forme <val1>:<val2>
-                dico2 = {}
+
                 for x in listeRetour:  # on la place dans un dictionnaire
                     c = x.split(':')  # sous la forme  key: value et <val1> devient la key
                     if dico.has_key(c[0]):  # nous avons déjà une occurence
@@ -650,19 +674,16 @@ class MyMusicPlugin(pyxbmctExtended.BackgroundDialogWindow):
 
                 try:
                     self.slider_duration.setPercent(pourcentagedureejouee)
-                    # self.slider_duration.setPercent(pourcentagedureejouee)
                 except KeyError:
-                    pass
+                    continue
 
                 try:
                     self.labelduree_jouee.setLabel(label=outils.getInHMS(dico['time']))
-                    # self.labelduree_jouee.setLabel(label= outils.getInHMS(self, dico['time']))
                 except KeyError:
-                    pass
+                    continue
 
                 try:
                     self.labelduree_fin.setLabel(label=outils.getInHMS(dico['duration']))
-                    # self.labelduree_fin.setLabel(label= outils.getInHMS(self, dico['duration']))
                 except KeyError:
                     self.labelduree_fin.setLabel(label=outils.getInHMS(0.0))
 
@@ -695,17 +716,14 @@ class MyMusicPlugin(pyxbmctExtended.BackgroundDialogWindow):
                 timedutour = time.time()
                 tempsparcouru = timedutour - timeEntreeDansLaBoucle
                 xbmc.log(str(compteur) + ' tour de boucle : ' + str(tempsparcouru), xbmc.LOGDEBUG)
-                #if pourcentagedureejouee >= 100:
-                #    self.breakBoucle_A = True
-                #    break
-
             # fin de la boucle A : sortie de subscribe
         # fin boucle while
-        xbmc.log('End of Boucle of Squueze , Bye', xbmc.LOGNOTICE)
+        xbmc.log('End of Boucle in Update_curent_track in FrameMyMusic', xbmc.LOGNOTICE)
         self.subscribe.resiliersouscription()
-        time.sleep(0.2)
-
-        xbmc.log('End of fonction update_current_track_is_playing , Bye', xbmc.LOGNOTICE)
+        reponse = self.InterfaceCLI.receptionReponseEtDecodage()
+        xbmc.log('Send resiliersouscription in A update_current_track in FrameMyMusic', xbmc.LOGNOTICE)
+        self.InterfaceCLI.viderLeBuffer()
+        xbmc.log('End of fonction update_current_track_is_playing in FrameMyMusic, Bye', xbmc.LOGNOTICE)
     # fin fonction update_current_track_is_playing
 
     def connectInterface(self):
