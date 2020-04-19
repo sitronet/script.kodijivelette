@@ -107,24 +107,27 @@ class ViewListPlugin(pyxbmctExtended.BackgroundDialogWindow):
 
 
     def geometrie(self):
-        SIZESCREEN_HEIGHT = xbmcgui.getScreenHeight()            # exemple  # 1080
-        SIZESCREEN_WIDTH = xbmcgui.getScreenWidth()                         # 1920
-
-        # replaced by pyxbmct but need for the size cover until the fix
-        self.GRIDSCREEN_Y, Reste = divmod(SIZESCREEN_HEIGHT, 10)            # 108
-        self.GRIDSCREEN_X, Reste = divmod(SIZESCREEN_WIDTH, 10)             # 192
-
+        # pyxbmct :
+        SIZE_WIDTH_pyxbmct = 1280
+        SIZE_HEIGHT_pyxbmct = 720
+        SIZESCREEN_HEIGHT = xbmcgui.getScreenHeight()  # exemple  # 1080
+        SIZESCREEN_WIDTH = xbmcgui.getScreenWidth()
+        Size_W_ChildSelf = SIZE_WIDTH_pyxbmct // 2
+        Size_H_ChildSelf = SIZE_HEIGHT_pyxbmct
         self.screenx = SIZESCREEN_WIDTH
         self.screeny = SIZESCREEN_HEIGHT
         xbmc.log('Real Size of Screen : ' + str(self.screenx) + ' x ' + str(self.screeny), xbmc.LOGNOTICE)
-
         if self.screenx > SIZE_WIDTH_pyxbmct:
-            self.screenx = SIZE_WIDTH_pyxbmct  # try
+            self.screenx = SIZE_WIDTH_pyxbmct
             self.screeny = SIZE_HEIGHT_pyxbmct
 
+        self.setGeometry(width_=Size_W_ChildSelf,
+                         height_=Size_H_ChildSelf - 100 ,
+                         rows_= NEUF,
+                         columns_= SEIZE,
+                         pos_x= 1,
+                         pos_y= 1 )
 
-        #pyxbmct :
-        self.setGeometry(self.screenx  , self.screeny , NEUF, SEIZE)
         xbmc.log('Size of Screen pyxbmct fix to : ' + str(self.screenx) + ' x ' + str(self.screeny), xbmc.LOGNOTICE)
 
         self.image_dir = ARTWORK  # path to pictures used in the program (future development, todo)
@@ -145,10 +148,10 @@ class ViewListPlugin(pyxbmctExtended.BackgroundDialogWindow):
         self.title_label = pyxbmct.Label('', textColor='0xFF808080')
         self.placeControl(self.title_label, 0 , 2 , 1 , 10)
 
-        row_depart = 2
-        col_depart = 1
+        row_depart = 0
+        col_depart = 0
         espace_row = 30
-        espace_col = 16
+        espace_col = SEIZE // 2
         hauteur_menu = 25
 
         self.listMenu_1 = pyxbmct.List(buttonFocusTexture=self.image_list_focus, _imageWidth= 38 , _imageHeight = 38 , _itemHeight=40)
@@ -558,8 +561,20 @@ class ViewListPlugin(pyxbmctExtended.BackgroundDialogWindow):
                 # Todo : analyse du bloc
 
                 recupropre = self.InterfaceCLI.receptionReponseEtDecodage()
-                listeB = recupropre.split(
-                    'subscribe:' + TIME_OF_LOOP_SUBCRIBE + '|')  # on élimine le début de la trame
+
+                if 'subscribe:-' in recupropre: # fin souscription the resiliersouscription is send by FramePlaying or
+                                                # else diplaying
+                                                # the FramePlaying  exits - function quit()
+                    self.breakBoucle_A = True
+                    self.Abonnement.clear()
+                    break
+
+                try:
+                    listeB = recupropre.split(
+                        'subscribe:' + TIME_OF_LOOP_SUBCRIBE + '|')  # on élimine le début de la trame
+                except ValueError:
+                    continue
+
                 try:
                     textC = listeB[1]  # on conserve la deuximème trame après suscribe...
                 except IndexError:
@@ -649,19 +664,14 @@ class ViewListPlugin(pyxbmctExtended.BackgroundDialogWindow):
                     # self.subscribe.resiliersouscription() # double emploi
                     self.breakBoucle_A = True
                     self.Abonnement.clear()
-
-                # fin de la boucle A : sortie de subscribe
+            # fin de la boucle A : sortie de subscribe
         # fin boucle while
-        xbmc.log('End of Boucle of Squueze , Bye', xbmc.LOGNOTICE)
+        xbmc.log('End of Boucle of Squeeze in FrameList , Bye', xbmc.LOGNOTICE)
         self.subscribe.resiliersouscription()
-        # comment allons nous arrèter la souscription (dans le bouton stop ou exit du gui)
-        # self.InterfaceCLIduLMS.demandedeStop.set()
-        # on demande au Thread de s'arréter  par un flag
-        # self.InterfaceCLI.closeconnexionWithCLI()
-        time.sleep(0.2)
-        # del  self.InterfaceCLI
-        # self.demandedeStop.set()
-        xbmc.log('End of fonction update_now_is_playing , Bye', xbmc.LOGNOTICE)
+        reponse = self.InterfaceCLI.receptionReponseEtDecodage()
+        xbmc.log('Send resiliersouscription in A update now_is_playing() in FrameList', xbmc.LOGNOTICE)
+        self.InterfaceCLI.viderLeBuffer()
+        xbmc.log('End of fonction update_now_is_playing in FrameList , Bye', xbmc.LOGNOTICE)
     # fin fonction update_now_is_playing
 
     def connectInterface(self):
