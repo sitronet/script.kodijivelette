@@ -321,13 +321,13 @@ class PlaylistPlugin(pyxbmctExtended.BackgroundDialogWindow):
 
     def quit_listing(self):# todo : à tester
         self.WindowPlayinghere = xbmcgui.getCurrentWindowId()
-        xbmc.log('fenetre listing is exiting: ' + str(self.WindowPlayinghere), xbmc.LOGNOTICE)
-        #xbmc.log('fenetre enregistrée dans methode now_is_playing n° : ' + str(self.Window_is_playing), xbmc.LOGNOTICE) # attribute error here
-        #self.Abonnement.clear() # -> AttributeError: 'SlimIsPlaying' object has no attribute 'Abonnement'
-        # todo : tester appel fonction du prg principal
-        # FrameMenu.fenetreMenu.desabonner() -> TypeError: unbound method desabonner() must be called with fenetreMenu
-        # instance as first argument (got nothing instead)
-        # self.subscribe.resiliersouscription() # -> AttributeError: 'SlimIsPlaying' object has no attribute subscribe
+        xbmc.log('fenetre PlaylistPlugin  is exiting: ' + str(self.WindowPlayinghere), xbmc.LOGNOTICE)
+
+        self.connectInterface()
+        self.get_playerid()
+        self.subscribe = Ecoute.Souscription(self.InterfaceCLI, self.playerid )
+        self.subscribe.resiliersouscription()
+        xbmc.log('send resiliersouscription in A quit() FramePlaylist', xbmc.LOGNOTICE)
         self.threadRunning = False
         self.close()
 
@@ -374,7 +374,7 @@ class PlaylistPlugin(pyxbmctExtended.BackgroundDialogWindow):
                 self.listMenu_playlist.getSelectedPosition()).getLabel()
             self.title_label.setLabel(self.itemSelection)
 
-    def randomPlaylist(self):
+    def randomPlaylist(self): # not used , Todo  Delete it or change logic
 
         xbmc.log(' entrée dans le random mix de la FramePlaylist', xbmc.LOGNOTICE)
 
@@ -583,9 +583,9 @@ class PlaylistPlugin(pyxbmctExtended.BackgroundDialogWindow):
         # fin fonction fin fonction functionNotYetImplemented, class Plugin_Generique
 
     # copier/coller de la fonction de FrameMenu.py
-    def update_current_track_playing(self):
+    def update_current_track_playing(self): # not yet used , Todo : Delete it or change logic
 
-        self.subscribe = Souscription(self.InterfaceCLI, self.playerid, self.Abonnement, self.recevoirEnAttente)
+        self.subscribe = Souscription(self.InterfaceCLI, self.playerid )
         self.subscribe.subscriptionLongue()
         # todo Q : comment faire la gestion de l'arret de la boucle de souscription ?
         #      A : fonction resiliersouscription()
@@ -610,6 +610,14 @@ class PlaylistPlugin(pyxbmctExtended.BackgroundDialogWindow):
             # Todo : analyse du bloc
 
             recupropre = self.InterfaceCLI.receptionReponseEtDecodage()
+
+            if 'subscribe:-' in recupropre:  # fin souscription the resiliersouscription is send by FramePlaying or
+                                             # else diplaying
+                                             # the FramePlaying  exits - function quit()
+                self.breakBoucle_A = True    # must exit the loop A
+                #self.Abonnement.clear()      # must exit the main loop
+                break
+
             listeB = recupropre.split('subscribe:' + TIME_OF_LOOP_SUBSCRIBE + '|')  # on élimine le début de la trame
             # attention doit correpondre à
             # la même valeur de subscribe dans Ecoute.py
@@ -676,12 +684,11 @@ class PlaylistPlugin(pyxbmctExtended.BackgroundDialogWindow):
 
                 # fin de la boucle A : sortie de subscribe
         # fin boucle while
-        xbmc.log('End of Boucle of Squueze , Bye', xbmc.LOGNOTICE)
+        xbmc.log('End of Boucle of update_current_track_playing in FramePlaylist , Bye', xbmc.LOGNOTICE)
         self.subscribe.resiliersouscription()
-        time.sleep(0.2)
-
-        xbmc.log('End of fonction update_current_track_is_playing , Bye', xbmc.LOGNOTICE)
-    # fin fonction update_current_track_is_playing
+        #self.InterfaceCLI.viderLeBuffer()
+        xbmc.log('End of fonction update_current_track_playing in FramePlaylist , Bye', xbmc.LOGNOTICE)
+    # fin fonction update_current_track_playing
 
     def connectInterface(self):
         self.InterfaceCLI = ConnexionClient.InterfaceCLIduLMS()

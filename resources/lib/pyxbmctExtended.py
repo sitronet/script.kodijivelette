@@ -37,7 +37,7 @@ class GenericSkin(pyxbmct.Skin):
         return os.path.join(self.images, 'AddonWindow', 'ContentPanel.png')
 
     '''
-    '''
+
     @property
     def background_img(self):
         return xbmc.translatePath(os.path.join(ADDON.getAddonInfo('path'), 'resources', 'skins', 'Default', 'media', 'pcp_vibrato.png'))
@@ -49,7 +49,7 @@ class GenericSkin(pyxbmct.Skin):
     @property
     def main_bg_img(self):
         return xbmc.translatePath(os.path.join(ADDON.getAddonInfo('path'), 'resources', 'skins', 'Default', 'media','pcp_vibrato.png'))
-    '''
+
 
 
 skin = GenericSkin()

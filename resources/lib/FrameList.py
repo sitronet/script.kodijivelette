@@ -214,6 +214,10 @@ class ViewListPlugin(pyxbmctExtended.BackgroundDialogWindow):
             # FrameMenu.fenetreMenu.desabonner() -> TypeError: unbound method desabonner() must be called with fenetreMenu
             # instance as first argument (got nothing instead)
             # self.subscribe.resiliersouscription() # -> AttributeError: 'SlimIsPlaying' object has no attribute subscribe
+            self.connectInterface()
+            self.get_playerid()
+            self.subscribe = Ecoute.Souscription(self.InterfaceCLI, self.playerid)
+            self.subscribe.resiliersouscription()
             self.Abonnement.clear()
             self.threadRunning = False
             self.close()
@@ -515,7 +519,7 @@ class ViewListPlugin(pyxbmctExtended.BackgroundDialogWindow):
         # xbmc.log('fenetre de player en maj n° : ' + str(self.WindowPlaying), xbmc.LOGDEBUG)
         # xbmc.log('nouvelle fenetre de player n° : ' + str(self.Window_is_playing), xbmc.LOGDEBUG)
 
-        self.subscribe = Souscription(self.InterfaceCLI, self.playerid, self.Abonnement, self.recevoirEnAttente)
+        self.subscribe = Souscription(self.InterfaceCLI, self.playerid )
         self.subscribe.subscription()
 
         while self.Abonnement.is_set():  # remember Abonnement is an thread event for souscription
@@ -527,12 +531,8 @@ class ViewListPlugin(pyxbmctExtended.BackgroundDialogWindow):
             compteur = 1
             titreenlecture = ''
             self.breakBoucle_A = False
-            timeoutduVolume = time.time() + 20
             while (self.breakBoucle_A == False):  # Boucle A principale de Subscribe
 
-                if time.time() > timeoutduVolume:
-                    self.jivelette.label_volume.setVisible(False)
-                    self.jivelette.slider_volume.setVisible(False)
                 if time.time() > timeoutdeTestdelaBoucle:
                     xbmc.log('Timeout : break A  ', xbmc.LOGNOTICE)
                     break
