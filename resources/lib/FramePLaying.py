@@ -27,9 +27,10 @@ import threading
 import time
 
 from resources.lib import ConnexionClient
-from resources.lib import outils
+from resources.lib import outils, Ecoute
 from resources.lib import pyxbmctExtended
 
+TIME_OF_LOOP_SUBSCRIBE = Ecoute.TIME_OF_LOOP_SUBSCRIBE
 
 sys.path.append(os.path.join(os.path.dirname(__file__), "resources", "lib"))
 
@@ -151,18 +152,25 @@ pyxbmct.addonwindow.skin = MySkin()
 
 
 class SlimIsPlaying(pyxbmctExtended.BackgroundDialogWindow):
-#class SlimIsPlaying(pyxbmct.AddonFullWindow):
+    '''
+    Frame d'affichage de NowIsPlaying
+        basé sur une extension de pyxbmct
+        permet d'avoir un background
+        pas de header ni title-bar ni titre
+    '''
+    # Or class SlimIsPlaying(pyxbmct.AddonFullWindow):
+
     def __init__(self, *args ):
         #title = args[0] # for AddonFullWindow
         #super(SlimIsPlaying, self).__init__( title)
-        # xbmc.log( ' param : ' + title  , xbmc.LOGNOTICE)
 
         super(SlimIsPlaying, self).__init__()
 
         self.WindowPlaying = xbmcgui.getCurrentWindowId()
-        xbmc.log('fenetre de class SlimIsPlaying n° : ' + str(self.WindowPlaying), xbmc.LOGDEBUG)
+        xbmc.log('fenetre de class SlimIsPlaying n° : ' + str(self.WindowPlaying), xbmc.LOGNOTICE)
         xbmc.log('Create Instance Slim is Now Playing KodiJivelette...' , xbmc.LOGNOTICE)
 
+        self.NowIsPlaying = True    # this is a flag for the main Loop in the method update
         self.threadRunning = True
         self.flagStatePause = False
 
@@ -241,11 +249,6 @@ class SlimIsPlaying(pyxbmctExtended.BackgroundDialogWindow):
         self.placeControl(self.labelArtist, 16 , 4 , 2 , 25 )
         self.labelArtist.addLabel('')
 
-        # la boite de texte 2 carrés de large sur 8 de hauteur (test avec 3 -> pas assez d'espace)
-        # attention qu'elle ne chevauche pas la playerbox
-        self.textbox = pyxbmct.TextBox(textColor = '0xFF888888')
-        self.placeControl(self.textbox, 15 , 1, 4 , 2 , 4 , 1)
-
         # Slider de la durée
         self.slider_duration = pyxbmct.Slider(textureback=self.textureback_slider_duration)
         self.placeControl(control=self.slider_duration,
@@ -254,8 +257,6 @@ class SlimIsPlaying(pyxbmctExtended.BackgroundDialogWindow):
                           rowspan= 1 ,
                           columnspan= 29 - 4 ,
                           pad_x= 1)
-        #self.slider_duration = pyxbmct.Slider(textureback=self.textureback_slider_duration, buttonTexture=self.texture_slider_duration)
-        #self.placeControl(self.slider_duration, ligneButton - 2  , int((SEIZE / 2) + 5 )  , 1 , 18 , pad_x = 5 , pad_y = 5 )
 
         self.slider_duration.setPercent(SLIDER_INIT_VALUE)
 
@@ -278,13 +279,14 @@ class SlimIsPlaying(pyxbmctExtended.BackgroundDialogWindow):
                           pad_y = 5 )
 
 
-        # réserver la boite pour les infos sur le player, à ajuster selon retour expérience.
-        self.playerbox = pyxbmct.TextBox()
-        self.placeControl(self.playerbox, 1, 1 , 2 , 5 )
 
-        # button pause :
+        # button pause : (Todo : rather a button maybe can do a frame Pause with the Button pause/play inside the frame)
         self.bouton_pause = pyxbmct.Button(label='', focusTexture=self.image_button_pause, noFocusTexture=self.image_button_pause)
-        self.placeControl(control=self.bouton_pause, row = NEUF / 2 , column= int(SEIZE /2) - 5  , rowspan= 6 , columnspan= 6 )
+        self.placeControl(control=self.bouton_pause,
+                          row = ( NEUF // 2 ) - 5  ,
+                          column= (SEIZE // 2) - 5  ,
+                          rowspan= 10 ,
+                          columnspan= 10 )
         self.bouton_pause.setVisible(False)
         self.bouton_play = pyxbmct.Button(label='', focusTexture=self.image_button_play, noFocusTexture='')
         self.placeControl(self.bouton_play , row = NEUF / 2 , column= (SEIZE / 2 ) - 2  , rowspan= 6 , columnspan= 6 )
@@ -292,8 +294,15 @@ class SlimIsPlaying(pyxbmctExtended.BackgroundDialogWindow):
 
         #  connect key
         # zone de contrôle des actions
-        self.connect(self.bouton_pause, self.pause_play)
-        self.connexionEvent()
+        # Todo
+        #self.connect(self.bouton_pause, self.pause_play)
+        #self.connexionEvent()
+
+        # get the server information and player
+        #self.connectInterface()
+        #self.get_playerid()
+        # then start the update process
+        #self.update_now_is_playing()
 
 
     def connexionEvent(self):
@@ -340,18 +349,23 @@ class SlimIsPlaying(pyxbmctExtended.BackgroundDialogWindow):
 
         else:
             xbmc.log('else condition onAction in FramePlaying' , xbmc.LOGNOTICE)
-            #self._executeConnected(action, self.actions_connected)
+            self._executeConnected(action, self.actions_connected)
 
 
     def quit_now_playing(self):# todo : à tester
+        self.NowIsPlaying = False       # with this flag the method update must exit the loop and stop
         self.WindowPlayinghere = xbmcgui.getCurrentWindowId()
         xbmc.log('fenetre now_is_playing is exiting: ' + str(self.WindowPlayinghere), xbmc.LOGNOTICE)
-        #xbmc.log('fenetre enregistrée dans methode now_is_playing n° : ' + str(self.Window_is_playing), xbmc.LOGNOTICE) # attribute error here
-        #self.Abonnement.clear() # -> AttributeError: 'SlimIsPlaying' object has no attribute 'Abonnement'
-        # todo : tester appel fonction du prg principal
-        # FrameMenu.fenetreMenu.desabonner() -> TypeError: unbound method desabonner() must be called with fenetreMenu
-        # instance as first argument (got nothing instead)
-        # self.subscribe.resiliersouscription() # -> AttributeError: 'SlimIsPlaying' object has no attribute subscribe
+        self.connectInterface()
+        self.get_playerid()
+        self.subscribe = Ecoute.Souscription(self.InterfaceCLI, self.playerid )
+        self.subscribe.resiliersouscription()
+        xbmc.log('send resiliersouscription in A quit() FramePlaying', xbmc.LOGNOTICE)
+        # don't receive here because need in the answer of server to exit the update_now_is_playing()
+        #recupropre = self.InterfaceCLI.receptionReponseEtDecodage()
+
+        time.sleep(1)    # wait the server answer to unsubscribe so update function can exit the loop and stop
+        #del subscribe
         self.threadRunning = False
         self.close()
 
@@ -363,6 +377,12 @@ class SlimIsPlaying(pyxbmctExtended.BackgroundDialogWindow):
         if not self.flagStatePause:
             self.bouton_pause.setVisible(True)
             self.flagStatePause = True
+            # pause also the subscribe
+            self.subscribe = Ecoute.Souscription(self.InterfaceCLI,
+                                                  self.playerid )
+            self.subscribe.resiliersouscription()
+            reponse = self.InterfaceCLI.receptionReponseEtDecodage()
+            self.InterfaceCLI.viderLeBuffer()
             requete = self.playerid + ' pause 1'
             self.InterfaceCLI.sendtoCLISomething(requete)
             reponse = self.InterfaceCLI.receptionReponseEtDecodage()
@@ -377,33 +397,32 @@ class SlimIsPlaying(pyxbmctExtended.BackgroundDialogWindow):
                 self.bouton_pause.setVisible(False)
                 self.flagStatePause = False
             del reponse
+            # turn on the subscribe
+            self.subscribe.subscription()
 
     def futureFunction(self):
         pass
 
     def promptVolume(self):
+        # before call the windows volume turn off the subscribe
+        self.connectInterface()
+        self.get_playerid()
+        self.subscribe = Ecoute.Souscription(self.InterfaceCLI, self.playerid )
+        self.subscribe.resiliersouscription()
+        reponse = self.InterfaceCLI.receptionReponseEtDecodage()
+        self.InterfaceCLI.viderLeBuffer()
         volumeFrame = outils.VolumeFrameChild()
         volumeFrame.doModal()
+        self.subscribe = Ecoute.Souscription(self.InterfaceCLI, self.playerid )
+        self.subscribe.subscription()
         del volumeFrame
+        # then turn on the subscription
+        del self.subscribe
         
     def promptContextMenu(self):
         contextMenuFrame = outils.ContextMenuFrameChild()
         contextMenuFrame.doModal()
         del contextMenuFrame
-
-    #slider_duration    self.slider_volume.setPercent(pourcentage)
-
-    def set_slider_duration(self, duree):
-        self.slider_duration.setPercent(duree)
-
-    def update_textbox(self, text):
-        self.textbox.setText("\n".join(text))
-
-    def update_playerbox(self, text):
-        self.playerbox.setText(" ".join(text))
-
-    def update_actionbox(self, text):
-        self.actionbox.setText("\r".join(text))
 
     def update_coverbox(self, lmsip, lmswebport, playerid, compteur):
         '''
@@ -435,6 +454,7 @@ class SlimIsPlaying(pyxbmctExtended.BackgroundDialogWindow):
     def connectInterface(self):
         self.InterfaceCLI = ConnexionClient.InterfaceCLIduLMS()
 
+
     def get_playerid(self):
         self.Players = outils.WhatAreThePlayers()
         self.playerid = self.Players.get_unplayeractif()
@@ -444,3 +464,202 @@ class SlimIsPlaying(pyxbmctExtended.BackgroundDialogWindow):
         self.nomserver = self.Server.LMSnom
         self.lmsip = self.Server.LMSCLIip
         self.lmswebport = self.Server.LMSwebport
+
+    def update_now_is_playing(self):
+        ''' method to use with doModal() in the calling program, for exemple : in FrameMenu.fenetreMenu
+            self.jivelette = FramePLaying.SlimIsPlaying()
+            self.jivelette.doModal()
+            This is the main loop when display the Frame Slim is playing
+            and the frame use doModal()
+            thereis a similar method inside the class FrameMenu.fenetreMenu when the frame use show()
+            but use a different logic to exit the loop
+        '''
+        xbmc.log('Entrée dans méthode Update_now_is_playing of FramePlaying', xbmc.LOGNOTICE)
+
+        self.Window_is_playing = xbmcgui.getCurrentWindowId()
+        #xbmc.log('fenetre de player en maj n° : ' + str(self.WindowPlaying), xbmc.LOGDEBUG)
+        #xbmc.log('nouvelle fenetre de player n° : ' + str(self.Window_is_playing), xbmc.LOGDEBUG)
+
+        # activation de la souscription au serveur process
+        self.subscribe = Ecoute.Souscription(self.InterfaceCLI , self.playerid )
+        self.subscribe.subscription()
+        # todo Q : comment faire la gestion de l'arret de la boucle de souscription ?
+
+        # there is no Abonnement in this class -> need to find something else
+        while self.NowIsPlaying:    # this is a flag
+            time.sleep(0.5)
+
+            timeoutdeTestdelaBoucle = time.time() + 60 * 2  # 2 minutes from now -for testing
+            timeoutdeRecherchedesPlayers = time.time() + 60 * 20  #todo toutes les 20 minutes nous rechercherons les players
+            timeEntreeDansLaBoucle = time.time()
+            compteur = 1
+            titreenlecture = ''
+            self.breakBoucle_A = False
+            while (self.breakBoucle_A == False):  # Boucle A principale de Subscribe
+
+                if time.time() > timeoutdeTestdelaBoucle:
+                    xbmc.log('Timeout : break A  ', xbmc.LOGNOTICE)
+                    break
+
+                if xbmc.Monitor().waitForAbort(0.):
+                    self.breakBoucle_A = True
+                    self.NowIsPlaying = True
+                #xbmc.log('trame recue suite à suscribe : ' + str(pourLog), xbmc.LOGDEBUG)
+                ('\n'
+                 '  exemple RadioParadise :\n'
+                 '  b8:27:eb:cf:f2:c0 status - 2 subscribe:30 rescan:1 player_name:piCorePlayer player_connected:1 \n'
+                 '  player_ip:192.168.1.15:35182 power:1 signalstrength:0 mode:play remote:1 \n'
+                 '  -----------------------------------------------------------------------------------------------------  '
+                 '  current_title:Echo & the Bunnymen  -  The Killing Moon time:1511.89265412712 rate:1 \n'
+                 '  sync_master:b8:27:eb:cf:f2:c0 sync_slaves:00:04:20:17:1c:44 mixer volume:42 playlist repeat:0 \n'
+                 '  playlist shuffle:0 playlist mode:off seq_no:0 playlist_cur_index:0 playlist_timestamp:1573925050.19126 \n'
+                 '  playlist_tracks:1 digital_volume_control:1 remoteMeta:HASH(0x8bf3bd8) playlist index:0 id:-93629680 \n'
+                 '  title: The Killing Moon\n'
+                 '\n'
+                 '                        ')
+                '''
+                exemple musique random :               
+                b8:27:eb:cf:f2:c0 status - 2 subscribe:30 player_name:piCorePlayer player_connected:1 
+                player_ip:192.168.1.15:55850 power:1 signalstrength:0 mode:play 
+                ---------------------------------------------------------------------------------------------
+                time:100.483604986191 rate:1 duration:314.826 can_seek:1 sync_master:b8:27:eb:cf:f2:c0 
+                sync_slaves:00:04:20:17:1c:44 mixer volume:36 playlist repeat:0 playlist shuffle:0 playlist mode:off 
+                seq_no:0 playlist_cur_index:10 playlist_timestamp:1573565762.11147 playlist_tracks:21 
+                digital_volume_control:1 playlist index:10 id:23149 title:Boogie On Reggae Woman 
+                playlist index:11 id:26702 title:Tears Dry On Their Own'
+                '''
+                #exemple playlist:
+                # 00:04:20:17:1
+                # c:44 | status | 0 | 200 | subscribe:10 | player_name:Squeezebox
+                # Receiver | player_connected:1 | player_ip:192.168.1.17:31420 |
+                # power:1 | signalstrength:92 | mode:play | time:31.1482262744904 | rate:1 | duration:238.893 | can_seek:1 | mixer
+                # volume:100 | playlist repeat:0 | playlist shuffle:0 | playlist mode:off | seq_no:0 |
+                # playlist_cur_index:4 | playlist_timestamp:1578669235.11137 | playlist_tracks:15 |
+                # digital_volume_control:1 |
+                # playlist index:0 | id:13304 | title:Foxy Lady |
+                # playlist index:1 | id:11673 | title:Won't Get Fooled Again (ISOLATED DRUMS)|
+                # playlist index:2|id:19938|title:Piste 2|
+                # playlist index:3|id:16874|title:China Girl|
+                # [...]
+                # playlist index:14|id:21643|title:A Kind Of Magic
+
+                # Here the program is blocked until data come from network (receptionReponse) and are store
+                # in recupropre
+                recupropre = self.InterfaceCLI.receptionReponseEtDecodage()
+                xbmc.log( 'recupropre = ' + str(recupropre), xbmc.LOGNOTICE)
+                # Then Analyse de la trame
+
+                if 'subscribe:-' in recupropre:
+                    xbmc.log('recu fin souscription in update in FramePlaying' , xbmc.LOGNOTICE)
+                    self.NowIsPlaying = False
+                    break
+                xbmc.log( '2eme ligne, recupropre = ' + str(recupropre), xbmc.LOGNOTICE)
+
+                listeB = recupropre.split('subscribe:' + TIME_OF_LOOP_SUBSCRIBE +'|')
+                # on élimine le début de la trame # attention doit correpondre à
+                # la même valeur de subscribe dans Ecoute.py
+                try:
+                    textC = listeB[1]           # on conserve la deuximème trame après suscribe...
+                except IndexError:
+                    break
+                listeRetour = textC.split('|')  # on obtient une liste des items
+                dico = dict()                   # pour chaque élement de la liste sous la forme <val1>:<val2>
+                dico2 = {}
+                for x in listeRetour:           # on la place dans un dictionnaire
+                    c = x.split(':')            # sous la forme  key: value et <val1> devient la key
+                    if dico.has_key(c[0]):      # nous avons déjà une occurence
+                        pass
+                    else:
+                        clef = c[0]
+                        dico[clef] = c[1]       # ensuite on pourra piocher dans le dico la valeur
+                # xbmc.log(str(dico.viewitems()), xbmc.LOGDEBUG)
+                '''
+                exemple du dictionnaire radio  suite :
+                dict_items([('mixer volume', '42'), ('playlist repeat', '0'), ('digital_volume_control', '1'), 
+                ('rescan', '1'), ('player_ip', '192.168.1.15'), ('rate', '1'), ('sync_slaves', '00'), ('id', '-93629680'), 
+                ('signalstrength', '0'), ('player_name', 'piCorePlayer'), 
+                ('current_title', 'Echo & the Bunnymen  -  The Killing Moon'), ('title', ' The Killing Moon\r\n'), 
+                ('playlist mode', 'off'), ('playlist_cur_index', '0'), ('playlist_timestamp', '1573925050.19126'), 
+                ('playlist index', '0'), ('power', '1'), ('playlist_tracks', '1'), ('playlist shuffle', '0'), 
+                ('sync_master', 'b8'), ('player_connected', '1'), ('remoteMeta', 'HASH(0x8bf3bd8)'), ('remote', '1'), 
+                ('seq_no', '0'), ('mode', 'play'), ('time', '1511.89265412712')])
+                '''
+
+                try:
+                    pourcentagedureejouee = 100 * float(dico['time']) / float(dico['duration'])
+                    xbmc.log('percent duree : ' + str(pourcentagedureejouee) + ' - time: ' + dico['time'], xbmc.LOGDEBUG)
+                except KeyError:
+                    pourcentagedureejouee = 0
+
+                try:
+                    self.slider_duration.setPercent(pourcentagedureejouee)
+                except KeyError:
+                    pass
+
+                try:
+                    self.labelduree_jouee.setLabel(label= outils.getInHMS(dico['time']))
+                except KeyError:
+                    pass
+
+                try:
+                    self.labelduree_fin.setLabel(label= outils.getInHMS(dico['duration']))
+                except KeyError:
+                    self.labelduree_fin.setLabel(label= outils.getInHMS(0.0))
+
+                try:
+                    nouveautitre = dico['title']
+                except KeyError:
+                    pass
+
+                if not ( nouveautitre == titreenlecture ):
+
+                    try:
+                        self.labeltitre_1.reset()
+                        self.labeltitre_1.addLabel(label='[B]' + dico['current_title'] + '[/B]')
+                    except KeyError:
+                        self.labeltitre_1.addLabel(label='')
+                        pass
+
+                    try:
+                        titreenlecture = dico['title']
+                        self.labeltitre_2.reset()
+                        self.labeltitre_2.addLabel(label='[B]' + titreenlecture + '[/B]')
+                    except KeyError:
+                        self.labeltitre_2.addLabel(label='')
+
+                    self.InterfaceCLI.sendtoCLISomething('album ?')
+                    reponse  = self.InterfaceCLI.receptionReponseEtDecodage()
+                    album = reponse.split('album|').pop()
+                    self.labelAlbum.reset()
+                    if not '|album' in album:
+                        self.labelAlbum.addLabel(label='[B]' + album + '[/B]')
+
+                    self.InterfaceCLI.sendtoCLISomething('artist ?')
+                    reponse  = self.InterfaceCLI.receptionReponseEtDecodage()
+                    artist = reponse.split('artist|').pop()
+                    self.labelArtist.reset()
+                    if not '|artist' in artist:
+                        self.labelArtist.addLabel(label='[B]' + artist + '[/B]')
+
+                self.update_coverbox(self.lmsip, self.lmswebport, self.playerid, compteur)
+
+               # log pour voir
+                compteur += 1
+                timedutour = time.time()
+                tempsparcouru = timedutour - timeEntreeDansLaBoucle
+                xbmc.log(str(compteur) + ' tour de boucle : ' + str(tempsparcouru), xbmc.LOGDEBUG)
+                xbmc.log('bool threadRunning : ' + str(self.threadRunning), xbmc.LOGNOTICE)
+                if not self.threadRunning:          # must never happen because we are in the running thread
+                    xbmc.log(' threadRunning is not True ', xbmc.LOGNOTICE)
+                    self.breakBoucle_A = True
+                    self.NowIsPlaying
+            # fin de la boucle A : sortie de subscribe
+        # fin boucle while NowIsPlaying
+        xbmc.log('End of Boucle of Squueze , Bye', xbmc.LOGNOTICE)
+        self.subscribe.resiliersouscription()
+        reponse = self.InterfaceCLI.receptionReponseEtDecodage()
+        xbmc.log('Send resiliersouscription in A update now_is_playing() in FramePlaying', xbmc.LOGNOTICE)
+        #del subscribe
+        self.InterfaceCLI.viderLeBuffer()
+        xbmc.log('End of fonction update_now_is_playing In FrmaePlaying, Bye', xbmc.LOGNOTICE)
+    #fin fonction update_now_is_playing
