@@ -78,6 +78,12 @@ sys.path.append(os.path.join(os.path.dirname(__file__), "resources", "lib"))
 
 
 class FavoritesMenu(pyxbmctExtended.BackgroundDialogWindow):
+    ''' frame pour afficher le sous menu des Favoris
+        appelé depuis l'item Favoris du menu principal
+        ceci est un essai pour tester une navigation dans menu différente
+        du standard (radio , app, myMusic, extra ...)
+        prometteur mais comment gérer plusieurs sous-menu ?
+    '''
 
     def __init__(self, *args ):
 
@@ -230,7 +236,7 @@ class FavoritesMenu(pyxbmctExtended.BackgroundDialogWindow):
 
         self.Window_is_playing = xbmcgui.getCurrentWindowId()
 
-        self.subscribe = Souscription(self.InterfaceCLI, self.playerid, self.Abonnement, self.recevoirEnAttente)
+        self.subscribe = Souscription(self.InterfaceCLI, self.playerid)
         self.subscribe.subscription()
 
         while self.Abonnement.is_set():  # remember Abonnement is an thread event for souscription
@@ -254,12 +260,20 @@ class FavoritesMenu(pyxbmctExtended.BackgroundDialogWindow):
                     self.Abonnement.clear()
 
                 recupropre = self.InterfaceCLI.receptionReponseEtDecodage()
+
+                if 'subscribe:-' in recupropre: # fin souscription the resiliersouscription is send by FramePlaying or
+                                                # else diplaying
+                                                # the FramePlaying  exits - function quit()
+                    self.breakBoucle_A = True   # must exit the loop A
+                    self.Abonnement.clear()     # must exit the main loop
+                    break
+
                 listeB = recupropre.split(
                     'subscribe:' + TIME_OF_LOOP_SUBCRIBE + '|')  # on élimine le début de la trame
                 try:
                     textC = listeB[1]  # on conserve la deuximème trame après suscribe...
                 except IndexError:
-                    break
+                    continue
                     # pass
                 listeRetour = textC.split('|')  # on obtient une liste des items
                 dico = dict()  # pour chaque élement de la liste sous la forme <val1>:<val2>
@@ -346,8 +360,10 @@ class FavoritesMenu(pyxbmctExtended.BackgroundDialogWindow):
         # fin boucle while
         xbmc.log('End of Boucle of Squueze , Bye', xbmc.LOGNOTICE)
         self.subscribe.resiliersouscription()
-        time.sleep(0.2)
-        xbmc.log('End of fonction update_now_is_playing , Bye', xbmc.LOGNOTICE)
+        reponse = self.InterfaceCLI.receptionReponseEtDecodage()
+        xbmc.log('Send resiliersouscription in A update now_is_playing() in FrameMenuFavorites', xbmc.LOGNOTICE)
+        self.InterfaceCLI.viderLeBuffer()
+        xbmc.log('End of fonction update_now_is_playing in FrameMenuFavorites , Bye', xbmc.LOGNOTICE)
     # fin fonction update_now_is_playing
 
     def connectInterface(self):
