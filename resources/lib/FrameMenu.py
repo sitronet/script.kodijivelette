@@ -706,6 +706,7 @@ class fenetreMenu(pyxbmct.AddonFullWindow):
         xbmc.log('launch to play : ' + labelajouer + ' ' + cmd + ' playlist play item_id:' + item_id , xbmc.LOGNOTICE  )
         if audio_type == 'audio' and hasitems == '0':
             # send the command to play the item_id
+            self.InterfaceCLI.viderLeBuffer()
             self.InterfaceCLI.sendtoCLISomething( cmd + ' playlist play item_id:' + item_id )
             reponse = self.InterfaceCLI.receptionReponseEtDecodage()
             time.sleep(0.5) # let's the time to retrieve the stream to get the cover
@@ -1139,6 +1140,7 @@ class fenetreMenu(pyxbmct.AddonFullWindow):
             requete = self.playerid + ' randomplay year'
             title = translation(32083 , 'Years mix' )
 
+        self.InterfaceCLI.viderLeBuffer()
         self.InterfaceCLI.sendtoCLISomething(requete)
         reponse = self.InterfaceCLI.receptionReponseEtDecodage()
 
@@ -1213,6 +1215,7 @@ class fenetreMenu(pyxbmct.AddonFullWindow):
             else:
                 requete = playerid + ' power 0'
 
+            self.InterfaceCLI.viderLeBuffer()
             self.InterfaceCLI.sendtoCLISomething(requete)
             reponse = self.InterfaceCLI.receptionReponseEtDecodage()
             del reponse
@@ -2034,6 +2037,7 @@ class fenetreMenu(pyxbmct.AddonFullWindow):
                     except KeyError:
                         self.jivelette.labeltitre_2.addLabel(label='')
 
+                    self.InterfaceCLI.viderLeBuffer()
                     self.InterfaceCLI.sendtoCLISomething('album ?')
                     reponse  = self.InterfaceCLI.receptionReponseEtDecodage()
                     album = reponse.split('album|').pop()
@@ -2041,6 +2045,7 @@ class fenetreMenu(pyxbmct.AddonFullWindow):
                     if not '|album' in album:
                         self.jivelette.labelAlbum.addLabel(label='[B]' + album + '[/B]')
 
+                    self.InterfaceCLI.viderLeBuffer()
                     self.InterfaceCLI.sendtoCLISomething('artist ?')
                     reponse  = self.InterfaceCLI.receptionReponseEtDecodage()
                     artist = reponse.split('artist|').pop()
@@ -2064,7 +2069,7 @@ class fenetreMenu(pyxbmct.AddonFullWindow):
                 # effacer les boutons :
                 # fin de la boucle A : sortie de subscribe
         # fin boucle while
-        xbmc.log('End of Boucle of Squueze , Bye', xbmc.LOGNOTICE)
+        xbmc.log('End of Boucle of Squeeze in FrameMenu , Bye', xbmc.LOGNOTICE)
         self.subscribe.resiliersouscription()
         reponse = self.InterfaceCLI.receptionReponseEtDecodage()
         xbmc.log('Send resiliersouscription in A update now_is_playing() in FrameMenu', xbmc.LOGNOTICE)
@@ -2228,18 +2233,21 @@ class fenetreMenu(pyxbmct.AddonFullWindow):
                 self.frameRandomPlay.listMenu_playlist.selectItem(int(playlist_current_index_title))
                 old_current_index_title = playlist_current_index_title
 
+            self.InterfaceCLI.viderLeBuffer()
             self.InterfaceCLI.sendtoCLISomething('album ?')
             reponse = self.InterfaceCLI.receptionReponseEtDecodage()
             album = reponse.split('album|').pop()
             #self.frameRandomPlay.labelAlbum.reset()
             self.frameRandomPlay.labelAlbum.setLabel(label='[B]' + album + '[/B]')
 
+            self.InterfaceCLI.viderLeBuffer()
             self.InterfaceCLI.sendtoCLISomething('artist ?')
             reponse = self.InterfaceCLI.receptionReponseEtDecodage()
             artist = reponse.split('artist|').pop()
             #self.frameRandomPlay.labelArtist.reset()
             self.frameRandomPlay.labelArtist.setLabel(label='[B]' + artist + '[/B]')
 
+            self.InterfaceCLI.viderLeBuffer()
             self.InterfaceCLI.sendtoCLISomething('title ?')
             reponse = self.InterfaceCLI.receptionReponseEtDecodage()
             artist = reponse.split('title|').pop()
@@ -2320,6 +2328,7 @@ class fenetreMenu(pyxbmct.AddonFullWindow):
             self.bouton_pause.setVisible(True)
             self.flagStatePause = True
             requete = self.playerid + ' pause 1'
+            self.InterfaceCLI.viderLeBuffer()
             self.InterfaceCLI.sendtoCLISomething(requete)
             reponse = self.InterfaceCLI.receptionReponseEtDecodage()
             del reponse
@@ -2327,6 +2336,7 @@ class fenetreMenu(pyxbmct.AddonFullWindow):
         else:
 
             requete = self.playerid + ' pause 0'
+            self.InterfaceCLI.viderLeBuffer()
             self.InterfaceCLI.sendtoCLISomething(requete)
             reponse = self.InterfaceCLI.receptionReponseEtDecodage()
             if 'pause' in reponse:
