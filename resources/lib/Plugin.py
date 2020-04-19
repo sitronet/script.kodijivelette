@@ -846,24 +846,49 @@ class MyMusic(Plugin_Generique):
         self.myMusic.listMenu_allArtists.reset()
 
         self.myMusic.show()
-
+        self.origine.InterfaceCLI.viderLeBuffer() # need because resiliersouscription() let some data in the buffer
         self.origine.InterfaceCLI.sendtoCLISomething('albums 0 100 artist_id:' + numeroItemSelectionFeuille + ' tags:' + TAGS )
 
-        nbre_a_traiter = self.origine.InterfaceCLI.receptionReponseEtDecodage().split('count:')
+        reception = self.origine.InterfaceCLI.receptionReponseEtDecodage()
+
+        # sometime the list of album is very long
+        nbreDeBoucle = 1
+        while self.origine.InterfaceCLI.dataAreWaiting():
+            reception = reception + self.origine.InterfaceCLI.receptionReponseEtDecodage()
+            nbreDeBoucle = nbreDeBoucle + 1
+
+        xbmc.log('nbre de Boucle en reception : ' + str(nbreDeBoucle), xbmc.LOGNOTICE)
+
+        try:
+            nbre_a_traiter = reception.split('count:')
+        except ValueError:
+            self.functionNotYetImplemented()
+            return
+
         try:
             nombreDItems = nbre_a_traiter.pop()
         except IndexError:
             self.functionNotYetImplemented()
             return
-        start = 0
-        requete = 'albums ' + str(start) + ' ' + str(nombreDItems) + ' artist_id:'+ numeroItemSelectionFeuille + ' tags:' + TAGS
-        self.origine.InterfaceCLI.sendtoCLISomething(requete)
-        reponsepropre = self.origine.InterfaceCLI.receptionReponseEtDecodage()
-        xbmc.log('Les albums unefoispropre : ' + str(reponsepropre), xbmc.LOGDEBUG)
+        try:
+            nbreEntier = int(nombreDItems)
+        except:
+            self.functionNotYetImplemented()
+            return
+
+        #start = 0
+        #requete = 'albums ' + str(start) + ' ' + str(nombreDItems) + ' artist_id:'+ numeroItemSelectionFeuille + ' tags:' + TAGS
+        #self.origine.InterfaceCLI.sendtoCLISomething(requete)
+        #reponsepropre = self.origine.InterfaceCLI.receptionReponseEtDecodage()
+        #xbmc.log('Les albums unefoispropre : ' + str(reponsepropre), xbmc.LOGDEBUG)
 
         #trim head and queue
-        poubelle, tampon = reponsepropre.split(TAGS+'|')
-        lesItemsAlbumsNormalised , poubelle = tampon.split('|count:')
+        try:
+            #poubelle, tampon = reponsepropre.split(TAGS+'|')
+            poubelle, tampon = reception.split(TAGS+'|')
+            lesItemsAlbumsNormalised , poubelle = tampon.split('|count:')
+        except ValueError:
+            return
 
         try:
             lachainedesItemsAlbums = lesItemsAlbumsNormalised.split('|')  #
