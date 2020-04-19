@@ -57,12 +57,11 @@ def singleton(cls):
 
 
 @singleton
-class WhereIsTheLMSServer:
+class WhereIsTheLMSServer():
 
     def __init__(self):
         self.url = '255.255.255.255'
         self.port = 3483
-        #self.logger = logging.getLogger()
         self.LMSnom = 'toto'
         self.LMSip = ''
         self.LMSUUID = ''
@@ -699,7 +698,7 @@ class VolumeFrameChild(pyxbmct.BlankDialogWindow):  # this one is transparent ba
         try:
             volumePercent = float(temp[1])
         except IndexError:
-            volumePercent = float(0)
+            volumePercent = float(50)
             stringLabel = 'Volume Error : '
         self.slider_volume.setPercent(volumePercent)
         self.label_volume.setLabel(stringLabel + str(volumePercent) + ' %')
@@ -724,6 +723,7 @@ class VolumeFrameChild(pyxbmct.BlankDialogWindow):  # this one is transparent ba
 
     def connectInterface(self):
         self.InterfaceCLI = InterfaceCLIduLMS()
+        self.recevoirEnAttente = self.InterfaceCLI.recevoirEnAttente
 
     def get_playerid(self):
         self.Players = WhatAreThePlayers()
