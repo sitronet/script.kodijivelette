@@ -680,9 +680,12 @@ class fenetreMenu(pyxbmct.AddonFullWindow):
         #self.jivelette = FramePLaying.SlimIsPlaying(title)
         # With BlankAddonWindow (no title)
         self.jivelette = FramePLaying.SlimIsPlaying()
-        self.jivelette.show()
-        time.sleep(0.5)
-        self.update_now_is_playing()
+        # todo test show() or doModal()
+        # with show the update is here
+        # with doModal the update is in jivelette
+        #self.jivelette.show()
+        #self.update_now_is_playing()
+        self.jivelette.doModal()
         del self.jivelette
 
     def launchPlayingItem(self):
@@ -1870,7 +1873,11 @@ class fenetreMenu(pyxbmct.AddonFullWindow):
         # find fonction set_artwork_size
 
     def update_now_is_playing(self):
-        '''This is the main loop when prompt the Frame now playing'''
+        '''This is the main loop when prompt the Frame now is playing
+            and the frame use show()
+            Todo : can replace by the same method inside the class frameNowisPlaying
+            when the frame use doModal()
+        '''
         self.Window_is_playing = xbmcgui.getCurrentWindowId()
         #xbmc.log('fenetre de player en maj n° : ' + str(self.WindowPlaying), xbmc.LOGDEBUG)
         #xbmc.log('nouvelle fenetre de player n° : ' + str(self.Window_is_playing), xbmc.LOGDEBUG)
@@ -1946,12 +1953,20 @@ class fenetreMenu(pyxbmct.AddonFullWindow):
                 # Todo : analyse du bloc, Done
 
                 recupropre = self.InterfaceCLI.receptionReponseEtDecodage()
+
+                if 'subscribe:-' in recupropre: # fin souscription the resiliersouscription is send by FramePlaying or
+                                                # else diplaying
+                                                # the FramePlaying  exits - function quit()
+                    self.breakBoucle_A = True
+                    self.Abonnement.clear()
+                    break
+
                 listeB = recupropre.split('subscribe:' + TIME_OF_LOOP_SUBSCRIBE +'|')  # on élimine le début de la trame # attention doit correpondre à
                 # la même valeur de subscribe dans Ecoute.py
                 try:
                     textC = listeB[1]  # on conserve la deuximème trame après suscribe...
                 except IndexError:
-                    break
+                    continue
                     #pass
                 listeRetour = textC.split('|')  # on obtient une liste des items
                 dico = dict()  # pour chaque élement de la liste sous la forme <val1>:<val2>
@@ -2051,14 +2066,10 @@ class fenetreMenu(pyxbmct.AddonFullWindow):
         # fin boucle while
         xbmc.log('End of Boucle of Squueze , Bye', xbmc.LOGNOTICE)
         self.subscribe.resiliersouscription()
-        # comment allons nous arrèter la souscription (dans le bouton stop ou exit du gui)
-        # self.InterfaceCLIduLMS.demandedeStop.set()
-        # on demande au Thread de s'arréter  par un flag
-        #self.InterfaceCLI.closeconnexionWithCLI()
-        time.sleep(0.2)
-        #del  self.InterfaceCLI
-        #self.demandedeStop.set()
-        xbmc.log('End of fonction update_now_is_playing , Bye', xbmc.LOGNOTICE)
+        reponse = self.InterfaceCLI.receptionReponseEtDecodage()
+        xbmc.log('Send resiliersouscription in A update now_is_playing() in FrameMenu', xbmc.LOGNOTICE)
+        self.InterfaceCLI.viderLeBuffer()
+        xbmc.log('End of fonction update_now_is_playing in FrameMenu , Bye', xbmc.LOGNOTICE)
     #fin fonction update_now_is_playing
 
     def stop_now_is_playing(self):
@@ -2090,6 +2101,15 @@ class fenetreMenu(pyxbmct.AddonFullWindow):
                                                  playerid=self.playerid, compteur=compteur)
 
             reponse = self.InterfaceCLI.receptionReponseEtDecodage()
+
+            if 'subscribe:-' in reponse:  # fin souscription the resiliersouscription is send by FramePlaying or
+                # else diplaying
+                # the FramePlaying  exits - function quit()
+                #self.breakBoucle_A = True  # must exit the loop A but doesn't exist here
+                self.Abonnement.clear()  # must exit the main loop
+                break
+
+
             try:
                 entete , atraiter = reponse.split('subscribe:' +  TIME_OF_LOOP_SUBSCRIBE + '|')
 
@@ -2227,9 +2247,12 @@ class fenetreMenu(pyxbmct.AddonFullWindow):
             self.frameRandomPlay.labelTitle.setLabel(label='[B]' + artist + '[/B]')
          # end loop While
 
-        xbmc.log('End of Boucle in Update random mix', xbmc.LOGNOTICE)
+        xbmc.log('End of Boucle in Update random mix in FrameMenu', xbmc.LOGNOTICE)
         self.subscribe.resiliersouscription()
-    # Fin fonction random mix
+        reponse = self.InterfaceCLI.receptionReponseEtDecodage()
+        xbmc.log('Send resiliersouscription in A update_random_mix() in FrameMenu', xbmc.LOGNOTICE)
+        self.InterfaceCLI.viderLeBuffer()
+    # Fin fonction update_random_mix_Playlist
 
     # Reminder :
     # racine -> branches -> feuilles -> fleurs ->  etamines
