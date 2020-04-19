@@ -2,7 +2,7 @@
 
 <addon id="script.kodijivelette"
 	   name="Kodijivelette, Slim devices (Squeezebox) view and basic control"
-	   version="0.0.h00"
+	   version="0.0.h01"
 	   provider-name="rondrach">
 
 	<requires>
