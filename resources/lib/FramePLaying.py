@@ -358,9 +358,10 @@ class SlimIsPlaying(pyxbmctExtended.BackgroundDialogWindow):
         xbmc.log('fenetre now_is_playing is exiting: ' + str(self.WindowPlayinghere), xbmc.LOGNOTICE)
         self.connectInterface()
         self.get_playerid()
-        self.subscribe = Ecoute.Souscription(self.InterfaceCLI, self.playerid )
-        self.subscribe.resiliersouscription()
-        xbmc.log('send resiliersouscription in A quit() FramePlaying', xbmc.LOGNOTICE)
+        #self.subscribe = Ecoute.Souscription(self.InterfaceCLI, self.playerid )
+        #self.subscribe.resiliersouscription()
+        self.InterfaceCLI.sendSignal('quit')
+        xbmc.log('sendsignal quit in A quit() FramePlaying', xbmc.LOGNOTICE)
         # don't receive here because need in the answer of server to exit the update_now_is_playing()
         #recupropre = self.InterfaceCLI.receptionReponseEtDecodage()
 
@@ -554,6 +555,12 @@ class SlimIsPlaying(pyxbmctExtended.BackgroundDialogWindow):
                     self.NowIsPlaying = False
                     break
                 xbmc.log( '2eme ligne, recupropre = ' + str(recupropre), xbmc.LOGNOTICE)
+
+                if recupropre.startwith('quit'):
+                    xbmc.log('recu quit in update in FramePlaying', xbmc.LOGNOTICE)
+                    self.NowIsPlaying = False
+                    break
+
 
                 listeB = recupropre.split('subscribe:' + TIME_OF_LOOP_SUBSCRIBE +'|')
                 # on élimine le début de la trame # attention doit correpondre à

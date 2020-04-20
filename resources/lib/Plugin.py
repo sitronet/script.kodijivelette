@@ -931,137 +931,260 @@ class MyMusic(Plugin_Generique):
 
         # fin fonction le_menu_feuille, class Plugin_MyMusic
 
-    def le_menu_fleurs(self, numeroItemSelectionFeuille):
+    def le_menu_fleurs(self, plugOrigine ,  numeroItemSelectionFeuille):
         '''
 
         :param numeroItemSelectionFeuille:
         :return:
         '''
-        xbmc.log(' entrée dans le_menu_fleur_du_plugins MyMusic', xbmc.LOGNOTICE)
+        if plugOrigine == 'All Artists':
 
-        '''
-        exemple :
-        artists 0 10 artist_id:4370
-        artists 0 10 artist_id%3A4370 id%3A4370 artist%3AA.%20Gainsbourg%2FSerge%20Gainsbourg count%3A1
-        albums 0 10 artist_id:4370
-        albums 0 10 artist_id%3A4370 id%3A1935 album%3ANo.%202 count%3A1
-        albums 0 10 artist_id:4370 tags:aCdejJKlstuwxy
-        albums 0 10 artist_id%3A4370 tags%3AaCdejJKlstuwxy id%3A1935 album%3ANo.%202 year%3A2003 
-        artwork_track_id%3Ab38f7f8a title%3ANo.%202 compilation%3A0 artist%3ASerge%20Gainsbourg textkey%3AN count%3A1
-        the cover is there : http://192.168.1.101:9000/music/b38f7f8a/cover.jpg
-        '''
-        artist = self.origine.listMenu_Feuilles_all_Artists.getListItem(self.origine.listMenu_Feuilles_all_Artists.getSelectedPosition()).getLabel()
-        #title = self.origine.listMenu_Feuilles_all_Artists.getListItem(numeroItemSelectionFeuille).getLabel()
-        # same :
-        #itemdelisteOrigine = self.origine.listMenu_Feuilles_all_Artists.getListItem(numeroItemSelectionFeuille)
-        #labeldetete = itemdelisteOrigine.getLabel()
+            xbmc.log(' entrée dans le_menu_fleur_All_Artists_du_plugins MyMusic', xbmc.LOGNOTICE)
 
-        # affichage nouvelle fenêtre:
-        #self.myMusic = FrameMyMusic.MyMusicPlugin(artist)
-        self.myMusic = FrameMyMusic.MyMusicPlugin()
+            '''
+            exemple :
+            artists 0 10 artist_id:4370
+            artists 0 10 artist_id%3A4370 id%3A4370 artist%3AA.%20Gainsbourg%2FSerge%20Gainsbourg count%3A1
+            albums 0 10 artist_id:4370
+            albums 0 10 artist_id%3A4370 id%3A1935 album%3ANo.%202 count%3A1
+            albums 0 10 artist_id:4370 tags:aCdejJKlstuwxy
+            albums 0 10 artist_id%3A4370 tags%3AaCdejJKlstuwxy id%3A1935 album%3ANo.%202 year%3A2003 
+            artwork_track_id%3Ab38f7f8a title%3ANo.%202 compilation%3A0 artist%3ASerge%20Gainsbourg textkey%3AN count%3A1
+            the cover is there : http://192.168.1.101:9000/music/b38f7f8a/cover.jpg
+            '''
+            artist = self.origine.listMenu_Feuilles_all_Artists.getListItem(self.origine.listMenu_Feuilles_all_Artists.getSelectedPosition()).getLabel()
+            #title = self.origine.listMenu_Feuilles_all_Artists.getListItem(numeroItemSelectionFeuille).getLabel()
+            # same :
+            #itemdelisteOrigine = self.origine.listMenu_Feuilles_all_Artists.getListItem(numeroItemSelectionFeuille)
+            #labeldetete = itemdelisteOrigine.getLabel()
 
-        self.myMusic.listMenu_allArtists.reset()
+            # affichage nouvelle fenêtre:
+            #self.myMusic = FrameMyMusic.MyMusicPlugin(artist)
+            self.myMusic = FrameMyMusic.MyMusicPlugin()
 
-        self.myMusic.show()
-        self.origine.InterfaceCLI.viderLeBuffer() # need because resiliersouscription() let some data in the buffer
-        self.origine.InterfaceCLI.sendtoCLISomething('albums 0 100 artist_id:' + numeroItemSelectionFeuille + ' tags:' + TAGS )
+            self.myMusic.listMenu_allArtists.reset()
 
-        reception = self.origine.InterfaceCLI.receptionReponseEtDecodage()
+            self.myMusic.show()
+            # initialise focus ans navigation
+            self.myMusic.listMenu_allArtists.setVisible(True)
+            self.myMusic.listMenu_allAlbums.setVisible(False)
+            self.myMusic.setFocus(self.myMusic.listMenu_allArtists)
+            self.myMusic.listMenu_allArtists.controlRight(self.myMusic.listMenu_detailAlbums)
+            self.myMusic.listMenu_detailAlbums.controlLeft(self.myMusic.listMenu_allArtists)
 
-        # sometime the list of album is very long
-        nbreDeBoucle = 1
-        while self.origine.InterfaceCLI.dataAreWaiting():
-            reception = reception + self.origine.InterfaceCLI.receptionReponseEtDecodage()
-            nbreDeBoucle = nbreDeBoucle + 1
+            self.origine.InterfaceCLI.viderLeBuffer() # need because resiliersouscription() let some data in the buffer
+            self.origine.InterfaceCLI.sendtoCLISomething('albums 0 100 artist_id:' + numeroItemSelectionFeuille + ' tags:' + TAGS )
 
-        xbmc.log('nbre de Boucle en reception : ' + str(nbreDeBoucle), xbmc.LOGNOTICE)
+            reception = self.origine.InterfaceCLI.receptionReponseEtDecodage()
 
-        try:
-            nbre_a_traiter = reception.split('count:')
-        except ValueError:
-            self.functionNotYetImplemented()
-            return
+            # sometime the list of album is very long
+            nbreDeBoucle = 1
+            while self.origine.InterfaceCLI.dataAreWaiting():
+                reception = reception + self.origine.InterfaceCLI.receptionReponseEtDecodage()
+                nbreDeBoucle = nbreDeBoucle + 1
 
-        try:
-            nombreDItems = nbre_a_traiter.pop()
-        except IndexError:
-            self.functionNotYetImplemented()
-            return
-        try:
-            nbreEntier = int(nombreDItems)
-        except:
-            self.functionNotYetImplemented()
-            return
-
-        #start = 0
-        #requete = 'albums ' + str(start) + ' ' + str(nombreDItems) + ' artist_id:'+ numeroItemSelectionFeuille + ' tags:' + TAGS
-        #self.origine.InterfaceCLI.sendtoCLISomething(requete)
-        #reponsepropre = self.origine.InterfaceCLI.receptionReponseEtDecodage()
-        #xbmc.log('Les albums unefoispropre : ' + str(reponsepropre), xbmc.LOGDEBUG)
-
-        #trim head and queue
-        try:
-            #poubelle, tampon = reponsepropre.split(TAGS+'|')
-            poubelle, tampon = reception.split(TAGS+'|')
-            lesItemsAlbumsNormalised , poubelle = tampon.split('|count:')
-        except ValueError:
-            return
-
-        try:
-            lachainedesItemsAlbums = lesItemsAlbumsNormalised.split('|')  #
-            xbmc.log('Plugin_music:: Fleurs chainedesAlbums : ' + str(lachainedesItemsAlbums), xbmc.LOGNOTICE)
-        except:
-            xbmc.log('functionNotYetImplemented plugin_music::fleurs', xbmc.LOGNOTICE)
-            self.functionNotYetImplemented()
-            return
-
-        nombrearanger = 0
-        index = 0
-        
-        itemtampon = xbmcgui.ListItem()
-        for chaine in lachainedesItemsAlbums:
+            xbmc.log('nbre de Boucle en reception : ' + str(nbreDeBoucle), xbmc.LOGNOTICE)
 
             try:
-                clef, valeur = chaine.split(':', 1)
+                nbre_a_traiter = reception.split('count:')
             except ValueError:
-                pass
+                self.functionNotYetImplemented()
+                return
 
-            if clef == 'id':
-                itemtampon.setProperty(clef, valeur)
-                itemtampon.setProperty('cmd', 'albums')
-                itemtampon.setProperty('artist_id' , numeroItemSelectionFeuille)
-                itemtampon.setProperty('artist', artist)
+            try:
+                nombreDItems = nbre_a_traiter.pop()
+            except IndexError:
+                self.functionNotYetImplemented()
+                return
+            try:
+                nbreEntier = int(nombreDItems)
+            except:
+                self.functionNotYetImplemented()
+                return
 
-            elif clef == 'album':
-                itemtampon.setLabel(valeur)
-            elif clef == 'artwork_track_id':
-                filename = 'artwork_' + valeur + '.tmp'
-                completeNameofFile = os.path.join(savepath, filename)
-                xbmc.log('filename cover : ' + str(completeNameofFile), xbmc.LOGNOTICE)
-                ulricone = 'http://' + self.origine.rechercheduserveur.LMSCLIip + ':' + \
-                           self.origine.rechercheduserveur.LMSwebport + '/music/' + valeur + '/cover.jpg'
+            #start = 0
+            #requete = 'albums ' + str(start) + ' ' + str(nombreDItems) + ' artist_id:'+ numeroItemSelectionFeuille + ' tags:' + TAGS
+            #self.origine.InterfaceCLI.sendtoCLISomething(requete)
+            #reponsepropre = self.origine.InterfaceCLI.receptionReponseEtDecodage()
+            #xbmc.log('Les albums unefoispropre : ' + str(reponsepropre), xbmc.LOGDEBUG)
+
+            #trim head and queue
+            try:
+                #poubelle, tampon = reponsepropre.split(TAGS+'|')
+                poubelle, tampon = reception.split(TAGS+'|')
+                lesItemsAlbumsNormalised , poubelle = tampon.split('|count:')
+            except ValueError:
+                return
+
+            try:
+                lachainedesItemsAlbums = lesItemsAlbumsNormalised.split('|')  #
+                xbmc.log('Plugin_music:: Fleurs chainedesAlbums : ' + str(lachainedesItemsAlbums), xbmc.LOGNOTICE)
+            except:
+                xbmc.log('functionNotYetImplemented plugin_music::fleurs', xbmc.LOGNOTICE)
+                self.functionNotYetImplemented()
+                return
+
+            nombrearanger = 0
+            index = 0
+
+            itemtampon = xbmcgui.ListItem()
+            for chaine in lachainedesItemsAlbums:
+
                 try:
-                    urllib.urlretrieve(ulricone, completeNameofFile)
-                    itemtampon.setArt({'thumb': completeNameofFile})
-                    itemtampon.setProperty('image' , completeNameofFile)
-                except IOError:
+                    clef, valeur = chaine.split(':', 1)
+                except ValueError:
                     pass
-            #elif clef == 'year':
-            #    title
-            #    compilation
-            #    artist
 
-            elif clef == 'textkey':
-                self.myMusic.listMenu_allArtists.addItem(itemtampon)
-                itemtampon = xbmcgui.ListItem()
-            else:
-                itemtampon.setProperty(clef,valeur)
+                if clef == 'id':
+                    itemtampon.setProperty(clef, valeur)
+                    itemtampon.setProperty('cmd', 'albums')
+                    itemtampon.setProperty('artist_id' , numeroItemSelectionFeuille)
+                    itemtampon.setProperty('artist', artist)
+
+                elif clef == 'album':
+                    itemtampon.setLabel(valeur)
+                elif clef == 'artwork_track_id':
+                    filename = 'artwork_' + valeur + '.tmp'
+                    completeNameofFile = os.path.join(savepath, filename)
+                    xbmc.log('filename cover : ' + str(completeNameofFile), xbmc.LOGNOTICE)
+                    ulricone = 'http://' + self.origine.rechercheduserveur.LMSCLIip + ':' + \
+                               self.origine.rechercheduserveur.LMSwebport + '/music/' + valeur + '/cover.jpg'
+                    try:
+                        urllib.urlretrieve(ulricone, completeNameofFile)
+                        itemtampon.setArt({'thumb': completeNameofFile})
+                        itemtampon.setProperty('image' , completeNameofFile)
+                    except IOError:
+                        pass
+                #elif clef == 'year':
+                #    title
+                #    compilation
+                #    artist
+
+                elif clef == 'textkey':
+                    self.myMusic.listMenu_allArtists.addItem(itemtampon)
+                    itemtampon = xbmcgui.ListItem()
+                else:
+                    itemtampon.setProperty(clef,valeur)
 
 
-        self.myMusic.listMenu_allArtists.setVisible(True)
+            self.myMusic.listMenu_allArtists.setVisible(True)
 
-        xbmc.Monitor().waitForAbort()
-        del self.myMusic
+            xbmc.Monitor().waitForAbort()
+            del self.myMusic
+        #fin if All_Artist
+
+        elif plugOrigine == 'Albums':
+
+            xbmc.log(' entrée dans le_menu_fleur_Albums_du_plugins MyMusic', xbmc.LOGNOTICE)
+            album = self.origine.listMenu_Feuilles_all_Albums.getListItem(
+                self.origine.listMenu_Feuilles_all_Albums.getSelectedPosition()).getLabel()
+            # title = self.origine.listMenu_Feuilles_all_Artists.getListItem(numeroItemSelectionFeuille).getLabel()
+            # same :
+            # itemdelisteOrigine = self.origine.listMenu_Feuilles_all_Artists.getListItem(numeroItemSelectionFeuille)
+            # labeldetete = itemdelisteOrigine.getLabel()
+
+            # affichage nouvelle fenêtre:
+            # self.myMusic = FrameMyMusic.MyMusicPlugin(artist)
+            self.myMusic = FrameMyMusic.MyMusicPlugin()
+
+            self.myMusic.listMenu_allArtists.reset()
+
+            self.myMusic.show()
+
+            # initialise focus ans navigation
+            self.myMusic.listMenu_allArtists.setVisible(False)
+            self.myMusic.listMenu_allAlbums.setVisible(True)
+            self.myMusic.setFocus(self.myMusic.listMenu_allAlbums)
+            self.myMusic.listMenu_allAlbums.controlRight(self.myMusic.listMenu_detailAlbums)
+            self.myMusic.listMenu_detailAlbums.controlLeft(self.myMusic.listMenu_allAlbums)
+
+            self.origine.InterfaceCLI.viderLeBuffer()  # need because resiliersouscription() let some data in the buffer
+            self.origine.InterfaceCLI.sendtoCLISomething(
+                'albums 0 100 album_id:' + numeroItemSelectionFeuille + ' tags:' + TAGS)
+
+            reception = self.origine.InterfaceCLI.receptionReponseEtDecodage()
+
+            try:
+                nbre_a_traiter = reception.split('count:')
+            except ValueError:
+                self.functionNotYetImplemented()
+                return
+
+            try:
+                nombreDItems = nbre_a_traiter.pop()
+            except IndexError:
+                self.functionNotYetImplemented()
+                return
+            try:
+                nbreEntier = int(nombreDItems)
+            except:
+                self.functionNotYetImplemented()
+                return
+
+            # trim head and queue
+            try:
+                # poubelle, tampon = reponsepropre.split(TAGS+'|')
+                poubelle, tampon = reception.split(TAGS + '|')
+                lesItemsAlbumsNormalised, poubelle = tampon.split('|count:')
+            except ValueError:
+                return
+
+            try:
+                lachainedesItemsAlbums = lesItemsAlbumsNormalised.split('|')  #
+                xbmc.log('Plugin_music:: Fleurs chainedesAlbums : ' + str(lachainedesItemsAlbums), xbmc.LOGNOTICE)
+            except:
+                xbmc.log('functionNotYetImplemented plugin_music::fleurs::Albums', xbmc.LOGNOTICE)
+                self.functionNotYetImplemented()
+                return
+
+            itemtampon = xbmcgui.ListItem()
+            for chaine in lachainedesItemsAlbums:
+
+                try:
+                    clef, valeur = chaine.split(':', 1)
+                except ValueError:
+                    pass
+
+                if clef == 'id':
+                    itemtampon.setProperty(clef, valeur)
+                    itemtampon.setProperty('cmd', 'albums')
+                    itemtampon.setProperty('album_id' , numeroItemSelectionFeuille)
+
+                if clef == 'id':
+                    itemtampon.setProperty(clef, valeur)
+                    itemtampon.setProperty('album_id', numeroItemSelectionFeuille)
+
+                elif clef == 'album':
+                    itemtampon.setLabel(valeur)
+
+                elif clef == 'artwork_track_id':
+                    filename = 'artwork_' + valeur + '.tmp'
+                    completeNameofFile = os.path.join(savepath, filename)
+                    xbmc.log('filename cover : ' + str(completeNameofFile), xbmc.LOGNOTICE)
+                    ulricone = 'http://' + self.origine.rechercheduserveur.LMSCLIip + ':' + \
+                               self.origine.rechercheduserveur.LMSwebport + '/music/' + valeur + '/cover.jpg'
+                    try:
+                        urllib.urlretrieve(ulricone, completeNameofFile)
+                        itemtampon.setArt({'thumb': completeNameofFile})
+                        itemtampon.setProperty('image', completeNameofFile)
+                    except IOError:
+                        pass
+                # elif clef == 'year':
+                #    title
+                #    compilation
+                #    artist
+
+                elif clef == 'textkey':
+                    itemtampon.setProperty(clef , valeur)
+                    self.myMusic.listMenu_allArtists.addItem(itemtampon)
+                    itemtampon = xbmcgui.ListItem()
+                else:
+                    itemtampon.setProperty(clef, valeur)
+
+            self.myMusic.listMenu_allArtists.setVisible(True)
+
+            xbmc.Monitor().waitForAbort()
+            del self.myMusic
 
 
 class Extras(Plugin_Generique):
