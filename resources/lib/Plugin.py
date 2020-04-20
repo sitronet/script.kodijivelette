@@ -705,7 +705,7 @@ class MyMusic(Plugin_Generique):
             buddydialog.create('look after ' + nbre_total_albums + ' Albums')
 
             start = 0
-            step = 100
+            step = 800
             end = step
             nbre_recolted = 0
             nbre_a_recolter = int(nbre_total_albums)
@@ -823,6 +823,7 @@ class MyMusic(Plugin_Generique):
 
             start = 0
             step = 800
+            end = step
             indicedesmenus = 1  # max = 3
             nbre_recolted = 0
             nbre_a_recolter = int(nombreDItems)
@@ -833,13 +834,14 @@ class MyMusic(Plugin_Generique):
             while nbre_recolted < nbre_a_recolter:
                 # indicedesmenus = indicedesmenus + 1 # todo : à revoir pour incrémenter jusqu'à 4 listmenu
                 if nbre_restant_a_recolter > step:
-                    self.origine.InterfaceCLI.sendtoCLISomething('artists ' + str(start) + '  ' + str(step))
+                    self.origine.InterfaceCLI.sendtoCLISomething('artists ' + str(start) + '  ' + str(end))
                     nbre_recolted = nbre_recolted + step
                     nbre_restant_a_recolter = nbre_restant_a_recolter - step # = nbre_a_recolter - nbre_recolted
                     start = start + step
+                    end = start + step
                     nbre_pour_calculer_buddydialog = nbre_pour_calculer_buddydialog + step
                 else:  #reste  moins d'items que le step
-                    requete_construite = 'artists ' + str(start) + ' ' + str(nbre_restant_a_recolter)
+                    requete_construite = 'artists ' + str(start) + ' ' + str(nbre_a_recolter)
                     self.origine.InterfaceCLI.sendtoCLISomething(requete_construite)
                     nbre_recolted = nbre_recolted + nbre_restant_a_recolter
 
@@ -856,7 +858,7 @@ class MyMusic(Plugin_Generique):
                     lesItemsArtists = reponsepropre.split('|count:')
                     xbmc.log('listetemp' + str(lesItemsArtists), xbmc.LOGDEBUG)
 
-                    lesItemsAlbums_text = lesItemsAlbums[0]
+                    lesItemsArtists_text = lesItemsArtists[0]
                 except IndexError:
                     self.functionNotYetImplemented()
                     return
