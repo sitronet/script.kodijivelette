@@ -458,7 +458,7 @@ class fenetreMenu(pyxbmct.AddonFullWindow):
             translation(32050, 'TODO'),
             translation(32051, 'All Artists'),
             translation(32052, 'TODO'),
-            translation(32053, 'TODO'),
+            translation(32053, 'Albums'),
             translation(32054, 'TODO'),
             translation(32055, 'TODO'),
             translation(32056, 'TODO'),
@@ -493,6 +493,7 @@ class fenetreMenu(pyxbmct.AddonFullWindow):
         # à voir plus tard
         self.listMenu_Feuilles = pyxbmct.List(buttonFocusTexture=self.image_list_focus, _imageWidth=38, _imageHeight=38, _itemHeight=40)
         self.listMenu_Feuilles_all_Artists = pyxbmct.List(buttonFocusTexture=self.image_list_focus, _imageWidth=38, _imageHeight=38, _itemHeight=40)
+        self.listMenu_Feuilles_all_Albums = pyxbmct.List(buttonFocusTexture=self.image_list_focus, _imageWidth=38, _imageHeight=38, _itemHeight=40)
         self.listMenu_Feuilles_RandomMix= pyxbmct.List(buttonFocusTexture=self.image_list_focus, _imageWidth=38, _imageHeight=38, _itemHeight=40)
         self.listMenu_Feuilles_Extras= pyxbmct.List(buttonFocusTexture=self.image_list_focus, _imageWidth=38, _imageHeight=38, _itemHeight=40)
 
@@ -578,6 +579,9 @@ class fenetreMenu(pyxbmct.AddonFullWindow):
         self.placeControl(self.listMenu_Feuilles_all_Artists, self.row_depart, self.col_depart_menu_feuille, \
                           self.row_hauteur_menu_branche,self.col_largeur_menu_feuille)
 
+        self.placeControl(self.listMenu_Feuilles_all_Albums, self.row_depart, self.col_depart_menu_feuille, \
+                          self.row_hauteur_menu_branche, self.col_largeur_menu_feuille)
+
         self.placeControl(self.listMenu_Feuilles_RandomMix, self.row_depart, self.col_depart_menu_feuille, \
                           self.row_hauteur_menu_branche,self.col_largeur_menu_feuille)
 
@@ -603,6 +607,7 @@ class fenetreMenu(pyxbmct.AddonFullWindow):
         self.connect(self.listMenu_Branches, self.navigationFromMenuBranche)
         self.connect(self.listMenu_Feuilles, self.navigationFromMenuFeuilles)
         self.connect(self.listMenu_Feuilles_all_Artists, self.navigationFromMenuFeuilles_all_Artists)
+        self.connect(self.listMenu_Feuilles_all_Albums, self.navigationFromMenuFeuilles_all_Albums)
         self.connect(self.listMenu_Feuilles_RandomMix, self.navigationFromMenuFeuilles_RandomMix)
         self.connect(self.listMenu_Extras, self.navigationFromMenuBrancheExtras)
         self.connect(self.listMenu_Feuilles_Extras, self.navigationFromMenuFeuillesExtras)
@@ -632,6 +637,7 @@ class fenetreMenu(pyxbmct.AddonFullWindow):
         self.Favorites_populated = False
         self.Extras_populated = False
         self.all_Artists_populated = False
+        self.all_albums_populated = False
 
     def set_navigation_lateral(self):
 
@@ -650,6 +656,7 @@ class fenetreMenu(pyxbmct.AddonFullWindow):
         self.listMenu_Branches.controlRight(self.listMenu_Feuilles)
         self.listMenu_Feuilles.controlLeft(self.listMenu_Branches)
         self.listMenu_Feuilles_all_Artists.controlLeft(self.listMenu_MyMusic)
+        self.listMenu_Feuilles_all_Albums.controlLeft(self.listMenu_MyMusic)
         self.listMenu_Feuilles_RandomMix.controlLeft(self.listMenu_MyMusic)
 
         self.listMenu_Extras.controlRight(self.listMenu_Feuilles_Extras)
@@ -731,6 +738,8 @@ class fenetreMenu(pyxbmct.AddonFullWindow):
                 self.listMenu_Extras.setVisible(False)
                 self.listMenu_Feuilles.setVisible(False)
                 self.listMenu_Feuilles_all_Artists.setVisible(False)
+                self.listMenu_Feuilles_all_Albums.setVisible(False)
+
 
                 self.listMenu_Fleur.setVisible(False)
         except:
@@ -771,6 +780,7 @@ class fenetreMenu(pyxbmct.AddonFullWindow):
             self.listMenu_Extras.setVisible(False)
             self.listMenu_Feuilles.setVisible(False)
             self.listMenu_Feuilles_all_Artists.setVisible(False)
+            self.listMenu_Feuilles_all_Albums.setVisible(False)
 
             self.listMenu_Fleur.setVisible(False)
 
@@ -895,6 +905,8 @@ class fenetreMenu(pyxbmct.AddonFullWindow):
                 self.listMenu_Extras.setVisible(False)
                 self.listMenu_Feuilles.setVisible(False)
                 self.listMenu_Feuilles_all_Artists.setVisible(True)
+                self.listMenu_Feuilles_all_Albums.setVisible(False)
+
 
                 self.listMenu_Fleur.setVisible(False)
         except:
@@ -908,6 +920,7 @@ class fenetreMenu(pyxbmct.AddonFullWindow):
                 self.listMenu_Extras.setVisible(False)
                 self.listMenu_Feuilles.setVisible(False)
                 self.listMenu_Feuilles_all_Artists.setVisible(True)
+                self.listMenu_Feuilles_all_Albums.setVisible(False)
                 self.listMenu_Feuilles_RandomMix.setVisible(False)
                 self.listMenu_Fleur.setVisible(False)
             except:
@@ -917,6 +930,27 @@ class fenetreMenu(pyxbmct.AddonFullWindow):
             self.listMenu_Feuilles_all_Artists.controlLeft(self.listMenu_MyMusic)
 
             if not self.all_Artists_populated:
+                new_music = Plugin.MyMusic(self)
+                new_music.le_menu_feuille(numeroItemSelectionBranche=NumeroItemSelectionBranche)
+        
+        elif self.itemSelectionBranche == translation(32053 , 'Albums'):
+            try:
+                self.listMenu_Racine.setVisible(True)
+                self.listMenu_MyMusic.setVisible(True)
+                self.listMenu_Branches.setVisible(False)
+                self.listMenu_Extras.setVisible(False)
+                self.listMenu_Feuilles.setVisible(False)
+                self.listMenu_Feuilles_all_Artists.setVisible(False)
+                self.listMenu_Feuilles_all_Albums.setVisible(True)
+                self.listMenu_Feuilles_RandomMix.setVisible(False)
+                self.listMenu_Fleur.setVisible(False)
+            except:
+                pass
+
+            self.listMenu_MyMusic.controlRight(self.listMenu_Feuilles_all_Albums)
+            self.listMenu_Feuilles_all_Albums.controlLeft(self.listMenu_MyMusic)
+
+            if not self.all_albums_populated:
                 new_music = Plugin.MyMusic(self)
                 new_music.le_menu_feuille(numeroItemSelectionBranche=NumeroItemSelectionBranche)
 
@@ -929,6 +963,7 @@ class fenetreMenu(pyxbmct.AddonFullWindow):
                 self.listMenu_Extras.setVisible(False)
                 self.listMenu_Feuilles.setVisible(False)
                 self.listMenu_Feuilles_all_Artists.setVisible(False)
+                self.listMenu_Feuilles_all_Albums.setVisible(False)
                 self.listMenu_Feuilles_RandomMix.setVisible(True)
                 self.listMenu_Fleur.setVisible(False)
             except:
@@ -962,6 +997,7 @@ class fenetreMenu(pyxbmct.AddonFullWindow):
             #todo :  write the other actions from the menu_music
             self.listMenu_Feuilles_RandomMix.setVisible(False)
             self.listMenu_Feuilles_all_Artists.setVisible(False)
+            self.listMenu_Feuilles_all_Albums.setVisible(False)
             self.listMenu_Feuilles.setVisible(True)
             self.listMenu_Feuilles.reset()
             self.functionNotYetImplemented(self.listMenu_Feuilles)
@@ -995,6 +1031,8 @@ class fenetreMenu(pyxbmct.AddonFullWindow):
                 self.listMenu_Extras.setVisible(False)
                 self.listMenu_Feuilles.setVisible(True)
                 self.listMenu_Feuilles_all_Artists.setVisible(False)
+                self.listMenu_Feuilles_all_Albums.setVisible(False)
+
 
                 self.listMenu_Fleur.setVisible(False)
             except:
@@ -1094,6 +1132,8 @@ class fenetreMenu(pyxbmct.AddonFullWindow):
         self.listMenu_Extras.setVisible(False)
         self.listMenu_Feuilles.setVisible(False)
         self.listMenu_Feuilles_all_Artists.setVisible(True)
+        self.listMenu_Feuilles_all_Albums.setVisible(False)
+
         self.listMenu_Fleur.setVisible(True)
 
         #self.setFocus(self.listMenu_Fleur)
@@ -1105,6 +1145,10 @@ class fenetreMenu(pyxbmct.AddonFullWindow):
 
         new_menu = Plugin.MyMusic(self)
         new_menu.le_menu_fleurs(itemSelection)
+    
+    def navigationFromMenuFeuilles_all_Albums(self):
+        # todo write it 
+        pass
 
     def navigationFromMenuFeuilles_RandomMix(self):
         # reset the screen invisible

@@ -675,7 +675,6 @@ class MyMusic(Plugin_Generique):
         # todo : not necessary need, could be in the initial menu switch (self.origine)
         if numeroItemSelectionBranche == 0 or \
             numeroItemSelectionBranche == 2 or \
-            numeroItemSelectionBranche == 3 or \
             numeroItemSelectionBranche == 4 or \
             numeroItemSelectionBranche == 5 or \
             numeroItemSelectionBranche == 6 or \
@@ -686,14 +685,122 @@ class MyMusic(Plugin_Generique):
             
             self.functionNotYetImplemented()    
 
+        elif numeroItemSelectionBranche == 3:  # liste 'all Albums
+            xbmc.log(' entrée dans le menu all albums du_plugin MyMusic', xbmc.LOGNOTICE)
+            if self.origine.all_albums_populated:
+                return
+
+            # the same porcessing as all artists
+            self.origine.InterfaceCLI.viderLeBuffer()
+            self.origine.InterfaceCLI.sendtoCLISomething('info total albums ?')
+            reponse = self.origine.InterfaceCLI.receptionReponseEtDecodage()
+            try:
+                nbre_a_traiter = reponse.split('|')
+                nbre_total_albums = nbre_a_traiter.pop()
+            except IndexError:
+                self.functionNotYetImplemented()
+                return
+
+            buddydialog = xbmcgui.DialogProgress()
+            buddydialog.create('look after ' + nbre_total_albums + ' Albums')
+
+            start = 0
+            step = 100
+            end = step
+            nbre_recolted = 0
+            nbre_a_recolter = int(nbre_total_albums)
+            nbre_restant = nbre_a_recolter
+            nbre_restant_a_recolter = nbre_restant
+            nbre_pour_calculer_buddydialog = 0
+            percent = 0
+            buddydialog.update(percent)
+            while nbre_recolted < nbre_a_recolter:
+                if nbre_restant_a_recolter > step:
+                    self.origine.InterfaceCLI.sendtoCLISomething('albums ' + str(start) + '  ' + str(end))
+                    nbre_recolted = nbre_recolted + step
+                    nbre_restant_a_recolter = nbre_restant_a_recolter - step # = nbre_a_recolter - nbre_recolted
+                    start = start + step
+                    end = start + step
+                    nbre_pour_calculer_buddydialog = nbre_pour_calculer_buddydialog + step
+                else:  #reste  moins d'items que le step
+                    requete_construite = 'albums ' + str(start) + ' ' + str(nbre_a_recolter)
+                    self.origine.InterfaceCLI.sendtoCLISomething(requete_construite)
+                    nbre_recolted = nbre_recolted + nbre_restant_a_recolter
+
+                xbmc.log('la récolte a été bonne de  : ' + str(nbre_recolted), xbmc.LOGNOTICE)
+
+                reponsepropre = self.origine.InterfaceCLI.receptionReponseEtDecodage()
+                xbmc.log('Les albums unefoispropre : ' + str(reponsepropre), xbmc.LOGNOTICE)
+
+                # if the buffer is truncated we need to colapse it
+                while not ('count:' + str(nbre_total_albums)) in reponsepropre:
+                    reponsepropre = reponsepropre + self.origine.InterfaceCLI.receptionReponseEtDecodage()
+
+                # here we get a string with albums we need to analyse it
+                # trim the tail count
+                try:
+                    lesItemsAlbums = reponsepropre.split('|count:')
+                    xbmc.log('listetemp des Albums' + str(lesItemsAlbums), xbmc.LOGDEBUG)
+
+                    lesItemsAlbums_text = lesItemsAlbums[0]
+                except IndexError:
+                    self.functionNotYetImplemented()
+                    return
+                # trim the head :
+                try:
+                    index_du_debut = lesItemsAlbums_text.find('albums ' + str(start) + ' ' + str(step) + '|')
+                    xbmc.log('index count : ' + str(index_du_debut), xbmc.LOGDEBUG)
+                    index_du_fin_de_titre = lesItemsAlbums_text.find('id')
+                    xbmc.log('index fin du  titre : ' + str(index_du_fin_de_titre), xbmc.LOGDEBUG)
+                    lesItemsAlbumsNormalised = lesItemsAlbums_text[index_du_fin_de_titre : ]
+                    xbmc.log('les Items Albums Normalised : ' + lesItemsAlbumsNormalised, xbmc.LOGNOTICE)
+                except:
+                    self.functionNotYetImplemented()
+                    return
+
+                # here we have a nice string of albums ' id:xxx|album:AAAA|id:yyy|album:BBBB etc...
+                try:
+                    lachainedesItemsAlbums = lesItemsAlbumsNormalised.split('|')  #
+                    xbmc.log('chaine des items albums  : ' + str(lachainedesItemsAlbums), xbmc.LOGDEBUG)
+                except:
+                    xbmc.log('functionNotYetImplemented recherche Album plugin.py', xbmc.LOGNOTICE)
+                    self.functionNotYetImplemented()
+                    return
+
+                itemtampon = xbmcgui.ListItem()     # prepare le menulist
+                # prepare update buddydialogprogress
+                nbre_pour_calculer = 0 if nbre_a_recolter < step else nbre_pour_calculer_buddydialog - step
+                xbmc.log('nbre pour calculer : ' + str(nbre_pour_calculer) + ' nbre buddy : ' + str(
+                    nbre_pour_calculer_buddydialog), xbmc.LOGNOTICE)
+
+                for chaine in lachainedesItemsAlbums:
+                    try:
+                        clef, valeur = chaine.split(':', 1)
+                    except ValueError:
+                        # some time the field send by server is not good, there is a real space rather an encoded space
+                        # exemple in my library : id:2806|artist:Bruno Mars | www.RNBxBeatz.com|
+                        pass
+
+                    if clef == 'id':
+                        itemtampon.setProperty('album_id', str(valeur))
+
+                    elif clef == 'album':
+                        itemtampon.setLabel(valeur)
+                        self.origine.listMenu_Feuilles_all_Albums.addItem(itemtampon)
+                        xbmc.log('Id item album : ' + str(itemtampon.getProperty('album_id')) + valeur, xbmc.LOGNOTICE)
+                        itemtampon = xbmcgui.ListItem()
+
+                percent = int ( 100 * int(nbre_recolted) / int(nbre_a_recolter))
+                buddydialog.update(percent)
+
+            buddydialog.close()
+            self.origine.all_albums_populated = True
+        # end if lister All Albums
+
         elif numeroItemSelectionBranche == 1: # liste 'all artists'
             xbmc.log(' entrée dans le menu all artists du_plugin MyMusic', xbmc.LOGNOTICE)
             if self.origine.all_Artists_populated:
                 return
-
-            #self.longListing = FrameList.ViewListPlugin('Artists')
-            #self.longListing.show()
-            #self.longListing.listMenu_1.reset()
 
             self.origine.InterfaceCLI.viderLeBuffer()
             self.origine.InterfaceCLI.sendtoCLISomething('artists')
@@ -709,7 +816,9 @@ class MyMusic(Plugin_Generique):
             nombreparcolonne , reste = divmod(int(nombreDItems), 3)
 
             # create a dialog view of the busy digging
-            buddydialog = xbmcgui.DialogProgressBG()
+            #buddydialog = xbmcgui.DialogProgressBG()
+
+            buddydialog = xbmcgui.DialogProgress()
             buddydialog.create('dig out ' + nombreDItems + ' Artists' )
 
             start = 0
@@ -747,17 +856,18 @@ class MyMusic(Plugin_Generique):
                     lesItemsArtists = reponsepropre.split('|count:')
                     xbmc.log('listetemp' + str(lesItemsArtists), xbmc.LOGDEBUG)
 
-                    lesItemsArtists_text = lesItemsArtists[0]
+                    lesItemsAlbums_text = lesItemsAlbums[0]
                 except IndexError:
                     self.functionNotYetImplemented()
                     return
+
                 try:
                     index_du_debut = lesItemsArtists_text.find('artists ' + str(start) + ' ' + str(step) + '|')
                     xbmc.log('index count : ' + str(index_du_debut), xbmc.LOGDEBUG)
                     index_du_fin_de_titre = lesItemsArtists_text.find('id',)
                     xbmc.log('index fin du  titre : ' + str(index_du_fin_de_titre), xbmc.LOGDEBUG)
                     lesItemsArtistsNormalised = lesItemsArtists_text[index_du_fin_de_titre : ]
-                    xbmc.log('lesItemsFleursNormalised : ' + lesItemsArtistsNormalised, xbmc.LOGDEBUG)
+                    xbmc.log('lesItemsArtistsNormalised : ' + lesItemsArtistsNormalised, xbmc.LOGDEBUG)
                 except:
                     self.functionNotYetImplemented()
                     return
