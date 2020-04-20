@@ -695,7 +695,7 @@ class MyMusic(Plugin_Generique):
             #self.longListing.show()
             #self.longListing.listMenu_1.reset()
 
-            self.InterfaceCLI.viderLeBuffer()
+            self.origine.InterfaceCLI.viderLeBuffer()
             self.origine.InterfaceCLI.sendtoCLISomething('artists')
             nbre_a_traiter = self.origine.InterfaceCLI.receptionReponseEtDecodage().split('count:')
             try:
