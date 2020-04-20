@@ -161,8 +161,8 @@ class InterfaceCLIduLMS(threading.Thread):
             chunk = self.socketdeConnexion.read_until(self.terminator)   # Attention si reset connexion catch exception
         except:
             xbmc.log('Exception sur réponse du serveur', xbmc.LOGNOTICE)
-        xbmc.log('reponse brute du serveur LMS : ' + chunk + '\n', xbmc.LOGNOTICE)
-        xbmc.log('size of chunk : ' + str(len(chunk)) + '\n', xbmc.LOGNOTICE)
+        xbmc.log('reponse brute du serveur LMS : ' + chunk + '\n', xbmc.LOGDEBUG)
+        xbmc.log('size of chunk : ' + str(len(chunk)) + '\n', xbmc.LOGDEBUG)
         return chunk
 
     def SignalAUnConsommateurDataRecu(self):
@@ -175,8 +175,7 @@ class InterfaceCLIduLMS(threading.Thread):
         '''
         # todo à tester les deux versions
         self.dataExchange = self._receiveFromCLISomething()
-        xbmc.log('dataExchange waiting : ' + self.dataExchange + '\n', xbmc.LOGNOTICE)
-        #self.dataExchange = self.dataExchange + self._receiveFromCLISomething()
+        xbmc.log('dataExchange waiting : ' + self.dataExchange + '\n', xbmc.LOGDEBUG)
         self.recevoirEnAttente.set()
         return
 
@@ -245,8 +244,8 @@ class InterfaceCLIduLMS(threading.Thread):
         self.recevoirEnAttente.clear()
         return
 
-    def sendSignalQuit(self):     # not yet used but could be
-        self.dataExchange = 'signalQuit'
+    def sendSignal(self,commande):     # not yet used but should be
+        self.dataExchange = commande
         self.recevoirEnAttente.set()
-        xbmc.log('trame envoyée : ' + self.dataExchange , xbmc.LOGNOTICE)
+        xbmc.log('commande envoyée : ' + self.dataExchange , xbmc.LOGNOTICE)
 
