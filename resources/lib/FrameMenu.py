@@ -1101,6 +1101,7 @@ class fenetreMenu(pyxbmct.AddonFullWindow):
             new_menu.le_menu_fleurs(numeroItemSelectionFeuille=NumeroItemSelectionFeuille)
 
     def navigationFromMenuFeuilles_all_Artists(self):
+
         itemSelectionFeuille = self.listMenu_Feuilles_all_Artists.getListItem(
                     self.listMenu_Feuilles_all_Artists.getSelectedPosition()).getLabel()
         listitemSelection = self.listMenu_Feuilles_all_Artists.getSelectedItem()
@@ -1134,9 +1135,9 @@ class fenetreMenu(pyxbmct.AddonFullWindow):
         self.listMenu_Feuilles_all_Artists.setVisible(True)
         self.listMenu_Feuilles_all_Albums.setVisible(False)
 
-        self.listMenu_Fleur.setVisible(True)
+        #self.listMenu_Fleur.setVisible(True)
+        self.setFocus(self.listMenu_Feuilles_all_Artists)
 
-        #self.setFocus(self.listMenu_Fleur)
         itemSelection = self.listMenu_Feuilles_all_Artists.getListItem(
             self.listMenu_Feuilles_all_Artists.getSelectedPosition()).getProperty('artist_id')
         xbmc.log('id item artist : ' + str(itemSelection) , xbmc.LOGNOTICE)
@@ -1144,11 +1145,55 @@ class fenetreMenu(pyxbmct.AddonFullWindow):
         xbmc.log('id item artist alternate : ' + str(itemalternate) , xbmc.LOGNOTICE)
 
         new_menu = Plugin.MyMusic(self)
-        new_menu.le_menu_fleurs(itemSelection)
+        new_menu.le_menu_fleurs('All Artists' , itemSelection)
     
     def navigationFromMenuFeuilles_all_Albums(self):
-        # todo write it 
-        pass
+        # todo write it
+
+        itemSelectionFeuille = self.listMenu_Feuilles_all_Albums.getListItem(
+            self.listMenu_Feuilles_all_Albums.getSelectedPosition()).getLabel()
+        listitemSelection = self.listMenu_Feuilles_all_Albums.getSelectedItem()
+        itemIdSelection = self.listMenu_Feuilles_all_Albums.getListItem(
+            self.listMenu_Feuilles_all_Albums.getSelectedPosition()).getProperty('id')
+        hasitems = self.listMenu_Feuilles_all_Albums.getListItem(
+            self.listMenu_Feuilles_all_Albums.getSelectedPosition()).getProperty('hasitems')
+        artist = self.listMenu_Feuilles_all_Albums.getListItem(
+            self.listMenu_Feuilles_all_Albums.getSelectedPosition()).getProperty('artist')
+        NumeroItemSelectionFeuille = self.listMenu_Feuilles_all_Albums.getSelectedPosition()
+
+        xbmc.log('label dans menu Feuille All Albums : ' + itemSelectionFeuille, xbmc.LOGNOTICE)
+        xbmc.log('id dans menu Feuille All Albums : ' + itemIdSelection, xbmc.LOGNOTICE)
+        xbmc.log('artist dans menu Feuille All Albums : ' + artist, xbmc.LOGNOTICE)
+        xbmc.log('hasitems dans menu Feuille All Albums : ' + hasitems, xbmc.LOGNOTICE)
+        xbmc.log('numéro dans menu Feuille All Albums : ' + str(NumeroItemSelectionFeuille), xbmc.LOGNOTICE)
+
+        self.list_item_feuille_label.setLabel(' :: ' + itemSelectionFeuille)
+
+        # if hasitem == 1:
+        # dig one  more time (no recursive)
+        # if hasitems == '1':
+        # self.les_menus_fleurs_Generic(NumeroItemSelectionFeuille)  # is it possible todo a recursive fonction ?
+
+        # reset the screen invisible
+        self.listMenu_Racine.setVisible(True)
+        self.listMenu_MyMusic.setVisible(True)
+        self.listMenu_Branches.setVisible(False)
+        self.listMenu_Extras.setVisible(False)
+        self.listMenu_Feuilles.setVisible(False)
+        self.listMenu_Feuilles_all_Artists.setVisible(False)
+        self.listMenu_Feuilles_all_Albums.setVisible(True)
+
+        self.setFocus(self.listMenu_Feuilles_all_Albums)
+
+        itemSelection = self.listMenu_Feuilles_all_Albums.getListItem(
+            self.listMenu_Feuilles_all_Albums.getSelectedPosition()).getProperty('album_id')
+        xbmc.log('id item album : ' + str(itemSelection), xbmc.LOGNOTICE)
+        itemalternate = self.listMenu_Feuilles_all_Albums.getSelectedItem().getProperty('album_id')
+        xbmc.log('id item album alternate : ' + str(itemalternate), xbmc.LOGNOTICE)
+
+        new_menu = Plugin.MyMusic(self)
+        new_menu.le_menu_fleurs('Albums', itemSelection)
+    # fin navigationFromMenuDeuilles_all_Albums
 
     def navigationFromMenuFeuilles_RandomMix(self):
         # reset the screen invisible
@@ -2007,6 +2052,13 @@ class fenetreMenu(pyxbmct.AddonFullWindow):
                     self.breakBoucle_A = True
                     self.Abonnement.clear()
                     break
+
+                if recupropre.startswith('quit'):
+                     xbmc.log('recu commande quit in update_now_is_playing in FrameMenu')
+                     self.breakBoucle_A = True
+                     self.Abonnement.clear()
+                     break
+
 
                 listeB = recupropre.split('subscribe:' + TIME_OF_LOOP_SUBSCRIBE +'|')  # on élimine le début de la trame # attention doit correpondre à
                 # la même valeur de subscribe dans Ecoute.py
