@@ -33,8 +33,10 @@ if Kodi:
     import xbmcaddon
     import pyxbmct
 
+    DEBUG_LEVEL = xbmc.LOGDEBUG
 
     ADDON_ID = 'script.kodijivelette'
+
     KODI_VERSION = int(xbmc.getInfoLabel("System.BuildVersion").split(".")[0])
     KODILANGUAGE = xbmc.getLanguage(xbmc.ISO_639_1)
     ADDON = xbmcaddon.Addon()
@@ -973,7 +975,19 @@ def recherchonsleServeur(self):
         exit(32)
     return
 
+def debug(message, level=DEBUG_LEVEL):
+    """Basic debug function for outputting info to the log.
+       get from script.squeezeinfo by elParaguayo
 
+      Should not use anything higher than debug to avoid spamming the logfile.
+    """
+    # Make sure encoding is ok for log file
+    if isinstance (message, str):
+        message = message.decode("utf-8")
+
+    # Format the message and send to the logfile
+    message = u"{}: {}".format(ADDON_ID, message)
+    xbmc.log(msg=message.encode("utf-8"), level=level)
 
 
 

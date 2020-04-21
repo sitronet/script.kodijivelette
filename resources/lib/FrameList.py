@@ -110,6 +110,10 @@ class ViewListPlugin(pyxbmctExtended.BackgroundDialogWindow):
         # pyxbmct :
         SIZE_WIDTH_pyxbmct = 1280
         SIZE_HEIGHT_pyxbmct = 720
+        self.tile_size = 20
+        self.rows_bas = 3
+        self.espace_bas = self.rows_bas * self.tile_size    # 3 rows from the bottom
+        self.nbre_columns = SEIZE // 2
         SIZESCREEN_HEIGHT = xbmcgui.getScreenHeight()  # exemple  # 1080
         SIZESCREEN_WIDTH = xbmcgui.getScreenWidth()
         Size_W_ChildSelf = SIZE_WIDTH_pyxbmct // 2
@@ -122,9 +126,9 @@ class ViewListPlugin(pyxbmctExtended.BackgroundDialogWindow):
             self.screeny = SIZE_HEIGHT_pyxbmct
 
         self.setGeometry(width_=Size_W_ChildSelf,
-                         height_=Size_H_ChildSelf - 100 ,
-                         rows_= NEUF,
-                         columns_= SEIZE,
+                         height_=Size_H_ChildSelf - self.espace_bas ,
+                         rows_= NEUF - self.rows_bas ,
+                         columns_= self.nbre_columns  ,
                          pos_x= 1,
                          pos_y= 1 )
 
@@ -150,8 +154,8 @@ class ViewListPlugin(pyxbmctExtended.BackgroundDialogWindow):
 
         row_depart = 0
         col_depart = 0
-        espace_row = 30
-        espace_col = SEIZE // 2
+        espace_row = NEUF - self.rows_bas
+        espace_col = self.nbre_columns // 2
         hauteur_menu = 25
 
         self.listMenu_1 = pyxbmct.List(buttonFocusTexture=self.image_list_focus, _imageWidth= 38 , _imageHeight = 38 , _itemHeight=40)

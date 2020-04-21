@@ -104,7 +104,7 @@ class FavoritesMenu(pyxbmctExtended.BackgroundDialogWindow):
         SIZESCREEN_HEIGHT = xbmcgui.getScreenHeight()  # exemple  # 1080
         SIZESCREEN_WIDTH = xbmcgui.getScreenWidth()
         Size_W_ChildSelf = 300
-        Size_H_ChildSelf = 500
+        Size_H_ChildSelf = 600
         self.screenx = SIZESCREEN_WIDTH
         self.screeny = SIZESCREEN_HEIGHT
         xbmc.log('Size of Screen : ' + str(self.screenx) + ' x ' + str(self.screeny), xbmc.LOGNOTICE)

@@ -1,3 +1,23 @@
+------------------------------------------------------------
+current version
+use of the fonction debug by elParaguayo (script.squeezeinfo) rather direct xbmc.log()
+do some ajustment to the frame FrameList
+add some icon in menu to test
+rewrite closeconnexionCLI()
+add closeconnexionCLI to function quit() in main FrameMenu
+
+
+
+-------------------------------------------------------------
+version 0.0.i__
+Many change : replace librairy socket by TelnetLib
+because of a bug in data received (trunk)
+add albums list plugin in myMusic
+some ajustement
+rewrite signalSend to quit a loop waiting data from server
+fenêtre sans header pérénisée
+
+--------------------------------------------------------------
 version 0.0.g00:
 Modificaton de toutes les fenêtres pour avoir sans header ,
 juste un essai
