@@ -1,10 +1,12 @@
 ------------------------------------------------------------
-current version
+version 0.0.j00
 use of the fonction debug by elParaguayo (script.squeezeinfo) rather direct xbmc.log()
 do some ajustment to the frame FrameList
 add some icon in menu to test
 rewrite closeconnexionCLI()
 add closeconnexionCLI to function quit() in main FrameMenu
+Ajout parcours des dossiers
+manque le play de l'item dossier
 
 
 
