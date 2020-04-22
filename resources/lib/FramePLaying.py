@@ -470,6 +470,9 @@ class SlimIsPlaying(pyxbmctExtended.BackgroundDialogWindow):
         ''' method to use with doModal() in the calling program, for exemple : in FrameMenu.fenetreMenu
             self.jivelette = FramePLaying.SlimIsPlaying()
             self.jivelette.doModal()
+            or todo  the fonction is calling by the function calling
+            self.jivelette.show()
+            self.jivelette.update_now_is_playing()
             This is the main loop when display the Frame Slim is playing
             and the frame use doModal()
             thereis a similar method inside the class FrameMenu.fenetreMenu when the frame use show()

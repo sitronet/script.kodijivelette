@@ -14,20 +14,37 @@ if Kodi:
     import pyxbmct
     savepath = xbmc.translatePath('special://temp')
 
+    ADDON_ID = 'script.kodijivelette'
+    ADDON = xbmcaddon.Addon()
+    ADDONID = ADDON.getAddonInfo('id')
+    ADDONNAME = ADDON.getAddonInfo('name')
+    ADDONVERSION = ADDON.getAddonInfo('version')
+
+    DEBUG_LEVEL = xbmc.LOGDEBUG
+
+    from resources.lib.outils import debug
+    from resources.lib import frameMusicFolder
+
 import urllib
 import os
 import time
 
 from resources.lib import ConnexionClient, Ecoute, FrameList, FrameMyMusic, FramePLaying,  outils ,  FrameMenuFavorites
 
+ARTWORK = xbmc.translatePath(os.path.join(ADDON.getAddonInfo('path'), 'resources', 'skins', 'Default', 'media', 'Slimserver'))
+
 TAGS = 'aCdejJKlstuwxy'
 
 class Plugin_Generique():
 
-    def __init__(self, rappelons_nous_de_notre_origine):
+    def __init__(self, parent):
 
-        self.origine = rappelons_nous_de_notre_origine
+        self.origine = parent
         self.origine.InterfaceCLI.viderLeBuffer()
+
+        self.image_dir = ARTWORK
+
+        self.image_folder = self.image_dir + '/icon_folder.png'
 
 
     def le_menu_branche(self, plugin):
@@ -679,7 +696,6 @@ class MyMusic(Plugin_Generique):
             numeroItemSelectionBranche == 5 or \
             numeroItemSelectionBranche == 6 or \
             numeroItemSelectionBranche == 7 or \
-            numeroItemSelectionBranche == 9 or \
             numeroItemSelectionBranche == 10 or \
             numeroItemSelectionBranche == 11:
             
@@ -925,6 +941,129 @@ class MyMusic(Plugin_Generique):
             '''all is erased and moved somewhere else  in the app ->
             FrameMenu:: update_random_mix_playlist '''
 
+        elif numeroItemSelectionBranche == 9:   # music folder call by FrameMenu->
+
+            debug(' entrée dans le menu music folder du_plugin MyMusic', xbmc.LOGNOTICE)
+            if self.origine.all_dossiers_populated:
+                return
+
+            # the same porcessing as all artists
+            self.origine.InterfaceCLI.viderLeBuffer()
+            self.origine.InterfaceCLI.sendtoCLISomething('musicfolder')
+            reponse = self.origine.InterfaceCLI.receptionReponseEtDecodage()
+            try:
+                nbre_a_traiter = reponse.split('|')
+                count_dossiers = nbre_a_traiter.pop()
+                countsplit = count_dossiers.split(':')
+                nbre_total_dossiers = countsplit.pop()
+            except IndexError:
+                self.functionNotYetImplemented()
+                return
+
+            buddydialog = xbmcgui.DialogProgress()
+            buddydialog.create('look after ' + nbre_total_dossiers + ' Folders ')
+
+            start = 0
+            step = 800
+            end = step
+            nbre_recolted = 0
+            nbre_a_recolter = int(nbre_total_dossiers)
+            nbre_restant = nbre_a_recolter
+            nbre_restant_a_recolter = nbre_restant
+            nbre_pour_calculer_buddydialog = 0
+            percent = 0
+            buddydialog.update(percent)
+            while nbre_recolted < nbre_a_recolter:
+                if nbre_restant_a_recolter > step:
+                    self.origine.InterfaceCLI.sendtoCLISomething('musicfolder ' + str(start) + '  ' + str(end))
+                    nbre_recolted = nbre_recolted + step
+                    nbre_restant_a_recolter = nbre_restant_a_recolter - step # = nbre_a_recolter - nbre_recolted
+                    start = start + step
+                    end = start + step
+                    nbre_pour_calculer_buddydialog = nbre_pour_calculer_buddydialog + step
+                else:  #reste  moins d'items que le step
+                    requete_construite = 'musicfolder ' + str(start) + ' ' + str(nbre_a_recolter)
+                    self.origine.InterfaceCLI.sendtoCLISomething(requete_construite)
+                    nbre_recolted = nbre_recolted + nbre_restant_a_recolter
+
+                debug('la récolte a été bonne de  : ' + str(nbre_recolted), xbmc.LOGNOTICE)
+
+                reponsepropre = self.origine.InterfaceCLI.receptionReponseEtDecodage()
+                debug('Les albums unefoispropre : ' + str(reponsepropre), xbmc.LOGNOTICE)
+
+                # if the buffer is truncated we need to colapse it
+                while not ('count:' + str(nbre_total_dossiers)) in reponsepropre:
+                    reponsepropre = reponsepropre + self.origine.InterfaceCLI.receptionReponseEtDecodage()
+
+                # here we get a string with albums we need to analyse it
+                # trim the tail count
+                try:
+                    lesItemsDossiers = reponsepropre.split('|count:')
+                    xbmc.log('listetemp des Dossiers' + str(lesItemsDossiers), xbmc.LOGDEBUG)
+
+                    lesItemsDossiers_text = lesItemsDossiers[0]
+                except IndexError:
+                    self.functionNotYetImplemented()
+                    return
+                # trim the head :
+                try:
+                    index_du_debut = lesItemsDossiers_text.find('musicfolder ' + str(start) + ' ' + str(step) + '|')
+                    debug('index count : ' + str(index_du_debut))
+                    index_du_fin_de_titre = lesItemsDossiers_text.find('id')
+                    debug('index fin du  titre : ' + str(index_du_fin_de_titre))
+                    lesItemsDossiersNormalised = lesItemsDossiers_text[index_du_fin_de_titre : ]
+                    debug('les Items Dossiers Normalised : ' + lesItemsDossiersNormalised, xbmc.LOGNOTICE)
+                except:
+                    self.functionNotYetImplemented()
+                    return
+
+                # here we have a nice string of albums ' id:xxx|album:AAAA|id:yyy|album:BBBB etc...
+                try:
+                    lachainedesItemsDossiers = lesItemsDossiersNormalised.split('|')  #
+                    debug('chaine des items albums  : ' + str(lachainedesItemsDossiers))
+                except:
+                    debug('functionNotYetImplemented recherche Dossiers plugin.py', xbmc.LOGNOTICE)
+                    self.functionNotYetImplemented()
+                    return
+
+                itemtampon = xbmcgui.ListItem()     # prepare le menulist
+                # prepare update buddydialogprogress
+                nbre_pour_calculer = 0 if nbre_a_recolter < step else nbre_pour_calculer_buddydialog - step
+                xbmc.log('nbre pour calculer : ' + str(nbre_pour_calculer) + ' nbre buddy : ' + str(
+                    nbre_pour_calculer_buddydialog), xbmc.LOGNOTICE)
+
+                debug('à decrypter : ' + str(lachainedesItemsDossiers), xbmc.LOGNOTICE)
+
+                for chaine in lachainedesItemsDossiers:
+                    debug('la chaine : ' + str(chaine), xbmc.LOGNOTICE)
+                    try:
+                        clef, valeur = chaine.split(':', 1)
+                    except ValueError:
+                        # some time the field send by server is not good, there is a real space rather an encoded space
+                        # exemple in my library : id:2806|artist:Bruno Mars | www.RNBxBeatz.com|
+                        pass
+
+                    if clef == 'id':
+                        itemtampon.setProperty('folder_id', str(valeur))
+
+                    elif clef == 'filename':
+                        itemtampon.setProperty(clef, valeur)
+                        itemtampon.setLabel(valeur)
+
+                    elif clef == 'type':
+                        itemtampon.setProperty(clef , valeur)
+                        if valeur == 'folder':
+                            itemtampon.setArt({'thumb': self.image_folder})
+                        self.origine.listMenu_Feuilles_all_Dossiers.addItem(itemtampon)
+                        debug('Id item dossier : ' + str(itemtampon.getProperty('folder_id')) + valeur, xbmc.LOGNOTICE)
+                        itemtampon = xbmcgui.ListItem()
+
+                percent = int ( 100 * int(nbre_recolted) / int(nbre_a_recolter))
+                buddydialog.update(percent)
+
+            buddydialog.close()
+            self.origine.all_dossiers_populated= True
+        # end if lister musicfolder
 
         else:
             pass
@@ -1185,10 +1324,97 @@ class MyMusic(Plugin_Generique):
 
             xbmc.Monitor().waitForAbort()
             del self.myMusic
+        #fin if Albums
+
+        elif plugOrigine == 'Dossiers':
+
+            xbmc.log(' entrée dans le_menu_fleur_Dossiers_du_plugins MyMusic', xbmc.LOGNOTICE)
+            album = self.origine.listMenu_Feuilles_all_Dossiers.getListItem(
+                self.origine.listMenu_Feuilles_all_Dossiers.getSelectedPosition()).getLabel()
+            # title = self.origine.listMenu_Feuilles_all_Artists.getListItem(numeroItemSelectionFeuille).getLabel()
+            # same :
+            # itemdelisteOrigine = self.origine.listMenu_Feuilles_all_Artists.getListItem(numeroItemSelectionFeuille)
+            # labeldetete = itemdelisteOrigine.getLabel()
+
+            # affichage nouvelle fenêtre:
+            # self.myMusic = FrameMyMusic.MyMusicPlugin(artist)
+            self.myMusic = frameMusicFolder.ViewMusicFolder()
+            self.myMusic.show()
+
+            # initialise focus ans navigation
+            self.myMusic.setFocus(self.myMusic.listMusicFolder)
+
+            self.origine.InterfaceCLI.viderLeBuffer()  # need because resiliersouscription() let some data in the buffer
+            self.origine.InterfaceCLI.sendtoCLISomething(
+                'musicfolder 0 100 folder_id:' + numeroItemSelectionFeuille)
+
+            reception = self.origine.InterfaceCLI.receptionReponseEtDecodage()
+
+            try:
+                nbre_a_traiter = reception.split('count:')
+            except ValueError:
+                self.functionNotYetImplemented()
+                return
+
+            try:
+                nombreDItems = nbre_a_traiter.pop()
+            except IndexError:
+                self.functionNotYetImplemented()
+                return
+            try:
+                nbreEntier = int(nombreDItems)
+            except:
+                self.functionNotYetImplemented()
+                return
+
+            # trim head and queue
+            try:
+                # poubelle, tampon = reponsepropre.split(TAGS+'|')
+                poubelle, tampon = reception.split('musicfolder|0|100|')
+                lesItemsDossiersNormalised, poubelle = tampon.split('|count:')
+            except ValueError:
+                return
+
+            try:
+                lachainedesItemsDossiers = lesItemsDossiersNormalised.split('|')  #
+                xbmc.log('Plugin_music:: Fleurs chainedesDossiers : ' + str(lachainedesItemsDossiers), xbmc.LOGNOTICE)
+            except:
+                xbmc.log('functionNotYetImplemented plugin_music::fleurs::Dossiers', xbmc.LOGNOTICE)
+                self.functionNotYetImplemented()
+                return
+
+            itemtampon = xbmcgui.ListItem()
+            for chaine in lachainedesItemsDossiers:
+
+                try:
+                    clef , valeur = chaine.split(':', 1)
+                except ValueError:
+                    pass
+
+                if clef == 'id':
+                    itemtampon.setProperty(clef, valeur)
+                    itemtampon.setProperty('folder_parent_id' , numeroItemSelectionFeuille)
+
+                elif clef == 'filename':
+                    itemtampon.setLabel(valeur)
+
+                elif clef == 'type':
+                    itemtampon.setProperty(clef, valeur)
+                    if valeur == 'folder':
+                        itemtampon.setArt({'thumb': self.image_folder})
+                    self.myMusic.listMusicFolder.addItem(itemtampon)
+                    itemtampon = xbmcgui.ListItem()
+
+
+            xbmc.Monitor().waitForAbort()
+            del self.myMusic
+        #fin if Dossier
+    # fin fonction le_menu_fleurs
+# fin class MyMusic
 
 
 class Extras(Plugin_Generique):
-    '''not yet  used
+    '''not yet  used Todo
     only a structural thing to think about
     perhaps never used
     '''

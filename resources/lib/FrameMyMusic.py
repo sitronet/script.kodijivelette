@@ -96,13 +96,14 @@ class MyMusicPlugin(pyxbmctExtended.BackgroundDialogWindow):
         xbmc.log('geometrie set', xbmc.LOGNOTICE)
         self.controlMenus()
         xbmc.log('control set', xbmc.LOGNOTICE)
-        self.set_navigation()
+        #self.set_navigation()
         xbmc.log('navigation  set', xbmc.LOGNOTICE)
 
         self.connexionEvent()
 
         self.connect(self.listMenu_allArtists, lambda : self.f_detailAlbums(menudeprovenance='listMenu_allArtists'))
         self.connect(self.listMenu_allAlbums, self.f_allAlbums_details)
+        #self.connect(self.listMenu_allDossiers, self.f_allDossiers_recurse)
         self.connect(self.listMenu_detailAlbums, lambda : self.f_listeTracks(menudeprovenance='listMenu_detailAlbums'))
         self.connect(self.listMenu_playlist, self.f_detailItemPlaylist)
 
@@ -208,14 +209,15 @@ class MyMusicPlugin(pyxbmctExtended.BackgroundDialogWindow):
 
         self.listMenu_allArtists = pyxbmct.List(buttonFocusTexture=self.image_list_focus, _imageWidth= 40 , _imageHeight = 40 , _itemHeight=42)
         self.listMenu_allAlbums = pyxbmct.List(buttonFocusTexture=self.image_list_focus, _imageWidth= 40 , _imageHeight = 40 , _itemHeight=42)
+        self.listMenu_allDossiers = pyxbmct.List(buttonFocusTexture=self.image_list_focus, _imageWidth= 40 , _imageHeight = 40 , _itemHeight=42)
 
-        self.listMenu_detailAlbums = pyxbmct.List(buttonFocusTexture=self.image_list_focus, _imageWidth= 0 , _imageHeight = 0 , _itemHeight=30)
+        self.listMenu_detailAlbums = pyxbmct.List(buttonFocusTexture=self.image_list_focus, _imageWidth= 30 , _imageHeight = 30 , _itemHeight=30)
 
         self.listMenu_playlist = pyxbmct.List(buttonFocusTexture=self.image_list_focus, _imageWidth= 40 , _imageHeight = 40 , _itemHeight=42)
 
         self.placeControl(self.listMenu_allArtists , row_depart , col_depart  , espace_row, espace_col )
-        
         self.placeControl(self.listMenu_allAlbums, row_depart, col_depart, espace_row, espace_col)
+        self.placeControl(self.listMenu_allDossiers, row_depart, col_depart, espace_row, espace_col)
 
         self.placeControl(self.listMenu_detailAlbums , row_depart , col_depart + espace_col, espace_row, espace_col )
 
@@ -225,6 +227,7 @@ class MyMusicPlugin(pyxbmctExtended.BackgroundDialogWindow):
         # Add items to the list , need to ask the focus before filling the list from Plugin.Plugin
         self.listMenu_allArtists.addItem('.')
         self.listMenu_allAlbums.addItem('.')
+        self.listMenu_allDossiers.addItem('.')
         self.listMenu_playlist.addItem('.')
 
     def connexionEvent(self):
@@ -300,6 +303,11 @@ class MyMusicPlugin(pyxbmctExtended.BackgroundDialogWindow):
         elif self.getFocus() == self.listMenu_allAlbums:
             self.itemSelectiondetail = self.listMenu_allAlbums.getListItem(
                                 self.listMenu_allAlbums.getSelectedPosition()).getLabel()
+            self.title_label.setLabel(self.itemSelectiondetail)
+
+        elif self.getFocus() == self.listMenu_allDossiers:
+            self.itemSelectiondetail = self.listMenu_allDossiers.getListItem(
+                                self.listMenu_allDossiers.getSelectedPosition()).getLabel()
             self.title_label.setLabel(self.itemSelectiondetail)
 
         elif self.getFocus() == self.listMenu_detailAlbums:
