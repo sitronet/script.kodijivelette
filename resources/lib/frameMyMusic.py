@@ -2,8 +2,6 @@
 # -*- coding: utf-8 -*-
 
 global savepath
-#savepath = '/tmp/' # savepath = 'special://temp'
-
 
 global Kodi
 Kodi = True
@@ -19,6 +17,7 @@ from resources.lib import ConnexionClient, Ecoute, outils
 from resources.lib.Ecoute import Souscription
 from resources.lib import pyxbmctExtended
 
+from resources.lib.outils import debug
 
 import json
 
@@ -67,29 +66,22 @@ if Kodi:
 
 TAGS = 'aCdejJKlstuwxy'
 
-def singleton(cls):
-    instance = [None]
-    def wrapper(*args, **kwargs):
-        if instance[0] is None:
-            instance[0] = cls(*args, **kwargs)
-        return instance[0]
 
-    return wrapper
 
-#@singleton
-class MyMusicPlugin(pyxbmctExtended.BackgroundDialogWindow):
+
+class MyMusic(pyxbmctExtended.BackgroundDialogWindow):
 
     def __init__(self, *args , **kwargs ):
         #title = args[0]
-        super(MyMusicPlugin, self).__init__()
+        super(MyMusic, self).__init__()
 
         self.recevoirEnAttente = threading.Event()
         self.recevoirEnAttente.clear()
         self.Abonnement = threading.Event()
         self.threadRunning = True
         self.WindowPlaying = xbmcgui.getCurrentWindowId()
-        xbmc.log('fenetre de class MyMusicPlugin n° : ' + str(self.WindowPlaying), xbmc.LOGNOTICE)
-        xbmc.log('Create Instance MyMusicPlugin KodiJivelette...' , xbmc.LOGNOTICE)
+        xbmc.log('fenetre de class MyMusic n° : ' + str(self.WindowPlaying), xbmc.LOGNOTICE)
+        xbmc.log('Create Instance frame MyMusic ' , xbmc.LOGNOTICE)
         self.playerid = ''
 
         self.geometrie()
@@ -101,13 +93,14 @@ class MyMusicPlugin(pyxbmctExtended.BackgroundDialogWindow):
 
         self.connexionEvent()
 
-        self.connect(self.listMenu_allArtists, lambda : self.f_detailAlbums(menudeprovenance='listMenu_allArtists'))
-        self.connect(self.listMenu_allAlbums, self.f_allAlbums_details)
+        self.connect(self.listMenu_principal, lambda : self.f_detailAlbums())
         self.connect(self.listMenu_detailAlbums, lambda : self.f_listeTracks(menudeprovenance='listMenu_detailAlbums'))
         self.connect(self.listMenu_playlist, self.f_detailItemPlaylist)
 
         self.connect(pyxbmct.ACTION_NAV_BACK, self.quit_listing) # rather self.close
         self.connect(pyxbmct.ACTION_PREVIOUS_MENU, self.quit_listing) # rather self.close
+
+        self.setFocus(self.listMenu_principal)
 
 
     def geometrie(self):
@@ -161,7 +154,7 @@ class MyMusicPlugin(pyxbmctExtended.BackgroundDialogWindow):
                           column=(SEIZE // 2) ,
                           rowspan=28,
                           columnspan=29)  # todo to fix
-        self.pochette.setImage(self.cover_jpg)
+        #self.pochette.setImage(self.cover_jpg)
 
         # Slider de la durée
         self.slider_duration = pyxbmct.Slider(textureback=self.textureback_slider_duration)
@@ -206,15 +199,13 @@ class MyMusicPlugin(pyxbmctExtended.BackgroundDialogWindow):
         espace_col = SEIZE / 4
         hauteur_menu = 25
 
-        self.listMenu_allArtists = pyxbmct.List(buttonFocusTexture=self.image_list_focus, _imageWidth= 40 , _imageHeight = 40 , _itemHeight=42)
-        self.listMenu_allAlbums = pyxbmct.List(buttonFocusTexture=self.image_list_focus, _imageWidth= 40 , _imageHeight = 40 , _itemHeight=42)
+        self.listMenu_principal = pyxbmct.List(buttonFocusTexture=self.image_list_focus, _imageWidth= 40 , _imageHeight = 40 , _itemHeight=42)
 
         self.listMenu_detailAlbums = pyxbmct.List(buttonFocusTexture=self.image_list_focus, _imageWidth= 30 , _imageHeight = 30 , _itemHeight=30)
 
         self.listMenu_playlist = pyxbmct.List(buttonFocusTexture=self.image_list_focus, _imageWidth= 40 , _imageHeight = 40 , _itemHeight=42)
 
-        self.placeControl(self.listMenu_allArtists , row_depart , col_depart  , espace_row, espace_col )
-        self.placeControl(self.listMenu_allAlbums, row_depart, col_depart, espace_row, espace_col)
+        self.placeControl(self.listMenu_principal , row_depart , col_depart  , espace_row, espace_col )
 
         self.placeControl(self.listMenu_detailAlbums , row_depart , col_depart + espace_col, espace_row, espace_col )
 
@@ -222,8 +213,7 @@ class MyMusicPlugin(pyxbmctExtended.BackgroundDialogWindow):
 
         # TRES IMPORTANT POUR AVOIR LE FOCUS
         # Add items to the list , need to ask the focus before filling the list from Plugin.Plugin
-        self.listMenu_allArtists.addItem('.')
-        self.listMenu_allAlbums.addItem('.')
+        self.listMenu_principal.addItem('.')        # then be filling by the Plugin
         self.listMenu_playlist.addItem('.')
 
     def connexionEvent(self):
@@ -252,7 +242,7 @@ class MyMusicPlugin(pyxbmctExtended.BackgroundDialogWindow):
             xbmc.log('nav_back' , xbmc.LOGNOTICE)
             self.quit_listing()
         else:
-            xbmc.log('else condition onAction in FrameMyMusic' , xbmc.LOGNOTICE)
+            xbmc.log('else condition onAction in FrameMyMusic Class MyMusic' , xbmc.LOGNOTICE)
             self._executeConnected(action, self.actions_connected)
 
     def quit_listing(self):# todo : à tester
@@ -278,202 +268,46 @@ class MyMusicPlugin(pyxbmctExtended.BackgroundDialogWindow):
         # Set navigation between controls (Button, list or slider)
         # Control has to be added to a window first if not raise RuntimeError
 
-        self.listMenu_allArtists.controlRight(self.listMenu_detailAlbums)
-        self.listMenu_detailAlbums.controlRight(self.listMenu_allArtists)
+        self.listMenu_principal.controlRight(self.listMenu_detailAlbums)
+        self.listMenu_detailAlbums.controlRight(self.listMenu_principal)
         
-        self.listMenu_allAlbums.controlRight(self.listMenu_detailAlbums)
 
-        #self.listMenu_allArtists.controlLeft(self.listMenu_detailAlbums)
-        self.listMenu_detailAlbums.controlLeft(self.listMenu_allArtists)
+        self.listMenu_principal.controlLeft(self.listMenu_detailAlbums)
+        self.listMenu_detailAlbums.controlLeft(self.listMenu_principal)
 
         # Set initial focus , don't forget to fill an item before setfocus
-        #self.setFocus(self.listMenu_allArtists)
+        self.setFocus(self.listMenu_principal)
         
     def   list_Menu_Navigation(self):
         # todo écrire quoi faire quanq un item est sélectionné dans le listemenu
-        if self.getFocus() == self.listMenu_allArtists:
-            self.itemSelection = self.listMenu_playlist.getListItem(
-                self.listMenu_playlist.getSelectedPosition()).getLabel()
+        if self.getFocus() == self.listMenu_principal:
+            self.itemSelection = self.listMenu_principal.getListItem(
+                self.listMenu_principal.getSelectedPosition()).getLabel()
             self.title_label.setLabel(self.itemSelection)
-        
-        elif self.getFocus() == self.listMenu_allAlbums:
-            self.itemSelectiondetail = self.listMenu_allAlbums.getListItem(
-                                self.listMenu_allAlbums.getSelectedPosition()).getLabel()
-            self.title_label.setLabel(self.itemSelectiondetail)
 
         elif self.getFocus() == self.listMenu_detailAlbums:
             self.itemSelectiondetail = self.listMenu_detailAlbums.getListItem(
                                 self.listMenu_detailAlbums.getSelectedPosition()).getLabel()
             self.title_label.setLabel(self.itemSelectiondetail)
 
-    def launchArtists(self, menudeprovenance='allArtists'):
-        pass
-
-    def f_allAlbums_details(self):
+    def f_detailAlbums(self):
         self.get_playerid()
         self.get_ident_server()
         self.connectInterface()
         self.listMenu_detailAlbums.reset()
 
-        labelajouer = self.listMenu_allAlbums.getListItem(self.listMenu_allAlbums.getSelectedPosition()).getLabel()
-        try:
-            artist = self.listMenu_allAlbums.getListItem(self.listMenu_allArtists.getSelectedPosition()).getProperty(
-            'artist')
-        except:
-            pass
+        labelajouer = self.listMenu_principal.getListItem(self.listMenu_principal.getSelectedPosition()).getLabel()
+        artist = self.listMenu_principal.getListItem(self.listMenu_principal.getSelectedPosition()).getProperty('artist')
         self.title_label.setLabel(labelajouer)
 
         # retrieve the filename cover.jpg from previous menulist and print it on coverbox
-        file_image = self.listMenu_allArtists.getListItem(self.listMenu_allArtists.getSelectedPosition()).getProperty(
-            'image')
-        if file_image:
-            self.pochette.setImage(file_image)
-
-        album_id = self.listMenu_allArtists.getListItem(self.listMenu_allArtists.getSelectedPosition()).getProperty(
-            'id')
-        try:
-            artist_id = self.listMenu_allArtists.getListItem(self.listMenu_allArtists.getSelectedPosition()).getProperty(
-            'artist_id')
-        except:
-            pass
-        requete = 'tracks 0 100 ' + 'album_id:' + album_id + ' sort:tracknum ' + 'tags:' + TAGS
-
-        self.InterfaceCLI.viderLeBuffer()
-        self.InterfaceCLI.sendtoCLISomething(requete)
-        reponse = self.InterfaceCLI.receptionReponseEtDecodage()
-
-        #enlever entête et queue
-        texte_en_liste_a_traiter = reponse.split('|count:')
-        xbmc.log('texte_a_traiter : ' + str(texte_en_liste_a_traiter), xbmc.LOGNOTICE)
-        if texte_en_liste_a_traiter == ['']:
-            # erreur dans la réponse
-            outils.functionNotYetImplemented()
-            return
-
-        try:
-            nombreDItemsTracks = texte_en_liste_a_traiter.pop()
-        except IndexError:
-            outils.functionNotYetImplemented()
-            return
-        try:
-            texte_a_traiter_titre = texte_en_liste_a_traiter.pop()
-            texte_en_liste_a_traiter_entete = texte_a_traiter_titre.split('tags:' + TAGS + '|')
-            xbmc.log('texte_a_traiter titre: ' + str(texte_en_liste_a_traiter_entete), xbmc.LOGNOTICE)
-        except IndexError:
-            item = xbmcgui.ListItem()
-            item.setLabel('Get an Error from Server! ')
-            self.listMenu_detailAlbums.addItem(item)
-
-            return
-        # exemple :
-        try:
-            lesItemsTracksNormalised = texte_en_liste_a_traiter_entete[1]
-            xbmc.log('lesItemsTracksNormalised : ' + lesItemsTracksNormalised, xbmc.LOGNOTICE)
-        except IndexError:
-            return
-
-        try:
-            lachainedesItemsTracks = lesItemsTracksNormalised.split('|')  #
-            xbmc.log('detail Albums : ' + str(lachainedesItemsTracks), xbmc.LOGNOTICE)
-        except IndexError:
-            xbmc.log('functionNotYetImplemented detailAlbums ', xbmc.LOGNOTICE)
-            outils.functionNotYetImplemented()
-            return
-
-
-        secondEtsuivant = False
-        index = 0
-        indice = ''  # fix if tracknum doesn't exist
-        titre = ''
-        year = ''
-        duree = ''
-        itemsTracks = []  # une liste
-        itemtampon = xbmcgui.ListItem()
-        for chaine in lachainedesItemsTracks:
-            xbmc.log('detail album 1 item : ' + str(chaine), xbmc.LOGNOTICE)
-            try:
-                clef, valeur = chaine.split(':', 1)
-            except ValueError:
-                # probably there are some ':' in the chaine (lyrics or information around the title)
-                # so we go on anyway
-                pass
-
-            if clef == 'id':
-
-                if secondEtsuivant:
-                    itemtampon.setLabel(indice + ' - ' + titre + ' - ' + year + ' : ' + duree + ' .')
-                    itemtampon.setProperty('album_id', album_id)
-                    try:
-                        itemtampon.setProperty('artist_id', artist_id)
-                    except:
-                        pass
-                    itemsTracks.append(itemtampon)
-                    itemtampon = xbmcgui.ListItem()
-                    index = index + 1
-                    xbmc.log('Ajout de l item dans listItem tampon' + titre + ' ' + itemtampon.getProperty('track_id'),
-                             xbmc.LOGNOTICE)
-
-                itemtampon.setProperty('track_id', valeur)
-                secondEtsuivant = True
-
-            elif clef == 'title':
-                titre = valeur
-                # itemtampon.setLabel(valeur)
-
-            elif clef == 'duration':
-                duree = outils.getInHMS(valeur)
-
-            elif clef == 'artwork_track_id':
-                hascode_artwork = valeur
-                completeNameofFile = self.get_artwork(hashcode_artwork=hascode_artwork)
-                # itemtampon.setArt({'thumb': completeNameofFile})
-                itemtampon.setProperty('image', completeNameofFile)
-
-            elif clef == 'tracknum':
-                itemtampon.setProperty(clef, valeur)
-                indice = valeur
-
-            elif clef == 'year':
-                itemtampon.setProperty(clef, valeur)
-                year = valeur
-            else:
-                # not sure that we have to keep other value
-                # for now we keep them but todo pass them
-                itemtampon.setProperty(clef, valeur)
-
-        # once exit the loop 'for' , fill the list with the last itemtampon :
-        itemtampon.setProperty('album_id', album_id)
-        itemtampon.setProperty('artist_id', artist_id)
-        itemtampon.setLabel(indice + ' - ' + titre + ' - ' + year + ' : ' + duree + ' .')
-        itemsTracks.append(itemtampon)
-        xbmc.log('Ajout de l item dans listItem tampon ' + titre + ' ' + itemtampon.getProperty('track_id'),
-                 xbmc.LOGNOTICE)
-
-        # sort the itemsTracks list by tracknum todo test this function or similar
-        # sorted(itemsTracks, key=lambda tracknum: tracknum[1])   # sort by n° track not always true
-
-        for item in itemsTracks:
-            xbmc.log('ajout de item trackss dans menu detailAlbum  : ' + item.getLabel(), xbmc.LOGNOTICE)
-            self.listMenu_detailAlbums.addItem(item)
-    # fin fonction f_allAlbums_details
-
-    def f_detailAlbums(self, menudeprovenance):
-        self.get_playerid()
-        self.get_ident_server()
-        self.connectInterface()
-        self.listMenu_detailAlbums.reset()
-
-        labelajouer = self.listMenu_allArtists.getListItem(self.listMenu_allArtists.getSelectedPosition()).getLabel()
-        artist = self.listMenu_allArtists.getListItem(self.listMenu_allArtists.getSelectedPosition()).getProperty('artist')
-        self.title_label.setLabel(labelajouer)
-
-        # retrieve the filename cover.jpg from previous menulist and print it on coverbox
-        file_image = self.listMenu_allArtists.getListItem(self.listMenu_allArtists.getSelectedPosition()).getProperty('image')
+        file_image = self.listMenu_principal.getListItem(self.listMenu_principal.getSelectedPosition()).getProperty('image')
         if file_image:
             self.pochette.setImage(file_image)
         
-        album_id = self.listMenu_allArtists.getListItem(self.listMenu_allArtists.getSelectedPosition()).getProperty('id')
-        artist_id = self.listMenu_allArtists.getListItem(self.listMenu_allArtists.getSelectedPosition()).getProperty('artist_id')
+        album_id = self.listMenu_principal.getListItem(self.listMenu_principal.getSelectedPosition()).getProperty('id')
+        artist_id = self.listMenu_principal.getListItem(self.listMenu_principal.getSelectedPosition()).getProperty('artist_id')
+
         requete = 'tracks 0 100 artist_id:' + artist_id + ' album_id:' + album_id + ' sort:tracknum ' + 'tags:' + TAGS
 
         self.InterfaceCLI.viderLeBuffer()
@@ -485,7 +319,6 @@ class MyMusicPlugin(pyxbmctExtended.BackgroundDialogWindow):
         album_id:1683|coverart:1|artwork_track_id:afe480cb|album:Au Pays Des Merveilles De Juliet|artist_id:4216|tracknum:3|
         url:file:///i-data/e0c90389/music/Musique/Yves%20Simon/03%20Au%20pays%20des%20Merveilles%20de%20Juliet.flac|
         remote:0|year:2007|
-        
         [...]
         id:20178|title:Rue de la Huchette|artist:Yves Simon|compilation:0|duration:139.808|album_id:1683|coverart:1|
         artwork_track_id:afe480cb|album:Au Pays Des Merveilles De Juliet|artist_id:4216|tracknum:2|
@@ -616,7 +449,7 @@ class MyMusicPlugin(pyxbmctExtended.BackgroundDialogWindow):
         #sorted(itemsTracks, key=lambda tracknum: tracknum[1])   # sort by n° track not always true
 
         for item in itemsTracks:
-            xbmc.log('ajout de item trackss dans menu detailAlbum  : ' + item.getLabel() , xbmc.LOGNOTICE)
+            xbmc.log('ajout de item tracks dans menu detailAlbum  : ' + item.getLabel() , xbmc.LOGNOTICE)
             self.listMenu_detailAlbums.addItem(item)
     # End of funcion f_detailAlbums
 
@@ -960,3 +793,194 @@ class MyMusicPlugin(pyxbmctExtended.BackgroundDialogWindow):
         contextMenuFrame = outils.ContextMenuFrameChild()
         contextMenuFrame.doModal()
         del contextMenuFrame
+
+class AllArtists(MyMusic):
+
+    def __init__(self, *args, **kwargs):
+        super(AllArtists, self).__init__()
+
+        self.connect(self.listMenu_principal, self.f_detailAlbums)
+        self.setFocus(self.listMenu_principal)
+
+
+    def onAction(self, action):
+        """
+        Catch button actions.
+
+        ``action`` is an instance of :class:`xbmcgui.Action` class.
+        """
+        if action == ACTION_PREVIOUS_MENU:
+            xbmc.log('Previous_menu' , xbmc.LOGNOTICE)
+            self.quit_listing()
+        elif action == ACTION_NAV_BACK:
+            xbmc.log('nav_back' , xbmc.LOGNOTICE)
+            self.quit_listing()
+        else:
+            xbmc.log('else condition onAction in frameMyMusic class AllArtists' , xbmc.LOGNOTICE)
+            self._executeConnected(action, self.actions_connected)
+
+    def f_detailAlbums(self):
+        self.get_playerid()
+        self.get_ident_server()
+        self.connectInterface()
+        self.listMenu_detailAlbums.reset()
+
+        labelajouer = self.listMenu_principal.getListItem(self.listMenu_principal.getSelectedPosition()).getLabel()
+        artist = self.listMenu_principal.getListItem(self.listMenu_principal.getSelectedPosition()).getProperty('artist')
+        self.title_label.setLabel(labelajouer)
+
+        # retrieve the filename cover.jpg from previous menulist and print it on coverbox
+        file_image = self.listMenu_principal.getListItem(self.listMenu_principal.getSelectedPosition()).getProperty(
+            'image')
+        if file_image:
+            self.pochette.setImage(file_image)
+
+        album_id = self.listMenu_principal.getListItem(self.listMenu_principal.getSelectedPosition()).getProperty('id')
+        artist_id = self.listMenu_principal.getListItem(self.listMenu_principal.getSelectedPosition()).getProperty('artist_id')
+
+        requete = 'tracks 0 100 artist_id:' + artist_id + ' album_id:' + album_id + ' sort:tracknum ' + 'tags:' + TAGS
+
+        self.InterfaceCLI.viderLeBuffer()
+        self.InterfaceCLI.sendtoCLISomething(requete)
+        reponse = self.InterfaceCLI.receptionReponseEtDecodage()
+        '''exemple de reponse :
+        tracks|0|100|artist_id:4216|album_id:1683|tags:aCdejJKlstuwxy|
+        id:20179|title:Au pays des Merveilles de Juliet|artist:Yves Simon|compilation:0|duration:144.144|
+        album_id:1683|coverart:1|artwork_track_id:afe480cb|album:Au Pays Des Merveilles De Juliet|artist_id:4216|tracknum:3|
+        url:file:///i-data/e0c90389/music/Musique/Yves%20Simon/03%20Au%20pays%20des%20Merveilles%20de%20Juliet.flac|
+        remote:0|year:2007|
+        [...]
+        id:20178|title:Rue de la Huchette|artist:Yves Simon|compilation:0|duration:139.808|album_id:1683|coverart:1|
+        artwork_track_id:afe480cb|album:Au Pays Des Merveilles De Juliet|artist_id:4216|tracknum:2|
+        url:file:///i-data/e0c90389/music/Musique/Yves%20Simon/02%20Rue%20de%20la%20Huchette.flac|
+        remote:0|year:2007|
+        count:10
+
+        '''
+
+        # enlever entête et queue
+        texte_en_liste_a_traiter = reponse.split('|count:')
+        xbmc.log('texte_a_traiter : ' + str(texte_en_liste_a_traiter), xbmc.LOGNOTICE)
+        if texte_en_liste_a_traiter == ['']:
+            # erreur dans la réponse
+            outils.functionNotYetImplemented()
+
+        try:
+            nombreDItemsTracks = texte_en_liste_a_traiter.pop()
+        except IndexError:
+            outils.functionNotYetImplemented()
+
+        try:
+            texte_a_traiter_titre = texte_en_liste_a_traiter.pop()
+            texte_en_liste_a_traiter_entete = texte_a_traiter_titre.split('tags:' + TAGS + '|')
+            xbmc.log('texte_a_traiter titre: ' + str(texte_en_liste_a_traiter_entete), xbmc.LOGNOTICE)
+        except IndexError:
+            item = xbmcgui.ListItem()
+            item.setLabel('Get an Error from Server! ')
+            self.listMenu_detailAlbums.addItem(item)
+
+        # exemple :
+        try:
+            lesItemsTracksNormalised = texte_en_liste_a_traiter_entete[1]
+            xbmc.log('lesItemsTracksNormalised : ' + lesItemsTracksNormalised, xbmc.LOGNOTICE)
+        except IndexError:
+            return
+
+        try:
+            lachainedesItemsTracks = lesItemsTracksNormalised.split('|')  #
+            xbmc.log('detail Albums : ' + str(lachainedesItemsTracks), xbmc.LOGNOTICE)
+        except IndexError:
+            xbmc.log('functionNotYetImplemented detailAlbums 310', xbmc.LOGNOTICE)
+            outils.functionNotYetImplemented()
+
+        '''
+        exemple detail albums :
+        ['id:23528', 'title:Allende', 'artist:1984 - En public au Theatre des Champs Elysees', 'compilation:0', 
+        'duration:270.367', 'album_id:1967', 'coverart:0', 'album:Cd3', 'artist_id:4425', 'tracknum:23', 
+        'url:file:///i-data/e0c/music/TOUT_Leo_Ferre_ou_Presque...48_CD_et_Extras/nde.mp3', 'remote:0',
+         'year:0', 
+         'id:23531', 'title:Avec le temps', 'artist:1984 - En public au Theatre des Champs Elysees', 'compilation:0', 
+         'duration:169.795', 'album_id:1967', 'coverart:0', 'album:Cd3', 'artist_id:4425', 'tracknum:26', 
+         'url:file:///i-data/e0c/music/TOUT_Leo_Ferre_ou_Presque...48_CD_et_Extra', 
+         'remote:0', 'year:0', 
+         [...]
+         , 'id:23529', 'title:Words Words Words', 'artist:1984 - En public au Theatre des Champs Elysees', 'compilation:0',
+          'duration:219.689', 'album_id:1967', 'coverart:0', 'album:Cd3', 'artist_id:4425', 'tracknum:24', 
+          'url:file:///i-data/e0c/music/TOUT_Leo_Ferre_ou_Presque...48_CD_et_Extrasrds.mp3', 
+          'remote:0', 'year:0']  
+
+        '''
+        secondEtsuivant = False
+        index = 0
+        indice = ''  # fix if tracknum doesn't exist
+        titre = ''
+        year = ''
+        duree = ''
+        itemsTracks = []  # une liste
+        itemtampon = xbmcgui.ListItem()
+        for chaine in lachainedesItemsTracks:
+            debug('detail album 1 item : ' + str(chaine), xbmc.LOGNOTICE)
+            try:
+                clef, valeur = chaine.split(':', 1)
+            except ValueError:
+                # probably there are some ':' in the chaine (lyrics or information around the title)
+                # so we go on anyway
+                pass
+
+            if clef == 'id':
+
+                if secondEtsuivant:
+                    itemtampon.setLabel(indice + ' - ' + titre + ' - ' + year + ' : ' + duree + ' .')
+                    itemtampon.setProperty('album_id', album_id)
+                    itemtampon.setProperty('artist_id', artist_id)
+                    itemsTracks.append(itemtampon)
+                    itemtampon = xbmcgui.ListItem()
+                    index = index + 1
+                    xbmc.log('Ajout de l item dans listItem tampon' + titre + ' ' + itemtampon.getProperty('track_id'),
+                             xbmc.LOGNOTICE)
+
+                itemtampon.setProperty('track_id', valeur)
+                secondEtsuivant = True
+
+            elif clef == 'title':
+                titre = valeur
+                # itemtampon.setLabel(valeur)
+
+            elif clef == 'duration':
+                duree = outils.getInHMS(valeur)
+
+            elif clef == 'artwork_track_id':
+                hascode_artwork = valeur
+                completeNameofFile = self.get_artwork(hashcode_artwork=hascode_artwork)
+                # itemtampon.setArt({'thumb': completeNameofFile})
+                itemtampon.setProperty('image', completeNameofFile)
+
+            elif clef == 'tracknum':
+                itemtampon.setProperty(clef, valeur)
+                indice = valeur
+
+            elif clef == 'year':
+                itemtampon.setProperty(clef, valeur)
+                year = valeur
+            else:
+                # not sure that we have to keep other value
+                # for now we keep them but todo pass them
+                itemtampon.setProperty(clef, valeur)
+
+        # once exit the loop 'for' , fill the list with the last itemtampon :
+        itemtampon.setProperty('album_id', album_id)
+        itemtampon.setProperty('artist_id', artist_id)
+        itemtampon.setLabel(indice + ' - ' + titre + ' - ' + year + ' : ' + duree + ' .')
+        itemsTracks.append(itemtampon)
+        xbmc.log('Ajout de l item dans listItem tampon ' + titre + ' ' + itemtampon.getProperty('track_id'),
+                 xbmc.LOGNOTICE)
+
+        # sort the itemsTracks list by tracknum todo test this function or similar
+        # sorted(itemsTracks, key=lambda tracknum: tracknum[1])   # sort by n° track not always true
+
+        for item in itemsTracks:
+            xbmc.log('ajout de item tracks dans menu detailAlbum  : ' + item.getLabel(), xbmc.LOGNOTICE)
+            self.listMenu_detailAlbums.addItem(item)
+    # End of funcion f_detailAlbums
+
+# fin class AllArtists(MyMusic):

@@ -24,12 +24,17 @@ if Kodi:
 
     from resources.lib.outils import debug
     from resources.lib import frameMusicFolder
+    from resources.lib import frameMyMusic
+    from resources.lib import FrameList
+    from resources.lib import frameMyMusicAllArtists
+    from resources.lib import frameMyMusicAlbums
+    from resources.lib import FrameMenuFavorites
+    from resources.lib import ConnexionClient, outils
 
 import urllib
 import os
 import time
 
-from resources.lib import ConnexionClient, Ecoute, FrameList, FrameMyMusic, FramePLaying,  outils ,  FrameMenuFavorites
 
 ARTWORK = xbmc.translatePath(os.path.join(ADDON.getAddonInfo('path'), 'resources', 'skins', 'Default', 'media'))
 ARTWORK_SLIM = xbmc.translatePath(os.path.join(ADDON.getAddonInfo('path'), 'resources', 'skins', 'Default', 'media', 'Slimserver'))
@@ -412,7 +417,6 @@ class Plugin_Generique():
                     self.longListing.listMenu_1.addItem(item)
                     #self.origine.listMenu_Fleur.addItem(item)
 
-            #self.longListing.listMenu_1.setVisible(True)
             self.longListing.doModal()
             #xbmc.Monitor().waitForAbort()
             del self.longListing
@@ -1136,80 +1140,52 @@ class MyMusic(Plugin_Generique):
 
             # affichage nouvelle fenêtre:
             #self.myMusic = FrameMyMusic.MyMusicPlugin(artist)
-            self.myMusic = FrameMyMusic.MyMusicPlugin()
+            #self.myMusic = FrameMyMusic.MyMusicPlugin()
+            self.myMusic = frameMyMusicAllArtists.MyMusicAllArtists()
 
-            self.myMusic.listMenu_allArtists.reset()
+            self.myMusic.listMenu_principal.reset()
 
-            self.myMusic.show()
+            #self.myMusic.show()
             # initialise focus ans navigation
-            self.myMusic.listMenu_allArtists.setVisible(True)
-            self.myMusic.listMenu_allAlbums.setVisible(False)
-            self.myMusic.setFocus(self.myMusic.listMenu_allArtists)
-            self.myMusic.listMenu_allArtists.controlRight(self.myMusic.listMenu_detailAlbums)
-            self.myMusic.listMenu_detailAlbums.controlLeft(self.myMusic.listMenu_allArtists)
+            self.myMusic.listMenu_principal.controlRight(self.myMusic.listMenu_detailAlbums)
+            self.myMusic.listMenu_detailAlbums.controlLeft(self.myMusic.listMenu_principal)
 
             self.origine.InterfaceCLI.viderLeBuffer() # need because resiliersouscription() let some data in the buffer
             self.origine.InterfaceCLI.sendtoCLISomething('albums 0 100 artist_id:' + numeroItemSelectionFeuille + ' tags:' + TAGS )
 
             reception = self.origine.InterfaceCLI.receptionReponseEtDecodage()
 
-            # sometime the list of album is very long
-            nbreDeBoucle = 1
-            while self.origine.InterfaceCLI.dataAreWaiting():
-                reception = reception + self.origine.InterfaceCLI.receptionReponseEtDecodage()
-                nbreDeBoucle = nbreDeBoucle + 1
-
-            xbmc.log('nbre de Boucle en reception : ' + str(nbreDeBoucle), xbmc.LOGNOTICE)
-
             try:
                 nbre_a_traiter = reception.split('count:')
-            except ValueError:
-                outils.functionNotYetImplemented()
-
-                return
-
-            try:
                 nombreDItems = nbre_a_traiter.pop()
             except IndexError:
                 outils.functionNotYetImplemented()
 
-                return
             try:
                 nbreEntier = int(nombreDItems)
             except:
                 outils.functionNotYetImplemented()
 
-                return
-
-            #start = 0
-            #requete = 'albums ' + str(start) + ' ' + str(nombreDItems) + ' artist_id:'+ numeroItemSelectionFeuille + ' tags:' + TAGS
-            #self.origine.InterfaceCLI.sendtoCLISomething(requete)
-            #reponsepropre = self.origine.InterfaceCLI.receptionReponseEtDecodage()
-            #xbmc.log('Les albums unefoispropre : ' + str(reponsepropre), xbmc.LOGDEBUG)
-
             #trim head and queue
             try:
-                #poubelle, tampon = reponsepropre.split(TAGS+'|')
                 poubelle, tampon = reception.split(TAGS+'|')
                 lesItemsAlbumsNormalised , poubelle = tampon.split('|count:')
             except ValueError:
-                return
+                outils.functionNotYetImplemented()
 
             try:
                 lachainedesItemsAlbums = lesItemsAlbumsNormalised.split('|')  #
-                xbmc.log('Plugin_music:: Fleurs chainedesAlbums : ' + str(lachainedesItemsAlbums), xbmc.LOGNOTICE)
+                debug('Plugin_music:: Fleurs chainedesAlbums : ' + str(lachainedesItemsAlbums), xbmc.LOGNOTICE)
             except:
-                xbmc.log('functionNotYetImplemented plugin_music::fleurs', xbmc.LOGNOTICE)
+                debug('functionNotYetImplemented plugin_music::fleurs', xbmc.LOGNOTICE)
                 outils.functionNotYetImplemented()
-
-                return
 
             nombrearanger = 0
             index = 0
 
             itemtampon = xbmcgui.ListItem()
             for chaine in lachainedesItemsAlbums:
-
+                debug('chainedesItemsAlbumsdelartiste : ' + chaine, xbmc.LOGNOTICE)
                 try:
                     clef, valeur = chaine.split(':', 1)
                 except ValueError:
@@ -1235,21 +1211,15 @@ class MyMusic(Plugin_Generique):
                         itemtampon.setProperty('image' , completeNameofFile)
                     except IOError:
                         pass
-                #elif clef == 'year':
-                #    title
-                #    compilation
-                #    artist
 
                 elif clef == 'textkey':
-                    self.myMusic.listMenu_allArtists.addItem(itemtampon)
+                    self.myMusic.listMenu_principal.addItem(itemtampon)
                     itemtampon = xbmcgui.ListItem()
                 else:
                     itemtampon.setProperty(clef,valeur)
 
-
-            self.myMusic.listMenu_allArtists.setVisible(True)
-
-            xbmc.Monitor().waitForAbort()
+            self.myMusic.listMenu_principal.setVisible(True)
+            self.myMusic.doModal()
             del self.myMusic
         #fin if All_Artist
 
@@ -1265,18 +1235,13 @@ class MyMusic(Plugin_Generique):
 
             # affichage nouvelle fenêtre:
             # self.myMusic = FrameMyMusic.MyMusicPlugin(artist)
-            self.myMusic = FrameMyMusic.MyMusicPlugin()
+            self.myMusic = frameMyMusicAlbums.MyMusicAllAlbums()
 
-            self.myMusic.listMenu_allArtists.reset()
-
-            self.myMusic.show()
+            #self.myMusic.show()
 
             # initialise focus ans navigation
-            self.myMusic.listMenu_allArtists.setVisible(False)
-            self.myMusic.listMenu_allAlbums.setVisible(True)
-            self.myMusic.setFocus(self.myMusic.listMenu_allAlbums)
-            self.myMusic.listMenu_allAlbums.controlRight(self.myMusic.listMenu_detailAlbums)
-            self.myMusic.listMenu_detailAlbums.controlLeft(self.myMusic.listMenu_allAlbums)
+            self.myMusic.listMenu_principal.controlRight(self.myMusic.listMenu_detailAlbums)
+            self.myMusic.listMenu_detailAlbums.controlLeft(self.myMusic.listMenu_principal)
 
             self.origine.InterfaceCLI.viderLeBuffer()  # need because resiliersouscription() let some data in the buffer
             self.origine.InterfaceCLI.sendtoCLISomething(
@@ -1287,9 +1252,7 @@ class MyMusic(Plugin_Generique):
             try:
                 nbre_a_traiter = reception.split('count:')
             except ValueError:
-                outils.functionNotYetImplemented()
-
-                return
+                pass
 
             try:
                 nombreDItems = nbre_a_traiter.pop()
@@ -1360,14 +1323,12 @@ class MyMusic(Plugin_Generique):
 
                 elif clef == 'textkey':
                     itemtampon.setProperty(clef , valeur)
-                    self.myMusic.listMenu_allArtists.addItem(itemtampon)
+                    self.myMusic.listMenu_principal.addItem(itemtampon)
                     itemtampon = xbmcgui.ListItem()
                 else:
                     itemtampon.setProperty(clef, valeur)
 
-            self.myMusic.listMenu_allArtists.setVisible(True)
-
-            xbmc.Monitor().waitForAbort()
+            self.myMusic.doModal()
             del self.myMusic
         #fin if Albums
 
@@ -1376,19 +1337,13 @@ class MyMusic(Plugin_Generique):
             xbmc.log(' entrée dans le_menu_fleur_Dossiers_du_plugins MyMusic', xbmc.LOGNOTICE)
             album = self.origine.listMenu_Feuilles_all_Dossiers.getListItem(
                 self.origine.listMenu_Feuilles_all_Dossiers.getSelectedPosition()).getLabel()
-            # title = self.origine.listMenu_Feuilles_all_Artists.getListItem(numeroItemSelectionFeuille).getLabel()
-            # same :
-            # itemdelisteOrigine = self.origine.listMenu_Feuilles_all_Artists.getListItem(numeroItemSelectionFeuille)
-            # labeldetete = itemdelisteOrigine.getLabel()
 
             # affichage nouvelle fenêtre:
             # self.myMusic = FrameMyMusic.MyMusicPlugin(artist)
             self.myMusic = frameMusicFolder.ViewMusicFolder()
-            self.myMusic.show()
+            #self.myMusic.show()
 
             # initialise focus ans navigation
-            self.myMusic.setFocus(self.myMusic.listMusicFolder)
-
             self.origine.InterfaceCLI.viderLeBuffer()  # need because resiliersouscription() let some data in the buffer
             self.origine.InterfaceCLI.sendtoCLISomething(
                 'musicfolder 0 100 folder_id:' + numeroItemSelectionFeuille)
@@ -1474,10 +1429,10 @@ class MyMusic(Plugin_Generique):
                     self.myMusic.listMusicFolder.addItem(itemtampon)
                     itemtampon = xbmcgui.ListItem()
 
-
-            xbmc.Monitor().waitForAbort()
+            self.myMusic.doModal()
+            #xbmc.Monitor().waitForAbort()
             del self.myMusic
-        #fin if Pluorigine Dossie
+        #fin if Plugorigine Dossier
     # fin fonction le_menu_fleurs
 # fin class MyMusic
 
