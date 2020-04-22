@@ -67,6 +67,8 @@ if Kodi:
     global savepath
     savepath = xbmc.translatePath('special://temp')
 
+    TAGS = 'aCdejJKlstuwxy'
+
 
 class ViewMusicFolder(pyxbmctExtended.BackgroundDialogWindow):
 
@@ -88,10 +90,17 @@ class ViewMusicFolder(pyxbmctExtended.BackgroundDialogWindow):
         self.set_navigation()
         xbmc.log('navigation  set', xbmc.LOGNOTICE)
 
+        # initial setup for playerid, lmsip, lmswebport etc...
         self.get_playerid()
         self.connectInterface()
+        self.get_ident_server()
+        debug('server : ' + self.nomserver + ' - ' + self.lmsip + ' : ' + self.lmswebport , xbmc.LOGNOTICE )
+        debug('player : ' + self.playerid , xbmc.LOGNOTICE )
 
-        self.connect(self.listMusicFolder,self.exploreAndPlay)
+        self.InterfaceCLI.viderLeBuffer()
+
+
+        self.connect(self.listMusicFolder,self.exploreOrPlay)
 
         self.connexionEvent()
 
@@ -139,6 +148,7 @@ class ViewMusicFolder(pyxbmctExtended.BackgroundDialogWindow):
         self.texture_slider_duration = self.image_dir + '/slider_button_new.png'
         self.image_list_focus = self.image_dir + '/MenuItemFO.png'  # myself
         self.image_folder = self.image_dir_slim + '/icon_folder.png'
+        self.image_musique = self.image_dir + '/music.png'
 
     def controlMenus(self):
         ''' Fix the size of itemlists in menus lists'''
@@ -154,7 +164,7 @@ class ViewMusicFolder(pyxbmctExtended.BackgroundDialogWindow):
 
         self.listMusicFolder = pyxbmct.List(buttonFocusTexture=self.image_list_focus, _imageWidth= 40 , _imageHeight = 40 , _itemHeight=40)
         
-        self.placeControl(self.listMusicFolder , row_depart , col_depart , espace_row, espace_col)
+        self.placeControl(self.listMusicFolder , row_depart , col_depart , espace_row, self.nbre_columns - 6 )
 
         # TRES IMPORTANT POUR AVOIR LE FOCUS
         # Add items to the list , need to ask the focus before filling the list from Plugin.Plugin
@@ -221,13 +231,14 @@ class ViewMusicFolder(pyxbmctExtended.BackgroundDialogWindow):
                 self.listMusicFolder.getSelectedPosition()).getLabel()
             self.title_label.setLabel(self.itemSelection1)
 
-    def exploreAndPlay(self):
-        debug('Entrée dan fonction eploreAndPlay frameMusicFolder', xbmc.LOGNOTICE)
+    def exploreOrPlay(self):
+        debug('Entrée dans la fonction eXploreOrPlay frameMusicFolder', xbmc.LOGNOTICE)
 
         labeitem = self.listMusicFolder.getListItem(self.listMusicFolder.getSelectedPosition()).getLabel()
         type = self.listMusicFolder.getListItem(self.listMusicFolder.getSelectedPosition()).getProperty('type')
         item_id = self.listMusicFolder.getListItem(self.listMusicFolder.getSelectedPosition()).getProperty('id')
-        filename = self.listMusicFolder.getListItem(self.listMusicFolder.getSelectedPosition()).getProperty('id')
+        filename = self.listMusicFolder.getListItem(self.listMusicFolder.getSelectedPosition()).getProperty('filename')
+        folder_parent_id = self.listMusicFolder.getListItem(self.listMusicFolder.getSelectedPosition()).getProperty('folder_parent_id')
 
 
         if type == 'folder':
@@ -238,21 +249,31 @@ class ViewMusicFolder(pyxbmctExtended.BackgroundDialogWindow):
             requete =  'musicfolder 0 100 folder_id:' + item_id
             self.InterfaceCLI.sendtoCLISomething(requete)
             reception = self.InterfaceCLI.receptionReponseEtDecodage()
+            '''
+            for example : 
+            musicfolder|0|100|folder_id:28999|
+            id:5822|filename:01 Hugh Laurie - St. James Infirmary.mp3|type:track|
+            id:5823|filename:02 Hugh Laurie - You Don't Know My Mind.mp3|type:track|
+            [...]
+            id:5836|filename:15 Hugh Laurie - Let Them Talk.mp3|type:track|
+            count:15
+            '''
+
             try:
                 nbre_a_traiter = reception.split('count:')
             except ValueError:
-                self.functionNotYetImplemented()
+                outils.functionNotYetImplemented()
                 return
 
             try:
                 nombreDItems = nbre_a_traiter.pop()
             except IndexError:
-                self.functionNotYetImplemented()
+                outils.functionNotYetImplemented()
                 return
             try:
                 nbreEntier = int(nombreDItems)
             except:
-                self.functionNotYetImplemented()
+                outils.functionNotYetImplemented()
                 return
 
                 # trim head and queue
@@ -268,7 +289,7 @@ class ViewMusicFolder(pyxbmctExtended.BackgroundDialogWindow):
                 xbmc.log('FrameMusicFolder:: Fleurs chainedesDossiers : ' + str(lachainedesItemsDossiers), xbmc.LOGNOTICE)
             except:
                 xbmc.log('functionNotYetImplemented plugin_music::fleurs::Dossiers', xbmc.LOGNOTICE)
-                self.functionNotYetImplemented()
+                outils.functionNotYetImplemented()
                 return
 
             itemtampon = xbmcgui.ListItem()
@@ -294,6 +315,27 @@ class ViewMusicFolder(pyxbmctExtended.BackgroundDialogWindow):
                     itemtampon.setProperty(clef, valeur)
                     if valeur == 'folder':
                         itemtampon.setArt({'thumb': self.image_folder})
+                        debug('set art for folder',xbmc.LOGNOTICE)
+                    elif valeur == 'track':
+                        debug('set art for track',xbmc.LOGNOTICE)
+                        requete = self.playerid + ' songinfo 0 20 track_id:' + itemtampon.getProperty('id') + ' tags:' + TAGS
+                        self.InterfaceCLI.sendtoCLISomething(requete)
+                        reponse = self.InterfaceCLI.receptionReponseEtDecodage()
+                        chainereponse = reponse.split('|')
+                        matching = [s for s in chainereponse if 'coverart:1' in s]
+                        if matching:
+                            coverartlist =  [s for s in chainereponse if 'artwork_track_id' in s]
+                            try:
+                                chainecoverart = coverartlist.pop()
+                                chainecoverartlist = chainecoverart.split(':')
+                                hascode_coverart = chainecoverartlist.pop()
+                                filename_coverart = self.get_artwork(hashcode_artwork=hascode_coverart)
+                                itemtampon.setArt({'thumb': filename_coverart})
+                            except IndexError:
+                                itemtampon.setArt({'thumb': self.image_musique})
+                        else:
+                            itemtampon.setArt({'thumb': self.image_musique})
+
                     newFrame.listMusicFolder.addItem(itemtampon)
                     itemtampon = xbmcgui.ListItem()
 
@@ -305,48 +347,136 @@ class ViewMusicFolder(pyxbmctExtended.BackgroundDialogWindow):
         # fin if folder
 
         elif type == 'track':
+            track_id = item_id
             # Could play
-            choix = xbmcgui.Dialog().select(heading=filename,
-                                            list=['Play now', 'Play after the current song', 'Add to Playlist'])
-            if choix == 0:
-                requete = cmd + ' playlist play item_id:' + str(item_id)
-            elif choix == 1:
-                requete = cmd + ' playlist insert item_id:' + str(item_id)
-            elif choix == 2:
-                requete = cmd + ' playlist add item_id:' + str(item_id)
+            xbmc.log('launch to play : ' + filename + ' playlistcontrol cmd:load track_id:' + item_id,
+                     xbmc.LOGNOTICE)
 
-            if not choix < 0:
-                self.connectInterface()
+            choix = xbmcgui.Dialog().select(heading=filename, list=['Play Song now', \
+                                                                       'Play folder now ', \
+                                                                       'Play Song after the current song', \
+                                                                       'Add Song  to Playlist', \
+                                                                       'More Info'])
+
+            if choix == 0:
+                # exemple : playlistcontrol cmd:load album_id:1683
+                requete = self.playerid + ' playlistcontrol cmd:load track_id:' + str(track_id)
+
+            elif choix == 1:
+                requete = self.playerid + ' playlistcontrol cmd:load folder_id:' + str(folder_parent_id)
+
+            elif choix == 2:
+                requete = self.playerid + ' playlistcontrol cmd:insert track_id:' + str(track_id)
+
+            elif choix == 3:
+                requete = self.playerid + ' playlistcontrol cmd:add track_id:' + str(track_id)
+
+            if not choix < 0 and not choix > 3:
                 xbmc.log('requete : ' + requete, xbmc.LOGNOTICE)
 
                 self.InterfaceCLI.sendtoCLISomething(requete)
                 reponse = self.InterfaceCLI.receptionReponseEtDecodage()
+
+
+                # now it is going to play
+                requetePlay = self.playerid + ' playlist play'
+                self.InterfaceCLI.sendtoCLISomething(requetePlay)
+                reponse = self.InterfaceCLI.receptionReponseEtDecodage()
                 del reponse
 
                 # then launch now is playing FramePlaying
+                self.WindowPlaying = xbmcgui.getCurrentWindowId()
+                debug('fenetre origine n° : ' + str(self.WindowPlaying), xbmc.LOGNOTICE)
+
                 self.Abonnement.set()  # need to renew subscribe after interupt
                 self.jivelette = FramePLaying.SlimIsPlaying()
-
-                self.WindowPlaying = xbmcgui.getCurrentWindowId()
-                xbmc.log('fenetre en cours n° : ' + str(self.WindowPlaying), xbmc.LOGNOTICE)
 
                 # todo : test inversion show et doModal
                 self.jivelette.show()
                 self.jivelette.update_now_is_playing()
                 # time.sleep(0.5)
-                #self.update_now_is_playing()  # the loop that keep the jivelette stand showing
+                # self.update_now_is_playing()  # the loop that keep the jivelette stand showing
 
                 # self.jivelette.doModal()
                 del self.jivelette
 
+            elif choix == 4:
+                # need more stuff to dig songinfo
+                requete = self.playerid + ' songinfo 0 100 track_id:' + str(track_id)
+                self.InterfaceCLI.sendtoCLISomething(requete)
+                reponse = self.InterfaceCLI.receptionReponseEtDecodage()
+                try:
+                    listesonginfo = reponse.split('|')
+                except ValueError:
+                    outils.functionNotYetImplemented()
+
+                textInfo = ''
+                for field in listesonginfo:
+
+                    textInfo = textInfo +  field + '\r\n'
+
+                dialogSongInfo = xbmcgui.Dialog()
+                dialogSongInfo.textviewer('Song Info : ' + filename , textInfo )
+
+            else:
+                pass
+
+        elif type == 'playlist':
+            playlist_id = item_id
+            # Could play
+            xbmc.log('launch to play : ' + filename + ' playlistcontrol cmd:load playlist_id:' + item_id,
+                     xbmc.LOGNOTICE)
+
+            choix = xbmcgui.Dialog().select(heading=filename, list=['Play playlist now',
+                                                                    'Play folder now ',
+                                                                    'Play playlist after the current song'
+                                                                    ] )
+
+            if choix == 0:
+                # exemple : playlistcontrol cmd:load album_id:1683
+                requete = self.playerid + ' playlistcontrol cmd:load playlist_id:' + str(playlist_id)
+
+            elif choix == 1:
+                requete = self.playerid + ' playlistcontrol cmd:load folder_id:' + str(folder_parent_id)
+
+            elif choix == 2:
+                requete = self.playerid + ' playlistcontrol cmd:insert playlist_id:' + str(playlist_id)
+
+            if not choix < 0 and not choix > 2 :
+                xbmc.log('requete : ' + requete, xbmc.LOGNOTICE)
+
+                self.InterfaceCLI.sendtoCLISomething(requete)
+                reponse = self.InterfaceCLI.receptionReponseEtDecodage()
+
+                # now it is going to play
+                requetePlay = self.playerid + ' playlist play'
+                self.InterfaceCLI.sendtoCLISomething(requetePlay)
+                reponse = self.InterfaceCLI.receptionReponseEtDecodage()
+                del reponse
+
+                # then launch now is playing FramePlaying
+                self.WindowPlaying = xbmcgui.getCurrentWindowId()
+                debug('fenetre origine n° : ' + str(self.WindowPlaying), xbmc.LOGNOTICE)
+
+                self.Abonnement.set()  # need to renew subscribe after interupt
+                self.jivelette = FramePLaying.SlimIsPlaying()
+
+                # todo : test inversion show et doModal
+                self.jivelette.show()
+                self.jivelette.update_now_is_playing()
+                # time.sleep(0.5)
+                # self.update_now_is_playing()  # the loop that keep the jivelette stand showing
+
+                # self.jivelette.doModal()
+                del self.jivelette
+
+            else:
+                pass
+    # fin fonction exploreOrPlay
 
 
 
-
-
-
-
-    def launchPlayingItem(self, menudeprovenance):
+    def launchPlayingItem(self, menudeprovenance): # this is a copy from FrameList ? Todo Delete it here
         ''' when an app or a radio is selected  launch the command to play
         mainly : cmd playlist play item_id
         example : radioparadise playlist play item_id:25478.1
@@ -435,14 +565,14 @@ class ViewMusicFolder(pyxbmctExtended.BackgroundDialogWindow):
             xbmc.log('texte_a_traiter : ' +  str(texte_en_liste_a_traiter) , xbmc.LOGNOTICE )
             if texte_en_liste_a_traiter == ['']:
                 # erreur dans la réponse
-                self.functionNotYetImplemented()
+                outils.functionNotYetImplemented()
                 return
 
             #exemple : ["00:04:20:17:1c:44|picks|items|0|count|item_id:46dc1389.0|title:Andy's Picks", '3']
             try:
                 nombreDItemsapplications = texte_en_liste_a_traiter.pop()
             except IndexError:
-                self.functionNotYetImplemented()
+                outils.functionNotYetImplemented()
                 return
             texte_a_traiter_titre = texte_en_liste_a_traiter.pop()
             texte_en_liste_a_traiter_titre = texte_a_traiter_titre.split('title:')
@@ -451,7 +581,7 @@ class ViewMusicFolder(pyxbmctExtended.BackgroundDialogWindow):
             try:
                 title = texte_en_liste_a_traiter_titre.pop()
             except IndexError:
-                self.functionNotYetImplemented()
+                outils.functionNotYetImplemented()
             #if nombreDItemsapplications > 9:
             # turn 8 by 8 (step 8)
             #self.longListing.title_label.setLabel(title)
@@ -528,7 +658,7 @@ class ViewMusicFolder(pyxbmctExtended.BackgroundDialogWindow):
                     xbmc.log('Frame: ' + str(lachainedesItemsFleurs) , xbmc.LOGNOTICE)
                 except IndexError:
                     xbmc.log('FrameList.py : functionNotYetImplemented Ligne 422', xbmc.LOGNOTICE)
-                    self.functionNotYetImplemented()
+                    outils.functionNotYetImplemented()
                     return
 
                 index = 0
@@ -568,7 +698,7 @@ class ViewMusicFolder(pyxbmctExtended.BackgroundDialogWindow):
                     self.listMenu_2.addItem(item)
 
 
-            #self.functionNotYetImplemented()
+            #outils.functionNotYetImplemented()
 
 
     def functionNotYetImplemented(self):
@@ -795,11 +925,27 @@ class ViewMusicFolder(pyxbmctExtended.BackgroundDialogWindow):
         try:
             urllib.urlretrieve(urltoopen, completeNameofFile)
         except IOError:
-            self.functionNotYetImplemented()
+            outils.functionNotYetImplemented()
         xbmc.log('nom du fichier image : ' + completeNameofFile , xbmc.LOGNOTICE)
         return completeNameofFile
         # fin fonction fin fonction get_icon, class Plugin_Generique
         # test
+
+    def get_artwork(self, hashcode_artwork):
+        # http://<server>:<port>/music/<track_id>/cover.jpg
+        filename = 'icon.image_' + str(hashcode_artwork) + '.tmp'
+        completeNameofFile = os.path.join(savepath, filename)
+
+        urlimage = 'http://' + self.lmsip + ':' + self.lmswebport + '/music/' + str(hashcode_artwork) + '/cover.jpg'
+
+        try:
+            urllib.urlretrieve(urlimage, completeNameofFile)
+        except IOError:
+            pass
+            outils.functionNotYetImplemented()
+
+        xbmc.log('nom du fichier image : ' + completeNameofFile, xbmc.LOGNOTICE)
+        return completeNameofFile
 
 
         #self.dictionnairedesplayers = dict()

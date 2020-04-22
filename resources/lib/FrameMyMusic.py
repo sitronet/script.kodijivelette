@@ -356,13 +356,13 @@ class MyMusicPlugin(pyxbmctExtended.BackgroundDialogWindow):
         xbmc.log('texte_a_traiter : ' + str(texte_en_liste_a_traiter), xbmc.LOGNOTICE)
         if texte_en_liste_a_traiter == ['']:
             # erreur dans la réponse
-            self.functionNotYetImplemented()
+            outils.functionNotYetImplemented()
             return
 
         try:
             nombreDItemsTracks = texte_en_liste_a_traiter.pop()
         except IndexError:
-            self.functionNotYetImplemented()
+            outils.functionNotYetImplemented()
             return
         try:
             texte_a_traiter_titre = texte_en_liste_a_traiter.pop()
@@ -386,7 +386,7 @@ class MyMusicPlugin(pyxbmctExtended.BackgroundDialogWindow):
             xbmc.log('detail Albums : ' + str(lachainedesItemsTracks), xbmc.LOGNOTICE)
         except IndexError:
             xbmc.log('functionNotYetImplemented detailAlbums ', xbmc.LOGNOTICE)
-            self.functionNotYetImplemented()
+            outils.functionNotYetImplemented()
             return
 
 
@@ -509,13 +509,13 @@ class MyMusicPlugin(pyxbmctExtended.BackgroundDialogWindow):
         xbmc.log('texte_a_traiter : ' +  str(texte_en_liste_a_traiter) , xbmc.LOGNOTICE )
         if texte_en_liste_a_traiter == ['']:
             # erreur dans la réponse
-            self.functionNotYetImplemented()
+            outils.functionNotYetImplemented()
             return
 
         try:
             nombreDItemsTracks = texte_en_liste_a_traiter.pop()
         except IndexError:
-            self.functionNotYetImplemented()
+            outils.functionNotYetImplemented()
             return
         try:
             texte_a_traiter_titre = texte_en_liste_a_traiter.pop()
@@ -539,7 +539,7 @@ class MyMusicPlugin(pyxbmctExtended.BackgroundDialogWindow):
             xbmc.log('detail Albums : ' + str(lachainedesItemsTracks) , xbmc.LOGNOTICE)
         except IndexError:
             xbmc.log('functionNotYetImplemented detailAlbums 310', xbmc.LOGNOTICE)
-            self.functionNotYetImplemented()
+            outils.functionNotYetImplemented()
             return
         '''
         exemple detail albums :
@@ -691,7 +691,7 @@ class MyMusicPlugin(pyxbmctExtended.BackgroundDialogWindow):
                 try:
                     listesonginfo = reponse.split('|')
                 except ValueError:
-                    self.functionNotYetImplemented()
+                    outils.functionNotYetImplemented()
 
                 textInfo = ''
                 for field in listesonginfo:
@@ -725,7 +725,7 @@ class MyMusicPlugin(pyxbmctExtended.BackgroundDialogWindow):
         try:
             listesonginfo = reponse.split('|')
         except ValueError:
-            self.functionNotYetImplemented()
+            outils.functionNotYetImplemented()
             return
 
         textInfo = ''
@@ -734,33 +734,6 @@ class MyMusicPlugin(pyxbmctExtended.BackgroundDialogWindow):
 
         dialogSongInfo = xbmcgui.Dialog()
         dialogSongInfo.textviewer('Song Info : ' + labelajouer , textInfo )
-
-    def functionNotYetImplemented(self):
-        '''
-        print in a menu (n°4) of the screen
-        perhaps it could rather alert in  a dialogbox ? (todo)
-        :return:
-        '''
-
-        self.title_label.setLabel('Nobody is perfect')
-
-        itemdeListe_1 = xbmcgui.ListItem()
-        itemdeListe_1.setLabel('function Not Yet')
-        self.listMenu_4.addItem(itemdeListe_1)
-
-        itemdeListe_2= xbmcgui.ListItem()
-        itemdeListe_2.setLabel('Implemented')
-        self.listMenu_4.addItem(itemdeListe_2)
-
-        itemdeListe_3 = xbmcgui.ListItem()
-        itemdeListe_3.setLabel('correctly')
-        self.listMenu_4.addItem(itemdeListe_3)
-
-        itemdeListe_4 = xbmcgui.ListItem()
-        itemdeListe_4.setLabel('need more stuff')
-        self.listMenu_4.addItem(itemdeListe_4)
-
-        # fin fonction fin fonction functionNotYetImplemented, class Plugin_Generique
 
     # copier/coller de la fonction de FrameMenu.py
     def update_current_track_playing(self):
@@ -933,7 +906,7 @@ class MyMusicPlugin(pyxbmctExtended.BackgroundDialogWindow):
         try:
             urllib.urlretrieve(urltoopen, completeNameofFile)
         except IOError:
-            self.functionNotYetImplemented()
+            outils.functionNotYetImplemented()
         xbmc.log('nom du fichier image : ' + completeNameofFile , xbmc.LOGNOTICE)
         return completeNameofFile
         # fin fonction fin fonction get_icon, class Plugin_Generique
@@ -950,7 +923,7 @@ class MyMusicPlugin(pyxbmctExtended.BackgroundDialogWindow):
             urllib.urlretrieve(urlimage, completeNameofFile)
         except IOError:
             pass
-            self.functionNotYetImplemented()
+            outils.functionNotYetImplemented()
         
         xbmc.log('nom du fichier image : ' + completeNameofFile , xbmc.LOGNOTICE)
         return completeNameofFile

@@ -29,6 +29,7 @@ import time
 from resources.lib import ConnexionClient
 from resources.lib import outils, Ecoute
 from resources.lib import pyxbmctExtended
+from resources.lib.outils import debug
 
 TIME_OF_LOOP_SUBSCRIBE = Ecoute.TIME_OF_LOOP_SUBSCRIBE
 
@@ -173,6 +174,13 @@ class SlimIsPlaying(pyxbmctExtended.BackgroundDialogWindow):
         self.NowIsPlaying = True    # this is a flag for the main Loop in the method update
         self.threadRunning = True
         self.flagStatePause = False
+        # initial setup to have self.InterfaceCli when update_now_is_playing() run inside this class :
+        self.get_playerid()
+        self.connectInterface()
+        self.get_ident_server()
+
+        debug('server : ' + self.nomserver + ' - ' + self.lmsip + ' : ' + self.lmswebport, xbmc.LOGNOTICE)
+        debug('player : ' + self.playerid, xbmc.LOGNOTICE)
 
         SIZESCREEN_HEIGHT = xbmcgui.getScreenHeight()            # exemple  # 1080
         SIZESCREEN_WIDTH = xbmcgui.getScreenWidth()                         # 1920
@@ -447,8 +455,12 @@ class SlimIsPlaying(pyxbmctExtended.BackgroundDialogWindow):
         filename = 'pochette' + str(compteur) + '.tmp'
         completeNameofFile = os.path.join(savepath , filename )
         xbmc.log('filename tmp : ' + str(completeNameofFile), xbmc.LOGNOTICE)
-        urllib.urlretrieve(urlcover , completeNameofFile)
-        self.pochette.setImage(completeNameofFile) # fonction d'xbmcgui
+        try:
+            urllib.urlretrieve(urlcover , completeNameofFile)
+            self.pochette.setImage(completeNameofFile)  # fonction d'xbmcgui
+        except:
+            debug('Erreur pour update coverbox in FramePlaying', xbmc.LOGNOTICE)
+
         #os.remove(completeNameofFile)  # suppression du fichier
         # fin fonction update_cover
 
@@ -490,7 +502,7 @@ class SlimIsPlaying(pyxbmctExtended.BackgroundDialogWindow):
         # todo Q : comment faire la gestion de l'arret de la boucle de souscription ?
 
         # there is no Abonnement in this class -> need to find something else
-        while self.NowIsPlaying:    # this is a flag
+        while self.NowIsPlaying:    # this is a boolean flag
             time.sleep(0.5)
 
             timeoutdeTestdelaBoucle = time.time() + 60 * 2  # 2 minutes from now -for testing
@@ -505,33 +517,10 @@ class SlimIsPlaying(pyxbmctExtended.BackgroundDialogWindow):
                     xbmc.log('Timeout : break A  ', xbmc.LOGNOTICE)
                     break
 
-                if xbmc.Monitor().waitForAbort(0.):
+                if xbmc.Monitor().waitForAbort(0.5):
                     self.breakBoucle_A = True
                     self.NowIsPlaying = True
-                #xbmc.log('trame recue suite à suscribe : ' + str(pourLog), xbmc.LOGDEBUG)
-                ('\n'
-                 '  exemple RadioParadise :\n'
-                 '  b8:27:eb:cf:f2:c0 status - 2 subscribe:30 rescan:1 player_name:piCorePlayer player_connected:1 \n'
-                 '  player_ip:192.168.1.15:35182 power:1 signalstrength:0 mode:play remote:1 \n'
-                 '  -----------------------------------------------------------------------------------------------------  '
-                 '  current_title:Echo & the Bunnymen  -  The Killing Moon time:1511.89265412712 rate:1 \n'
-                 '  sync_master:b8:27:eb:cf:f2:c0 sync_slaves:00:04:20:17:1c:44 mixer volume:42 playlist repeat:0 \n'
-                 '  playlist shuffle:0 playlist mode:off seq_no:0 playlist_cur_index:0 playlist_timestamp:1573925050.19126 \n'
-                 '  playlist_tracks:1 digital_volume_control:1 remoteMeta:HASH(0x8bf3bd8) playlist index:0 id:-93629680 \n'
-                 '  title: The Killing Moon\n'
-                 '\n'
-                 '                        ')
-                '''
-                exemple musique random :               
-                b8:27:eb:cf:f2:c0 status - 2 subscribe:30 player_name:piCorePlayer player_connected:1 
-                player_ip:192.168.1.15:55850 power:1 signalstrength:0 mode:play 
-                ---------------------------------------------------------------------------------------------
-                time:100.483604986191 rate:1 duration:314.826 can_seek:1 sync_master:b8:27:eb:cf:f2:c0 
-                sync_slaves:00:04:20:17:1c:44 mixer volume:36 playlist repeat:0 playlist shuffle:0 playlist mode:off 
-                seq_no:0 playlist_cur_index:10 playlist_timestamp:1573565762.11147 playlist_tracks:21 
-                digital_volume_control:1 playlist index:10 id:23149 title:Boogie On Reggae Woman 
-                playlist index:11 id:26702 title:Tears Dry On Their Own'
-                '''
+
                 #exemple playlist:
                 # 00:04:20:17:1
                 # c:44 | status | 0 | 200 | subscribe:10 | player_name:Squeezebox
@@ -559,7 +548,7 @@ class SlimIsPlaying(pyxbmctExtended.BackgroundDialogWindow):
                     break
                 xbmc.log( '2eme ligne, recupropre = ' + str(recupropre), xbmc.LOGNOTICE)
 
-                if recupropre.startwith('quit'):
+                if recupropre.startswith('quit'):
                     xbmc.log('recu quit in update in FramePlaying', xbmc.LOGNOTICE)
                     self.NowIsPlaying = False
                     break
@@ -616,9 +605,12 @@ class SlimIsPlaying(pyxbmctExtended.BackgroundDialogWindow):
                 except KeyError:
                     self.labelduree_fin.setLabel(label= outils.getInHMS(0.0))
 
+                # Todo : if it is a playlist it is not the same struct
+                # so 'title' , 'time' and so on doesn't exist
                 try:
                     nouveautitre = dico['title']
                 except KeyError:
+                    nouveautitre = ''
                     pass
 
                 if not ( nouveautitre == titreenlecture ):

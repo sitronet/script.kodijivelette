@@ -76,6 +76,14 @@ class WhereIsTheLMSServer():
         # par le propriétaire du serveur LMS
         self.Etape = ''
 
+    @property
+    def lmsIP(self):
+        return self.LMSCLIip
+
+    @property
+    def lmsWebPort(self):
+        return self.LMSwebport
+
     def decodageduDataGram(self, reponse):
         """
         Decodage du DataGram
@@ -988,6 +996,10 @@ def debug(message, level=DEBUG_LEVEL):
     # Format the message and send to the logfile
     message = u"{}: {}".format(ADDON_ID, message)
     xbmc.log(msg=message.encode("utf-8"), level=level)
+
+def functionNotYetImplemented():
+    dialog = xbmcgui.Dialog()
+    dialog.notification('nobody is perfect', 'This function is not yet implemented', xbmcgui.NOTIFICATION_INFO, 5000)
 
 
 

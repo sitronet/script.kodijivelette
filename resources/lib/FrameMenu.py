@@ -752,8 +752,8 @@ class fenetreMenu(pyxbmct.AddonFullWindow):
                 self.launchPlayingNowandOthersCommands(labelajouer)
 
         else:
-            notFinish = Plugin.Plugin_Generique(self)
-            notFinish.functionNotYetImplemented()
+            outils.functionNotYetImplemented()
+
 
     def navigationFromMenuInitialisationServer(self):
         # is this below necessary ?
@@ -1062,7 +1062,7 @@ class fenetreMenu(pyxbmct.AddonFullWindow):
             self.listMenu_Feuilles_all_Albums.setVisible(False)
             self.listMenu_Feuilles.setVisible(True)
             self.listMenu_Feuilles.reset()
-            self.functionNotYetImplemented(self.listMenu_Feuilles)
+            outils.functionNotYetImplemented()
 
     def navigationFromMenuBranche(self):
 
@@ -1380,10 +1380,11 @@ class fenetreMenu(pyxbmct.AddonFullWindow):
             #self.players_action()
         elif NumeroItemSelectionBranche == 1:
             self.listMenu_Feuilles_Extras.reset()
-            self.functionNotYetImplemented(self.listMenu_Feuilles_Extras)
+            outils.functionNotYetImplemented()
+
         elif NumeroItemSelectionBranche == 2:
             self.listMenu_Feuilles_Extras.reset()
-            self.functionNotYetImplemented(self.listMenu_Feuilles_Extras)
+            outils.functionNotYetImplemented()
 
     def navigationFromMenuFeuillesExtras(self):
 
@@ -2170,7 +2171,8 @@ class fenetreMenu(pyxbmct.AddonFullWindow):
                      break
 
 
-                listeB = recupropre.split('subscribe:' + TIME_OF_LOOP_SUBSCRIBE +'|')  # on élimine le début de la trame # attention doit correpondre à
+                listeB = recupropre.split('subscribe:' + TIME_OF_LOOP_SUBSCRIBE +'|')
+                # on élimine le début de la trame # attention doit correpondre à
                 # la même valeur de subscribe dans Ecoute.py
                 try:
                     textC = listeB[1]  # on conserve la deuximème trame après suscribe...
@@ -2222,9 +2224,13 @@ class fenetreMenu(pyxbmct.AddonFullWindow):
                 except KeyError:
                     self.jivelette.labelduree_fin.setLabel(label= outils.getInHMS(0.0))
 
+                # Todo : if it is a playlist it is not the same struct
+                # so 'title' , 'time' and so on doesn't exist
+
                 try:
                     nouveautitre = dico['title']
                 except KeyError:
+                    nouveautitre = ''
                     pass
 
                 if not nouveautitre == titreenlecture:
@@ -2473,7 +2479,7 @@ class fenetreMenu(pyxbmct.AddonFullWindow):
     # root ->   branchs ->  leaves - >  flowers -> stamens
 
     def les_menus_feuilles_Extras(self, numeroItemSelectionBranche):
-        self.functionNotYetImplemented((self.listMenu_Feuilles))
+        outils.functionNotYetImplemented()
 
     def get_artwork(self, index , artwork_track_id):
         '''
@@ -2497,23 +2503,6 @@ class fenetreMenu(pyxbmct.AddonFullWindow):
         # fin fonction fin fonction get_icon, class Plugin_Generique
         # test
 
-
-    def functionNotYetImplemented(self, menu):
-        itemdeListe_1 = xbmcgui.ListItem()
-        itemdeListe_1.setLabel('Not Yet')
-        menu.addItem(itemdeListe_1)
-        #itemdeListe_2 = xbmcgui.ListItem() # attention nouvelle référence sinon utiliser itemdeListe.copy()
-        #itemdeListe_2.setLabel('Yet')
-        #menu.addItem(itemdeListe_2)
-        itemdeListe_3= xbmcgui.ListItem()
-        itemdeListe_3.setLabel('Implemented')
-        menu.addItem(itemdeListe_3)
-        itemdeListe_4 = xbmcgui.ListItem()
-        itemdeListe_4.setLabel('correctly')
-        menu.addItem(itemdeListe_4)
-        itemdeListe_5 = xbmcgui.ListItem()
-        itemdeListe_5.setLabel('need more stuff')
-        menu.addItem(itemdeListe_5)
 
     def functionNotPossible(self, menu):
         itemdeListe_3= xbmcgui.ListItem()

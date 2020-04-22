@@ -355,14 +355,14 @@ class ViewListPlugin(pyxbmctExtended.BackgroundDialogWindow):
             xbmc.log('texte_a_traiter : ' +  str(texte_en_liste_a_traiter) , xbmc.LOGNOTICE )
             if texte_en_liste_a_traiter == ['']:
                 # erreur dans la réponse
-                self.functionNotYetImplemented()
+                outils.functionNotYetImplemented()
                 return
 
             #exemple : ["00:04:20:17:1c:44|picks|items|0|count|item_id:46dc1389.0|title:Andy's Picks", '3']
             try:
                 nombreDItemsapplications = texte_en_liste_a_traiter.pop()
             except IndexError:
-                self.functionNotYetImplemented()
+                outils.functionNotYetImplemented()
                 return
             texte_a_traiter_titre = texte_en_liste_a_traiter.pop()
             texte_en_liste_a_traiter_titre = texte_a_traiter_titre.split('title:')
@@ -371,7 +371,7 @@ class ViewListPlugin(pyxbmctExtended.BackgroundDialogWindow):
             try:
                 title = texte_en_liste_a_traiter_titre.pop()
             except IndexError:
-                self.functionNotYetImplemented()
+                outils.functionNotYetImplemented()
             #if nombreDItemsapplications > 9:
             # turn 8 by 8 (step 8)
             #self.longListing.title_label.setLabel(title)
@@ -448,7 +448,7 @@ class ViewListPlugin(pyxbmctExtended.BackgroundDialogWindow):
                     xbmc.log('FrameList.py : ligne 422 : ' + str(lachainedesItemsFleurs) , xbmc.LOGNOTICE)
                 except IndexError:
                     xbmc.log('FrameList.py : functionNotYetImplemented Ligne 422', xbmc.LOGNOTICE)
-                    self.functionNotYetImplemented()
+                    outils.functionNotYetImplemented()
                     return
 
                 index = 0
@@ -488,35 +488,7 @@ class ViewListPlugin(pyxbmctExtended.BackgroundDialogWindow):
                     self.listMenu_2.addItem(item)
 
 
-            #self.functionNotYetImplemented()
-
-
-    def functionNotYetImplemented(self):
-        '''
-        print in a menu (n°4) of the screen
-        perhaps it could rather alert in  a dialogbox ? (todo)
-        :return:
-        '''
-
-        self.title_label.setLabel('Nobody is perfect')
-
-        itemdeListe_1 = xbmcgui.ListItem()
-        itemdeListe_1.setLabel('function Not Yet')
-        self.listMenu_4.addItem(itemdeListe_1)
-
-        itemdeListe_2= xbmcgui.ListItem()
-        itemdeListe_2.setLabel('Implemented')
-        self.listMenu_4.addItem(itemdeListe_2)
-
-        itemdeListe_3 = xbmcgui.ListItem()
-        itemdeListe_3.setLabel('correctly')
-        self.listMenu_4.addItem(itemdeListe_3)
-
-        itemdeListe_4 = xbmcgui.ListItem()
-        itemdeListe_4.setLabel('need more stuff')
-        self.listMenu_4.addItem(itemdeListe_4)
-
-        # fin fonction fin fonction functionNotYetImplemented, class Plugin_Generique
+            #outils.functionNotYetImplemented()
 
     # copier/coller de la fonction de FrameMenu.py
     def update_now_is_playing(self):
@@ -715,7 +687,7 @@ class ViewListPlugin(pyxbmctExtended.BackgroundDialogWindow):
         try:
             urllib.urlretrieve(urltoopen, completeNameofFile)
         except IOError:
-            self.functionNotYetImplemented()
+            outils.functionNotYetImplemented()
         xbmc.log('nom du fichier image : ' + completeNameofFile , xbmc.LOGNOTICE)
         return completeNameofFile
         # fin fonction fin fonction get_icon, class Plugin_Generique

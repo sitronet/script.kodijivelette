@@ -31,7 +31,8 @@ import time
 
 from resources.lib import ConnexionClient, Ecoute, FrameList, FrameMyMusic, FramePLaying,  outils ,  FrameMenuFavorites
 
-ARTWORK = xbmc.translatePath(os.path.join(ADDON.getAddonInfo('path'), 'resources', 'skins', 'Default', 'media', 'Slimserver'))
+ARTWORK = xbmc.translatePath(os.path.join(ADDON.getAddonInfo('path'), 'resources', 'skins', 'Default', 'media'))
+ARTWORK_SLIM = xbmc.translatePath(os.path.join(ADDON.getAddonInfo('path'), 'resources', 'skins', 'Default', 'media', 'Slimserver'))
 
 TAGS = 'aCdejJKlstuwxy'
 
@@ -39,12 +40,22 @@ class Plugin_Generique():
 
     def __init__(self, parent):
 
+        # todo : replace parent by the functions to initialize
         self.origine = parent
-        self.origine.InterfaceCLI.viderLeBuffer()
+
+        #self.origine.InterfaceCLI.viderLeBuffer()
+
+        self.get_ident_server()
+        self.get_playerid()
+        self.connectInterface()
+
+        self.InterfaceCLI.viderLeBuffer()
 
         self.image_dir = ARTWORK
+        self.image_slim = ARTWORK_SLIM
 
-        self.image_folder = self.image_dir + '/icon_folder.png'
+        self.image_folder = self.image_slim + '/icon_folder.png'
+        self.image_musique = self.image_dir + '/music.png'
 
 
     def le_menu_branche(self, plugin):
@@ -69,7 +80,7 @@ class Plugin_Generique():
             xbmc.log('nbre d items du plugin : ' + nombreD_items_a_traiter, xbmc.LOGNOTICE)
         except IndexError:
             # skip to end
-            self.origine.functionNotYetImplemented(self.origine.listMenu_Fleur)
+            outils.functionNotYetImplemented()
             return
 
         self.origine.InterfaceCLI.sendtoCLISomething(plugin + ' 0 ' + nombreD_items_a_traiter)
@@ -109,7 +120,7 @@ class Plugin_Generique():
             try:
                 listeTempUnPlugin = unItemBrut.split('|')
             except IndexError:
-                self.origine.functionNotYetImplemented()
+                outils.functionNotYetImplemented()
                 return
             for unchamps in listeTempUnPlugin:
                 key, value = unchamps.split(':', 1)
@@ -148,7 +159,7 @@ class Plugin_Generique():
         try:
             nombreDItemsApplication = nbre_a_traiter.pop()
         except IndexError:
-            self.functionNotYetImplemented()
+            outils.functionNotYetImplemented()
             return
         # TODO : if count greater than X : cut the request in pièce not more 5 or 8
         start = '0'
@@ -158,7 +169,7 @@ class Plugin_Generique():
         try:
             lachainedesItemsApps = lesItemsApps[1].split('|')
         except IndexError:
-            self.functionNotYetImplemented()
+            outils.functionNotYetImplemented()
             return
         listedesdictionnairedesItemsApps = [{} for _ in range(int(nombreDItemsApplication)  )]  # magic word
         # for now listedesdictionnairedesItemsApps is : [ {}, {}, {}, {}, {}, {}, {}, {} ]
@@ -168,7 +179,7 @@ class Plugin_Generique():
             try:
                 clef, valeur = chaine.split(':', 1)
             except ValueError:
-                self.functionNotYetImplemented()
+                outils.functionNotYetImplemented()
 
             if clef == 'title':
                 pass
@@ -248,14 +259,16 @@ class Plugin_Generique():
             xbmc.log('texte_a_traiter : ' +  str(texte_en_liste_a_traiter) , xbmc.LOGNOTICE )
             if texte_en_liste_a_traiter == ['']:
                 # erreur dans la réponse
-                self.functionNotYetImplemented()
+                outils.functionNotYetImplemented()
+
                 return
 
             #exemple : ["00:04:20:17:1c:44|picks|items|0|count|item_id:46dc1389.0|title:Andy's Picks", '3']
             try:
                 nombreDItemsapplications = texte_en_liste_a_traiter.pop()
             except IndexError:
-                self.functionNotYetImplemented()
+                outils.functionNotYetImplemented()
+
                 return
             try:
                 texte_a_traiter_titre = texte_en_liste_a_traiter.pop()
@@ -267,7 +280,8 @@ class Plugin_Generique():
             try:
                 title = texte_en_liste_a_traiter_titre.pop()
             except IndexError:
-                self.functionNotYetImplemented()
+                outils.functionNotYetImplemented()
+
             #if nombreDItemsapplications > 9:
             # turn 8 by 8 (step 8)
             #self.longListing.title_label.setLabel(title)
@@ -326,7 +340,8 @@ class Plugin_Generique():
                 try:
                     lesItemsFleurs_text = lesItemsFleurs[1]
                 except IndexError:
-                    self.functionNotYetImplemented()
+                    outils.functionNotYetImplemented()
+
                     return
                 try:
                     xbmc.log('lesItemsFleurs_text : ' + lesItemsFleurs_text, xbmc.LOGDEBUG )
@@ -340,7 +355,8 @@ class Plugin_Generique():
                     lesItemsFleursNormalised = lesItemsFleurs_text[index_du_fin_de_titre + 1 : index_du_count]
                     xbmc.log('lesItemsFleursNormalised : ' + lesItemsFleursNormalised, xbmc.LOGNOTICE )
                 except:
-                    self.functionNotYetImplemented()
+                    outils.functionNotYetImplemented()
+
                     return
 
                 '''
@@ -355,7 +371,8 @@ class Plugin_Generique():
                     xbmc.log('ligne 317 : ' + str(lachainedesItemsFleurs) , xbmc.LOGNOTICE)
                 except:
                     xbmc.log('functionNotYetImplemented Ligne 323', xbmc.LOGNOTICE)
-                    self.functionNotYetImplemented()
+                    outils.functionNotYetImplemented()
+
                     return
 
                 index = 0
@@ -426,38 +443,28 @@ class Plugin_Generique():
         try:
             urllib.urlretrieve(urltoopen, completeNameofFile)
         except IOError:
-            self.functionNotYetImplemented()
+            outils.functionNotYetImplemented()
+
         xbmc.log('nom du fichier image : ' + completeNameofFile , xbmc.LOGNOTICE)
         return completeNameofFile
         # fin fonction fin fonction get_icon, class Plugin_Generique
 
+    def get_artwork(self, hashcode_artwork):
+        # http://<server>:<port>/music/<track_id>/cover.jpg
+        filename = 'icon.image_' + str(hashcode_artwork) + '.tmp'
+        completeNameofFile = os.path.join(savepath, filename)
 
-    def functionNotYetImplemented(self):
-        #self.erreur = FrameList.ViewListPlugin('Error inside the code')
-        self.erreur = FrameList.ViewListPlugin()
+        urlimage = 'http://' + self.lmsip + ':' + self.lmswebport + '/music/' + str(hashcode_artwork) + '/cover.jpg'
 
-        self.erreur.title_label.setLabel('Nobody is perfect')
+        try:
+            urllib.urlretrieve(urlimage, completeNameofFile)
+        except IOError:
+            pass
+            outils.functionNotYetImplemented()
 
-        self.erreur.listMenu_2.reset()
+        xbmc.log('nom du fichier image : ' + completeNameofFile, xbmc.LOGNOTICE)
+        return completeNameofFile
 
-        itemdeListe_1 = xbmcgui.ListItem()
-        itemdeListe_1.setLabel('Not Yet')
-        self.erreur.listMenu_2.addItem(itemdeListe_1)
-
-        itemdeListe_2= xbmcgui.ListItem()
-        itemdeListe_2.setLabel('Implemented')
-        self.erreur.listMenu_2.addItem(itemdeListe_2)
-
-        itemdeListe_3 = xbmcgui.ListItem()
-        itemdeListe_3.setLabel('correctly')
-        self.erreur.listMenu_2.addItem(itemdeListe_3)
-
-        itemdeListe_4 = xbmcgui.ListItem()
-        itemdeListe_4.setLabel('need more stuff')
-        self.erreur.listMenu_2.addItem(itemdeListe_4)
-
-        self.erreur.doModal()
-        # fin fonction fin fonction functionNotYetImplemented, class Plugin_Generique
 
     def connectInterface(self):
         self.InterfaceCLI = ConnexionClient.InterfaceCLIduLMS()
@@ -513,7 +520,7 @@ class Plugin_Favorites(Plugin_Generique):
             xbmc.log('nbre d items du plugin : ' + nombreD_items_a_traiter, xbmc.LOGNOTICE)
         except IndexError:
             # skip to end
-            self.origine.functionNotYetImplemented(menu=self.origine.listMenu_Branches)
+            outils.functionNotYetImplemented()
             return
         '''
         exemple favorites items  :
@@ -536,7 +543,8 @@ class Plugin_Favorites(Plugin_Generique):
         try:
             lachainedesItemsApps = lesItemsApps[1].split('|')
         except IndexError:
-            self.functionNotYetImplemented()
+            outils.functionNotYetImplemented()
+
             return
         listedesdictionnairedesItemsApps = [{} for _ in range(int(nombreD_items_a_traiter))]  # magic word
         # for now listedesdictionnairedesItemsApps is : [ {}, {}, {}, {}, {}, {}, {}, {} ]
@@ -546,7 +554,8 @@ class Plugin_Favorites(Plugin_Generique):
             try:
                 clef, valeur = chaine.split(':', 1)
             except ValueError:
-                self.functionNotYetImplemented()
+                outils.functionNotYetImplemented()
+
 
             if clef == 'title':
                 pass
@@ -662,7 +671,8 @@ class Plugin_Favorites(Plugin_Generique):
 
         else:
             # in case we have to dig one more time , it shouldn't happens
-            self.functionNotYetImplemented()
+            outils.functionNotYetImplemented()
+
 
         # fin fonction le_menu_feuille, surcharge dans class Plugin_Favorites
 
@@ -672,6 +682,20 @@ class MyMusic(Plugin_Generique):
     there are many ways to put the songs by artist, by album, by genre or anything else.
 
     '''
+
+    #def __init__(self, *args, **kwargs):
+
+    #def __init__(self, parent):
+
+        #super(MyMusic, self).__init__(parent) #ca marche pas ça : TypeError
+
+        #self.origine = parent
+
+        #self.get_playerid()
+        #self.get_ident_server()
+        #self.connectInterface()
+        #self.InterfaceCLI.viderLeBuffer()
+
     def le_menu_feuille(self, numeroItemSelectionBranche):
         '''
          (listMenu_Racine) item : My Music-> (listMenu_MyMusic) iem : All Artist -> (by menu_feuille : listMenu_Feuilles_all_artists)
@@ -699,7 +723,8 @@ class MyMusic(Plugin_Generique):
             numeroItemSelectionBranche == 10 or \
             numeroItemSelectionBranche == 11:
             
-            self.functionNotYetImplemented()    
+            outils.functionNotYetImplemented()
+    
 
         elif numeroItemSelectionBranche == 3:  # liste 'all Albums
             xbmc.log(' entrée dans le menu all albums du_plugin MyMusic', xbmc.LOGNOTICE)
@@ -714,7 +739,8 @@ class MyMusic(Plugin_Generique):
                 nbre_a_traiter = reponse.split('|')
                 nbre_total_albums = nbre_a_traiter.pop()
             except IndexError:
-                self.functionNotYetImplemented()
+                outils.functionNotYetImplemented()
+
                 return
 
             buddydialog = xbmcgui.DialogProgress()
@@ -760,7 +786,8 @@ class MyMusic(Plugin_Generique):
 
                     lesItemsAlbums_text = lesItemsAlbums[0]
                 except IndexError:
-                    self.functionNotYetImplemented()
+                    outils.functionNotYetImplemented()
+
                     return
                 # trim the head :
                 try:
@@ -771,7 +798,8 @@ class MyMusic(Plugin_Generique):
                     lesItemsAlbumsNormalised = lesItemsAlbums_text[index_du_fin_de_titre : ]
                     xbmc.log('les Items Albums Normalised : ' + lesItemsAlbumsNormalised, xbmc.LOGNOTICE)
                 except:
-                    self.functionNotYetImplemented()
+                    outils.functionNotYetImplemented()
+
                     return
 
                 # here we have a nice string of albums ' id:xxx|album:AAAA|id:yyy|album:BBBB etc...
@@ -780,7 +808,8 @@ class MyMusic(Plugin_Generique):
                     xbmc.log('chaine des items albums  : ' + str(lachainedesItemsAlbums), xbmc.LOGDEBUG)
                 except:
                     xbmc.log('functionNotYetImplemented recherche Album plugin.py', xbmc.LOGNOTICE)
-                    self.functionNotYetImplemented()
+                    outils.functionNotYetImplemented()
+
                     return
 
                 itemtampon = xbmcgui.ListItem()     # prepare le menulist
@@ -824,7 +853,8 @@ class MyMusic(Plugin_Generique):
             try:
                 nombreDItems = nbre_a_traiter.pop()
             except IndexError:
-                self.functionNotYetImplemented()
+                outils.functionNotYetImplemented()
+
                 return
 
             # calcul de la répartition sur 3 colonnes :
@@ -876,7 +906,8 @@ class MyMusic(Plugin_Generique):
 
                     lesItemsArtists_text = lesItemsArtists[0]
                 except IndexError:
-                    self.functionNotYetImplemented()
+                    outils.functionNotYetImplemented()
+
                     return
 
                 try:
@@ -887,7 +918,8 @@ class MyMusic(Plugin_Generique):
                     lesItemsArtistsNormalised = lesItemsArtists_text[index_du_fin_de_titre : ]
                     xbmc.log('lesItemsArtistsNormalised : ' + lesItemsArtistsNormalised, xbmc.LOGDEBUG)
                 except:
-                    self.functionNotYetImplemented()
+                    outils.functionNotYetImplemented()
+
                     return
 
                 try:
@@ -895,7 +927,8 @@ class MyMusic(Plugin_Generique):
                     xbmc.log('plugin_mymusic , ligne xxx : ' + str(lachainedesItemsArtists), xbmc.LOGDEBUG)
                 except:
                     xbmc.log('functionNotYetImplemented  plugin my_music Ligne xxx', xbmc.LOGNOTICE)
-                    self.functionNotYetImplemented()
+                    outils.functionNotYetImplemented()
+
                     return
 
                 itemsArtist = []  # une liste
@@ -957,7 +990,8 @@ class MyMusic(Plugin_Generique):
                 countsplit = count_dossiers.split(':')
                 nbre_total_dossiers = countsplit.pop()
             except IndexError:
-                self.functionNotYetImplemented()
+                outils.functionNotYetImplemented()
+
                 return
 
             buddydialog = xbmcgui.DialogProgress()
@@ -1003,7 +1037,8 @@ class MyMusic(Plugin_Generique):
 
                     lesItemsDossiers_text = lesItemsDossiers[0]
                 except IndexError:
-                    self.functionNotYetImplemented()
+                    outils.functionNotYetImplemented()
+
                     return
                 # trim the head :
                 try:
@@ -1014,7 +1049,8 @@ class MyMusic(Plugin_Generique):
                     lesItemsDossiersNormalised = lesItemsDossiers_text[index_du_fin_de_titre : ]
                     debug('les Items Dossiers Normalised : ' + lesItemsDossiersNormalised, xbmc.LOGNOTICE)
                 except:
-                    self.functionNotYetImplemented()
+                    outils.functionNotYetImplemented()
+
                     return
 
                 # here we have a nice string of albums ' id:xxx|album:AAAA|id:yyy|album:BBBB etc...
@@ -1023,7 +1059,8 @@ class MyMusic(Plugin_Generique):
                     debug('chaine des items albums  : ' + str(lachainedesItemsDossiers))
                 except:
                     debug('functionNotYetImplemented recherche Dossiers plugin.py', xbmc.LOGNOTICE)
-                    self.functionNotYetImplemented()
+                    outils.functionNotYetImplemented()
+
                     return
 
                 itemtampon = xbmcgui.ListItem()     # prepare le menulist
@@ -1127,18 +1164,21 @@ class MyMusic(Plugin_Generique):
             try:
                 nbre_a_traiter = reception.split('count:')
             except ValueError:
-                self.functionNotYetImplemented()
+                outils.functionNotYetImplemented()
+
                 return
 
             try:
                 nombreDItems = nbre_a_traiter.pop()
             except IndexError:
-                self.functionNotYetImplemented()
+                outils.functionNotYetImplemented()
+
                 return
             try:
                 nbreEntier = int(nombreDItems)
             except:
-                self.functionNotYetImplemented()
+                outils.functionNotYetImplemented()
+
                 return
 
             #start = 0
@@ -1160,7 +1200,8 @@ class MyMusic(Plugin_Generique):
                 xbmc.log('Plugin_music:: Fleurs chainedesAlbums : ' + str(lachainedesItemsAlbums), xbmc.LOGNOTICE)
             except:
                 xbmc.log('functionNotYetImplemented plugin_music::fleurs', xbmc.LOGNOTICE)
-                self.functionNotYetImplemented()
+                outils.functionNotYetImplemented()
+
                 return
 
             nombrearanger = 0
@@ -1246,18 +1287,21 @@ class MyMusic(Plugin_Generique):
             try:
                 nbre_a_traiter = reception.split('count:')
             except ValueError:
-                self.functionNotYetImplemented()
+                outils.functionNotYetImplemented()
+
                 return
 
             try:
                 nombreDItems = nbre_a_traiter.pop()
             except IndexError:
-                self.functionNotYetImplemented()
+                outils.functionNotYetImplemented()
+
                 return
             try:
                 nbreEntier = int(nombreDItems)
             except:
-                self.functionNotYetImplemented()
+                outils.functionNotYetImplemented()
+
                 return
 
             # trim head and queue
@@ -1273,7 +1317,8 @@ class MyMusic(Plugin_Generique):
                 xbmc.log('Plugin_music:: Fleurs chainedesAlbums : ' + str(lachainedesItemsAlbums), xbmc.LOGNOTICE)
             except:
                 xbmc.log('functionNotYetImplemented plugin_music::fleurs::Albums', xbmc.LOGNOTICE)
-                self.functionNotYetImplemented()
+                outils.functionNotYetImplemented()
+
                 return
 
             itemtampon = xbmcgui.ListItem()
@@ -1353,18 +1398,21 @@ class MyMusic(Plugin_Generique):
             try:
                 nbre_a_traiter = reception.split('count:')
             except ValueError:
-                self.functionNotYetImplemented()
+                outils.functionNotYetImplemented()
+
                 return
 
             try:
                 nombreDItems = nbre_a_traiter.pop()
             except IndexError:
-                self.functionNotYetImplemented()
+                outils.functionNotYetImplemented()
+
                 return
             try:
                 nbreEntier = int(nombreDItems)
             except:
-                self.functionNotYetImplemented()
+                outils.functionNotYetImplemented()
+
                 return
 
             # trim head and queue
@@ -1380,7 +1428,8 @@ class MyMusic(Plugin_Generique):
                 xbmc.log('Plugin_music:: Fleurs chainedesDossiers : ' + str(lachainedesItemsDossiers), xbmc.LOGNOTICE)
             except:
                 xbmc.log('functionNotYetImplemented plugin_music::fleurs::Dossiers', xbmc.LOGNOTICE)
-                self.functionNotYetImplemented()
+                outils.functionNotYetImplemented()
+
                 return
 
             itemtampon = xbmcgui.ListItem()
@@ -1402,13 +1451,33 @@ class MyMusic(Plugin_Generique):
                     itemtampon.setProperty(clef, valeur)
                     if valeur == 'folder':
                         itemtampon.setArt({'thumb': self.image_folder})
+                    elif valeur == 'track':
+                        debug('set art for track',xbmc.LOGNOTICE)
+                        requete = self.playerid + ' songinfo 0 20 track_id:' + itemtampon.getProperty('id') + ' tags:' + TAGS
+                        self.InterfaceCLI.sendtoCLISomething(requete)
+                        reponse = self.InterfaceCLI.receptionReponseEtDecodage()
+                        chainereponse = reponse.split('|')
+                        matching = [s for s in chainereponse if 'coverart:1' in s]
+                        if matching:
+                            coverartlist =  [s for s in chainereponse if 'artwork_track_id' in s]
+                            try:
+                                chainecoverart = coverartlist.pop()
+                                chainecoverartlist = chainecoverart.split(':')
+                                hascode_coverart = chainecoverartlist.pop()
+                                filename_coverart = self.get_artwork(hashcode_artwork=hascode_coverart)
+                                itemtampon.setArt({'thumb': filename_coverart})
+                            except IndexError:
+                                itemtampon.setArt({'thumb': self.image_musique})
+                        else:
+                            itemtampon.setArt({'thumb': self.image_musique})
+
                     self.myMusic.listMusicFolder.addItem(itemtampon)
                     itemtampon = xbmcgui.ListItem()
 
 
             xbmc.Monitor().waitForAbort()
             del self.myMusic
-        #fin if Dossier
+        #fin if Pluorigine Dossie
     # fin fonction le_menu_fleurs
 # fin class MyMusic
 
@@ -1426,13 +1495,16 @@ class Extras(Plugin_Generique):
     def le_menu_feuille(self, numeroItemSelection):
         if numeroItemSelection == 0:
             # players action
-            self.functionNotYetImplemented()
+            outils.functionNotYetImplemented()
+
             return
         elif numeroItemSelection == 1:
             # music source
-            self.functionNotYetImplemented()
+            outils.functionNotYetImplemented()
+
             return
         elif numeroItemSelection == 2:
             #don't stop the music
-            self.functionNotYetImplemented()
+            outils.functionNotYetImplemented()
+
             return
