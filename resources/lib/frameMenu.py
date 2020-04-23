@@ -24,10 +24,10 @@ import copy
 sys.path.append(os.path.join(os.path.dirname(__file__), "resources", "lib"))
 
 #from outils import WhereIsTheLMSServer
-from resources.lib.ConnexionClient import InterfaceCLIduLMS
+from resources.lib.connexionClient import InterfaceCLIduLMS
 from resources.lib.outils import KODI_VERSION
-from resources.lib.Ecoute import Souscription
-from resources.lib import Ecoute, FramePLaying, FramePlaylist, outils, Plugin
+from resources.lib.ecoute import Souscription
+from resources.lib import ecoute, framePlaying, framePlaylist, outils, plugin
 import json
 #from singleton_decorator import singleton
 
@@ -55,7 +55,7 @@ if Kodi:
 
     # print __language__(32001)
 
-    TIME_OF_LOOP_SUBSCRIBE = Ecoute.TIME_OF_LOOP_SUBSCRIBE
+    TIME_OF_LOOP_SUBSCRIBE = ecoute.TIME_OF_LOOP_SUBSCRIBE
 
     # screen 16:9 so to have grid square fix to 16-9 on 1280 x 720 max of pyxbmct
     SIZE_WIDTH_pyxbmct = 1280
@@ -181,7 +181,7 @@ class MySkin(pyxbmct.Skin):
 pyxbmct.addonwindow.skin = MySkin()
 
 
-# todo : test , try to catch the requete from FrameList (communicate between frame) , is it possible ?
+# todo : test , try to catch the requete from frameList (communicate between frame) , is it possible ?
 
 # Then create your UI window class with the new background
 #class MyCoolWindow(pyxbmct.AddonWindow):
@@ -196,16 +196,16 @@ def singleton(cls):
     return wrapper
 
 #@singleton
-#class fenetreMenu(pyxbmct.AddonFullWindow):    # background (skin) header+ title
-#class fenetreMenu(pyxbmct.AddonDialogWindow):  # background (skin) header+ title + on the top screen
-#class fenetreMenu(pyxbmct.BlankDialogWindow):  # transparent without header+title and on top
-#class fenetreMenu(pyxbmct.BlankFullWindow):    # black background without header+title (cannot change background)
-#class fenetreMenu(pyxbmctExtended.AddonFullWindowWT)  # background (skin) without header+title
-class fenetreMenu(pyxbmct.AddonFullWindow):
+#class FenetreMenu(pyxbmct.AddonFullWindow):    # background (skin) header+ title
+#class FenetreMenu(pyxbmct.AddonDialogWindow):  # background (skin) header+ title + on the top screen
+#class FenetreMenu(pyxbmct.BlankDialogWindow):  # transparent without header+title and on top
+#class FenetreMenu(pyxbmct.BlankFullWindow):    # black background without header+title (cannot change background)
+#class FenetreMenu(pyxbmctExtended.AddonFullWindowWT)  # background (skin) without header+title
+class FenetreMenu(pyxbmct.AddonFullWindow):
 
     def __init__(self,*args, **kwargs):
         #title = args[0]
-        super(fenetreMenu, self).__init__()
+        super(FenetreMenu, self).__init__()
 
         self.Window_is_playing  = xbmcgui.getCurrentWindowId()
         self.flagContextMenu = False
@@ -289,7 +289,7 @@ class fenetreMenu(pyxbmct.AddonFullWindow):
 
 
         else:
-            debug('else condition onAction in FrameMenu' + str(action)  , xbmc.LOGNOTICE)
+            debug('else condition onAction in frameMenu' + str(action)  , xbmc.LOGNOTICE)
             self._executeConnected(action, self.actions_connected)
 
     def quit(self):
@@ -713,9 +713,9 @@ class fenetreMenu(pyxbmct.AddonFullWindow):
 
         self.Abonnement.set()
         # With AddonFullWindow
-        #self.jivelette = FramePLaying.SlimIsPlaying(title)
+        #self.jivelette = framePlaying.SlimIsPlaying(title)
         # With BlankAddonWindow (no title)
-        self.jivelette = FramePLaying.SlimIsPlaying()
+        self.jivelette = framePlaying.SlimIsPlaying()
         # todo test show() or doModal()
         # with show the update is here
         # with doModal the update is in jivelette
@@ -854,14 +854,14 @@ class fenetreMenu(pyxbmct.AddonFullWindow):
         itemSelectionRacine = self.listMenu_Racine.getListItem(self.listMenu_Racine.getSelectedPosition()).getLabel()
 
         if itemSelectionRacine == translation(32040 , 'Now Playing'):
-            # activer frame EcouteEnCours
+            # activer frame ecouteEnCours
             self.Abonnement.set() # need to renew subscribe after interupt
             # With AddonFullWindow
-            # self.jivelette = FramePLaying.SlimIsPlaying(title)
-            #self.jivelette = FramePLaying.SlimIsPlaying(translation(32040, 'Now Playing'))
+            # self.jivelette = framePlaying.SlimIsPlaying(title)
+            #self.jivelette = framePlaying.SlimIsPlaying(translation(32040, 'Now Playing'))
 
             # With BlankAddonWindow (no title)
-            self.jivelette = FramePLaying.SlimIsPlaying()
+            self.jivelette = framePlaying.SlimIsPlaying()
 
             self.WindowPlaying = xbmcgui.getCurrentWindowId()
             debug('fenetre en cours n° : ' + str(self.WindowPlaying), xbmc.LOGDEBUG)
@@ -883,7 +883,7 @@ class fenetreMenu(pyxbmct.AddonFullWindow):
             self.listMenu_Branches.reset()
             self.setFocus(self.listMenu_Branches)
 
-            new_radio = Plugin.Plugin_Generique(parent=self)
+            new_radio = plugin.Plugin_Generique(parent=self)
             self.liste_du_menu_branche_des_plugins = new_radio.le_menu_branche('radios')
             self.setFocus(self.listMenu_Branches)
 
@@ -894,7 +894,7 @@ class fenetreMenu(pyxbmct.AddonFullWindow):
                 self.listMenu_Branches.reset()
                 self.setFocus(self.listMenu_Branches)
 
-                new_apps = Plugin.Plugin_Generique(parent=self)
+                new_apps = plugin.Plugin_Generique(parent=self)
                 self.liste_du_menu_branche_des_plugins = new_apps.le_menu_branche('apps')
                 self.setFocus(self.listMenu_Branches)
 
@@ -905,7 +905,7 @@ class fenetreMenu(pyxbmct.AddonFullWindow):
             if self.can_favorites:
                 self.listMenu_Branches.reset()
 
-                new_favorites = Plugin.Plugin_Favorites(self)
+                new_favorites = plugin.Plugin_Favorites(self)
                 self.liste_du_menu_branche_des_plugins = new_favorites.le_menu_branche('favorites')
             else:
                 self.functionNotPossible(menu=self.listMenu_Branches)
@@ -964,7 +964,7 @@ class fenetreMenu(pyxbmct.AddonFullWindow):
             self.listMenu_Feuilles_all_Artists.controlLeft(self.listMenu_MyMusic)
 
             if not self.all_Artists_populated:
-                new_music = Plugin.MyMusic(self)
+                new_music = plugin.MyMusic(self)
                 new_music.le_menu_feuille(numeroItemSelectionBranche=NumeroItemSelectionBranche)
         
         elif self.itemSelectionBranche == translation(32053 , 'Albums'):
@@ -987,7 +987,7 @@ class fenetreMenu(pyxbmct.AddonFullWindow):
             self.listMenu_Feuilles_all_Albums.controlLeft(self.listMenu_MyMusic)
 
             if not self.all_albums_populated:
-                new_music = Plugin.MyMusic(self)
+                new_music = plugin.MyMusic(self)
                 new_music.le_menu_feuille(numeroItemSelectionBranche=NumeroItemSelectionBranche)
 
         elif self.itemSelectionBranche == translation(32058 , default='Random Mix'):
@@ -1052,7 +1052,7 @@ class fenetreMenu(pyxbmct.AddonFullWindow):
             self.listMenu_Feuilles_all_Dossiers.controlLeft(self.listMenu_MyMusic)
 
             if not self.all_dossiers_populated:
-                new_music = Plugin.MyMusic(self)
+                new_music = plugin.MyMusic(self)
                 new_music.le_menu_feuille(numeroItemSelectionBranche=NumeroItemSelectionBranche)
 
         else:
@@ -1100,11 +1100,11 @@ class fenetreMenu(pyxbmct.AddonFullWindow):
             except:
                 pass
 
-            new_feuille = Plugin.Plugin_Generique(parent=self)
+            new_feuille = plugin.Plugin_Generique(parent=self)
 
         # Todo : delete lines below because we cannot have branch='Favorites'4
         elif self.itemSelectionRacine == translation(32044 , 'Favorites'):
-            new_feuille = Plugin.Plugin_Favorites(self)
+            new_feuille = plugin.Plugin_Favorites(self)
 
         new_feuille.le_menu_feuille(numeroItemSelectionBranche=NumeroItemSelectionBranche)
     # fin fonction navigationFromMenuBranche
@@ -1155,11 +1155,11 @@ class fenetreMenu(pyxbmct.AddonFullWindow):
             self.listMenu_MyMusic.setVisible(True)
 
             if itemSelection:
-                new_menu = Plugin.MyMusic(parent=self)
+                new_menu = plugin.MyMusic(parent=self)
                 new_menu.le_menu_fleurs(itemSelection)
 
         else:
-            new_menu = Plugin.Plugin_Generique(parent=self)
+            new_menu = plugin.Plugin_Generique(parent=self)
             new_menu.le_menu_fleurs(numeroItemSelectionFeuille=NumeroItemSelectionFeuille)
 
     def navigationFromMenuFeuilles_all_Artists(self):
@@ -1206,7 +1206,7 @@ class fenetreMenu(pyxbmct.AddonFullWindow):
         itemalternate = self.listMenu_Feuilles_all_Artists.getSelectedItem().getProperty('artist_id')
         debug('id item artist alternate : ' + str(itemalternate) , xbmc.LOGNOTICE)
 
-        new_menu = Plugin.MyMusic(self)
+        new_menu = plugin.MyMusic(self)
         new_menu.le_menu_fleurs('All Artists' , itemSelection)
     
     def navigationFromMenuFeuilles_all_Albums(self):
@@ -1253,7 +1253,7 @@ class fenetreMenu(pyxbmct.AddonFullWindow):
         itemalternate = self.listMenu_Feuilles_all_Albums.getSelectedItem().getProperty('album_id')
         debug('id item album alternate : ' + str(itemalternate), xbmc.LOGNOTICE)
 
-        new_menu = Plugin.MyMusic(self)
+        new_menu = plugin.MyMusic(self)
         new_menu.le_menu_fleurs('Albums', itemSelection)
     # fin navigationFromMenuDeuilles_all_Albums
 
@@ -1296,8 +1296,7 @@ class fenetreMenu(pyxbmct.AddonFullWindow):
         reponse = self.InterfaceCLI.receptionReponseEtDecodage()
 
         self.Abonnement.set()
-        #self.frameRandomPlay = FramePlaylist.PlaylistPlugin(translation(32040, 'Now playing ') + ' : ' + title)
-        self.frameRandomPlay = FramePlaylist.PlaylistPlugin()
+        self.frameRandomPlay = framePlaylist.PlaylistPlugin()
 
         self.frameRandomPlay.show()
         self.frameRandomPlay.listMenu_playlist.reset()
@@ -1347,7 +1346,7 @@ class fenetreMenu(pyxbmct.AddonFullWindow):
         itemalternate = self.listMenu_Feuilles_all_Dossiers.getSelectedItem().getProperty('folder_id')
         debug('id item folder alternate : ' + str(itemalternate), xbmc.LOGNOTICE)
 
-        new_menu = Plugin.MyMusic(self)
+        new_menu = plugin.MyMusic(self)
         new_menu.le_menu_fleurs('Dossiers', itemSelection)
     # fin navigationFromMenuFeuilles_all_Dossiers
 
@@ -1950,7 +1949,7 @@ class fenetreMenu(pyxbmct.AddonFullWindow):
         self.InterfaceCLI.start()
         while not self.InterfaceCLI.startDone:
             time.sleep(0.1)
-        debug('Connexion vue dans fonction FrameMenu  : ' + str(self.InterfaceCLI.connexionAuServeurReussie), xbmc.LOGNOTICE)
+        debug('Connexion vue dans fonction frameMenu  : ' + str(self.InterfaceCLI.connexionAuServeurReussie), xbmc.LOGNOTICE)
         if self.InterfaceCLI.connexionAuServeurReussie:
             debug('Resultat Connexion  : Bon ' , xbmc.LOGNOTICE)
         else:
@@ -2157,15 +2156,15 @@ class fenetreMenu(pyxbmct.AddonFullWindow):
 
                 recupropre = self.InterfaceCLI.receptionReponseEtDecodage()
 
-                if 'subscribe:-' in recupropre: # fin souscription the resiliersouscription is send by FramePlaying or
+                if 'subscribe:-' in recupropre: # fin souscription the resiliersouscription is send by framePlaying or
                                                 # else diplaying
-                                                # the FramePlaying  exits - function quit()
+                                                # the framePlaying  exits - function quit()
                     self.breakBoucle_A = True
                     self.Abonnement.clear()
                     break
 
                 if recupropre.startswith('quit'):
-                     debug('recu commande quit in update_now_is_playing in FrameMenu')
+                     debug('recu commande quit in update_now_is_playing in frameMenu')
                      self.breakBoucle_A = True
                      self.Abonnement.clear()
                      break
@@ -2173,7 +2172,7 @@ class fenetreMenu(pyxbmct.AddonFullWindow):
 
                 listeB = recupropre.split('subscribe:' + TIME_OF_LOOP_SUBSCRIBE +'|')
                 # on élimine le début de la trame # attention doit correpondre à
-                # la même valeur de subscribe dans Ecoute.py
+                # la même valeur de subscribe dans ecoute.py
                 try:
                     textC = listeB[1]  # on conserve la deuximème trame après suscribe...
                 except IndexError:
@@ -2281,12 +2280,12 @@ class fenetreMenu(pyxbmct.AddonFullWindow):
                 # effacer les boutons :
                 # fin de la boucle A : sortie de subscribe
         # fin boucle while
-        debug('End of Boucle of Squeeze in FrameMenu , Bye', xbmc.LOGNOTICE)
+        debug('End of Boucle of Squeeze in frameMenu , Bye', xbmc.LOGNOTICE)
         self.subscribe.resiliersouscription()
         reponse = self.InterfaceCLI.receptionReponseEtDecodage()
-        debug('Send resiliersouscription in A update now_is_playing() in FrameMenu', xbmc.LOGNOTICE)
+        debug('Send resiliersouscription in A update now_is_playing() in frameMenu', xbmc.LOGNOTICE)
         self.InterfaceCLI.viderLeBuffer()
-        debug('End of fonction update_now_is_playing in FrameMenu , Bye', xbmc.LOGNOTICE)
+        debug('End of fonction update_now_is_playing in frameMenu , Bye', xbmc.LOGNOTICE)
     #fin fonction update_now_is_playing
 
     def stop_now_is_playing(self):
@@ -2295,7 +2294,7 @@ class fenetreMenu(pyxbmct.AddonFullWindow):
     def update_random_mix_Playlist(self):
         '''this is the main loop when prompt the Frame Random playlist'''
 
-        debug(' entrée dans le random mix de la FramePlaylist', xbmc.LOGNOTICE)
+        debug(' entrée dans le random mix de la framePlaylist', xbmc.LOGNOTICE)
         self.Window_is_playing = xbmcgui.getCurrentWindowId()
         #debug('fenetre de player en maj n° : ' + str(self.WindowPlaying), xbmc.LOGDEBUG)
         #debug('nouvelle fenetre de player n° : ' + str(self.Window_is_playing), xbmc.LOGDEBUG)
@@ -2319,9 +2318,9 @@ class fenetreMenu(pyxbmct.AddonFullWindow):
 
             reponse = self.InterfaceCLI.receptionReponseEtDecodage()
 
-            if 'subscribe:-' in reponse:  # fin souscription the resiliersouscription is send by FramePlaying or
+            if 'subscribe:-' in reponse:  # fin souscription the resiliersouscription is send by framePlaying or
                 # else diplaying
-                # the FramePlaying  exits - function quit()
+                # the framePlaying  exits - function quit()
                 #self.breakBoucle_A = True  # must exit the loop A but doesn't exist here
                 self.Abonnement.clear()  # must exit the main loop
                 break
@@ -2467,10 +2466,10 @@ class fenetreMenu(pyxbmct.AddonFullWindow):
             self.frameRandomPlay.labelTitle.setLabel(label='[B]' + artist + '[/B]')
          # end loop While
 
-        debug('End of Boucle in Update random mix in FrameMenu', xbmc.LOGNOTICE)
+        debug('End of Boucle in Update random mix in frameMenu', xbmc.LOGNOTICE)
         self.subscribe.resiliersouscription()
         reponse = self.InterfaceCLI.receptionReponseEtDecodage()
-        debug('Send resiliersouscription in A update_random_mix() in FrameMenu', xbmc.LOGNOTICE)
+        debug('Send resiliersouscription in A update_random_mix() in frameMenu', xbmc.LOGNOTICE)
         self.InterfaceCLI.viderLeBuffer()
     # Fin fonction update_random_mix_Playlist
 

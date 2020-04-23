@@ -15,8 +15,8 @@ import time
 import urllib
 import os
 
-from resources.lib import ConnexionClient, Ecoute, outils
-from resources.lib.Ecoute import Souscription
+from resources.lib import connexionClient, ecoute, outils
+from resources.lib.ecoute import Souscription
 from resources.lib import pyxbmctExtended
 
 
@@ -73,7 +73,7 @@ if Kodi:
     ACTION_VOLUME_DOWN = 89
     ACTION_VOLUME_UP = 88
 
-    TIME_OF_LOOP_SUBSCRIBE = Ecoute.TIME_OF_LOOP_SUBSCRIBE
+    TIME_OF_LOOP_SUBSCRIBE = ecoute.TIME_OF_LOOP_SUBSCRIBE
 
 TAGS = 'aCdejJKlstuwxy'
 
@@ -261,7 +261,7 @@ class PlaylistPlugin(pyxbmctExtended.BackgroundDialogWindow):
         self.placeControl(self.listMenu_playlist , row_depart , col_depart  , espace_row, (SEIZE / 2) - 2 )
 
         # TRES IMPORTANT POUR AVOIR LE FOCUS
-        # Add items to the list , need to ask the focus before filling the list from Plugin.Plugin
+        # Add items to the list , need to ask the focus before filling the list from plugin.Plugin
         self.listMenu_playlist.addItem('')
         self.listMenu_playlist.setEnabled(True)
 
@@ -316,7 +316,7 @@ class PlaylistPlugin(pyxbmctExtended.BackgroundDialogWindow):
             self.promptContextMenu()
 
         else:
-            xbmc.log('else condition onAction in FramePlaylist', xbmc.LOGNOTICE)
+            xbmc.log('else condition onAction in framePlaylist', xbmc.LOGNOTICE)
             self._executeConnected(action, self.actions_connected)
 
     def quit_listing(self):# todo : à tester
@@ -325,9 +325,9 @@ class PlaylistPlugin(pyxbmctExtended.BackgroundDialogWindow):
 
         self.connectInterface()
         self.get_playerid()
-        self.subscribe = Ecoute.Souscription(self.InterfaceCLI, self.playerid )
+        self.subscribe = ecoute.Souscription(self.InterfaceCLI, self.playerid )
         self.subscribe.resiliersouscription()
-        xbmc.log('send resiliersouscription in A quit() FramePlaylist', xbmc.LOGNOTICE)
+        xbmc.log('send resiliersouscription in A quit() framePlaylist', xbmc.LOGNOTICE)
         self.threadRunning = False
         self.close()
 
@@ -376,7 +376,7 @@ class PlaylistPlugin(pyxbmctExtended.BackgroundDialogWindow):
 
     def randomPlaylist(self): # not used , Todo  Delete it or change logic
 
-        xbmc.log(' entrée dans le random mix de la FramePlaylist', xbmc.LOGNOTICE)
+        xbmc.log(' entrée dans le random mix de la framePlaylist', xbmc.LOGNOTICE)
 
         self.connectInterface()
         self.get_ident_server()
@@ -556,7 +556,7 @@ class PlaylistPlugin(pyxbmctExtended.BackgroundDialogWindow):
             return
 
 
-    # copier/coller de la fonction de FrameMenu.py
+    # copier/coller de la fonction de frameMenu.py
     def update_current_track_playing(self): # not yet used , Todo : Delete it or change logic
 
         self.subscribe = Souscription(self.InterfaceCLI, self.playerid )
@@ -585,16 +585,16 @@ class PlaylistPlugin(pyxbmctExtended.BackgroundDialogWindow):
 
             recupropre = self.InterfaceCLI.receptionReponseEtDecodage()
 
-            if 'subscribe:-' in recupropre:  # fin souscription the resiliersouscription is send by FramePlaying or
+            if 'subscribe:-' in recupropre:  # fin souscription the resiliersouscription is send by framePlaying or
                                              # else diplaying
-                                             # the FramePlaying  exits - function quit()
+                                             # the framePlaying  exits - function quit()
                 self.breakBoucle_A = True    # must exit the loop A
                 #self.Abonnement.clear()      # must exit the main loop
                 break
 
             listeB = recupropre.split('subscribe:' + TIME_OF_LOOP_SUBSCRIBE + '|')  # on élimine le début de la trame
             # attention doit correpondre à
-            # la même valeur de subscribe dans Ecoute.py
+            # la même valeur de subscribe dans ecoute.py
             try:
                 textC = listeB[1]  # on conserve la deuximème trame après suscribe...
             except IndexError:
@@ -658,14 +658,14 @@ class PlaylistPlugin(pyxbmctExtended.BackgroundDialogWindow):
 
                 # fin de la boucle A : sortie de subscribe
         # fin boucle while
-        xbmc.log('End of Boucle of update_current_track_playing in FramePlaylist , Bye', xbmc.LOGNOTICE)
+        xbmc.log('End of Boucle of update_current_track_playing in framePlaylist , Bye', xbmc.LOGNOTICE)
         self.subscribe.resiliersouscription()
         #self.InterfaceCLI.viderLeBuffer()
-        xbmc.log('End of fonction update_current_track_playing in FramePlaylist , Bye', xbmc.LOGNOTICE)
+        xbmc.log('End of fonction update_current_track_playing in framePlaylist , Bye', xbmc.LOGNOTICE)
     # fin fonction update_current_track_playing
 
     def connectInterface(self):
-        self.InterfaceCLI = ConnexionClient.InterfaceCLIduLMS()
+        self.InterfaceCLI = connexionClient.InterfaceCLIduLMS()
 
     def get_playerid(self):
         self.Players = outils.WhatAreThePlayers()
@@ -731,7 +731,7 @@ class PlaylistPlugin(pyxbmctExtended.BackgroundDialogWindow):
             dans une autre version on récupère la pochette du serveur grâce au tag fourni
             dans l'information sur la chanson en cours
 
-            Same function in FramePlaying.py (redondance)
+            Same function in framePlaying.py (redondance)
             :param lmsip:
             :param lmswebport:
             :param playerid:

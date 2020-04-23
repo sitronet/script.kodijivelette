@@ -34,7 +34,7 @@ if Kodi:
     ADDONVERSION = ADDON.getAddonInfo('version')
     ARTWORK = xbmc.translatePath(os.path.join(ADDON.getAddonInfo('path'), 'resources', 'skins', 'Default', 'media'))
 
-from resources.lib import FrameMenu
+from resources.lib import frameMenu
 from resources.lib.outils import KODI_VERSION
 
 #__language__ = xbmc.Language(os.getcwd()).getLocalizedString
@@ -57,7 +57,7 @@ def translation(message_id, default=False):
 if __name__ == '__main__':
 
     #fenetredesMenus = FrameMenu.fenetreMenu(translation(32001, 'Home'))
-    fenetredesMenus = FrameMenu.fenetreMenu()
+    fenetredesMenus = frameMenu.fenetreMenu()
 
     fenetredesMenus.doModal()
 

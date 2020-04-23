@@ -5,9 +5,9 @@
 
 Chapitre dict() voir recherchedesPlayers() avec allocation dynamique du nom des dictionnaires
 
-Chapitre Socket : voir le fichier ConnexionClient.py
+Chapitre Socket : voir le fichier connexionClient.py
 
-Chapitre échange de données entre Processus : main program et ConnexionClient.py
+Chapitre échange de données entre Processus : main program et connexionClient.py
 en particulier la fonction SignaAunConsommateur(), la logique adoptée ici n'est pas forcément la meilleure
 mais à mon grand étonnement et bizarrement elle fonctionne
 Voir aussi l'échange de donnée venant de WhereIstheServer.py :
@@ -26,12 +26,12 @@ import random
 import threading
 import time
 
-from resources.lib import ConnexionClient
-from resources.lib import outils, Ecoute
+from resources.lib import connexionClient
+from resources.lib import outils, ecoute
 from resources.lib import pyxbmctExtended
 from resources.lib.outils import debug
 
-TIME_OF_LOOP_SUBSCRIBE = Ecoute.TIME_OF_LOOP_SUBSCRIBE
+TIME_OF_LOOP_SUBSCRIBE = ecoute.TIME_OF_LOOP_SUBSCRIBE
 
 sys.path.append(os.path.join(os.path.dirname(__file__), "resources", "lib"))
 
@@ -366,7 +366,7 @@ class SlimIsPlaying(pyxbmctExtended.BackgroundDialogWindow):
         xbmc.log('fenetre now_is_playing is exiting: ' + str(self.WindowPlayinghere), xbmc.LOGNOTICE)
         self.connectInterface()
         self.get_playerid()
-        #self.subscribe = Ecoute.Souscription(self.InterfaceCLI, self.playerid )
+        #self.subscribe = ecoute.Souscription(self.InterfaceCLI, self.playerid )
         #self.subscribe.resiliersouscription()
         self.InterfaceCLI.sendSignal('quit')
         xbmc.log('sendsignal quit in A quit() FramePlaying', xbmc.LOGNOTICE)
@@ -387,7 +387,7 @@ class SlimIsPlaying(pyxbmctExtended.BackgroundDialogWindow):
             self.bouton_pause.setVisible(True)
             self.flagStatePause = True
             # pause also the subscribe
-            self.subscribe = Ecoute.Souscription(self.InterfaceCLI,
+            self.subscribe = ecoute.Souscription(self.InterfaceCLI,
                                                   self.playerid )
             self.subscribe.resiliersouscription()
             reponse = self.InterfaceCLI.receptionReponseEtDecodage()
@@ -416,13 +416,13 @@ class SlimIsPlaying(pyxbmctExtended.BackgroundDialogWindow):
         # before call the windows volume turn off the subscribe
         self.connectInterface()
         self.get_playerid()
-        self.subscribe = Ecoute.Souscription(self.InterfaceCLI, self.playerid )
+        self.subscribe = ecoute.Souscription(self.InterfaceCLI, self.playerid )
         self.subscribe.resiliersouscription()
         reponse = self.InterfaceCLI.receptionReponseEtDecodage()
         self.InterfaceCLI.viderLeBuffer()
         volumeFrame = outils.VolumeFrameChild()
         volumeFrame.doModal()
-        self.subscribe = Ecoute.Souscription(self.InterfaceCLI, self.playerid )
+        self.subscribe = ecoute.Souscription(self.InterfaceCLI, self.playerid )
         self.subscribe.subscription()
         del volumeFrame
         # then turn on the subscription
@@ -465,7 +465,7 @@ class SlimIsPlaying(pyxbmctExtended.BackgroundDialogWindow):
         # fin fonction update_cover
 
     def connectInterface(self):
-        self.InterfaceCLI = ConnexionClient.InterfaceCLIduLMS()
+        self.InterfaceCLI = connexionClient.InterfaceCLIduLMS()
 
 
     def get_playerid(self):
@@ -479,15 +479,15 @@ class SlimIsPlaying(pyxbmctExtended.BackgroundDialogWindow):
         self.lmswebport = self.Server.LMSwebport
 
     def update_now_is_playing(self):
-        ''' method to use with doModal() in the calling program, for exemple : in FrameMenu.fenetreMenu
-            self.jivelette = FramePLaying.SlimIsPlaying()
+        ''' method to use with doModal() in the calling program, for exemple : in frameMenu.FenetreMenu
+            self.jivelette = framePlaying.SlimIsPlaying()
             self.jivelette.doModal()
             or todo  the fonction is calling by the function calling
             self.jivelette.show()
             self.jivelette.update_now_is_playing()
             This is the main loop when display the Frame Slim is playing
             and the frame use doModal()
-            thereis a similar method inside the class FrameMenu.fenetreMenu when the frame use show()
+            thereis a similar method inside the class frameMenu.FenetreMenu when the frame use show()
             but use a different logic to exit the loop
         '''
         xbmc.log('Entrée dans méthode Update_now_is_playing of FramePlaying', xbmc.LOGNOTICE)
@@ -497,7 +497,7 @@ class SlimIsPlaying(pyxbmctExtended.BackgroundDialogWindow):
         #xbmc.log('nouvelle fenetre de player n° : ' + str(self.Window_is_playing), xbmc.LOGDEBUG)
 
         # activation de la souscription au serveur process
-        self.subscribe = Ecoute.Souscription(self.InterfaceCLI , self.playerid )
+        self.subscribe = ecoute.Souscription(self.InterfaceCLI , self.playerid )
         self.subscribe.subscription()
         # todo Q : comment faire la gestion de l'arret de la boucle de souscription ?
 
@@ -556,7 +556,7 @@ class SlimIsPlaying(pyxbmctExtended.BackgroundDialogWindow):
 
                 listeB = recupropre.split('subscribe:' + TIME_OF_LOOP_SUBSCRIBE +'|')
                 # on élimine le début de la trame # attention doit correpondre à
-                # la même valeur de subscribe dans Ecoute.py
+                # la même valeur de subscribe dans ecoute.py
                 try:
                     textC = listeB[1]           # on conserve la deuximème trame après suscribe...
                 except IndexError:

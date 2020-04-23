@@ -19,8 +19,8 @@ import time
 import copy
 
 from resources.lib import pyxbmctExtended
-from resources.lib import ConnexionClient, Ecoute, FramePLaying, outils
-from resources.lib.Ecoute import Souscription
+from resources.lib import connexionClient, ecoute, framePlaying, outils
+from resources.lib.ecoute import Souscription
 
 
 if Kodi:
@@ -37,7 +37,7 @@ if Kodi:
     global savepath
     savepath = xbmc.translatePath('special://temp')
 
-    TIME_OF_LOOP_SUBCRIBE = Ecoute.TIME_OF_LOOP_SUBSCRIBE
+    TIME_OF_LOOP_SUBCRIBE = ecoute.TIME_OF_LOOP_SUBSCRIBE
 
     # Kodi key action codes.
     # More codes available in xbmcgui module
@@ -212,9 +212,9 @@ class FavoritesMenu(pyxbmctExtended.BackgroundDialogWindow):
                 reponse = self.InterfaceCLI.receptionReponseEtDecodage()
                 del reponse
 
-                # then launch now is playing FramePlaying
+                # then launch now is playing framePlaying
                 self.Abonnement.set() # need to renew subscribe after interupt
-                self.jivelette = FramePLaying.SlimIsPlaying()
+                self.jivelette = framePlaying.SlimIsPlaying()
 
                 self.WindowPlaying = xbmcgui.getCurrentWindowId()
                 xbmc.log('fenetre en cours n° : ' + str(self.WindowPlaying), xbmc.LOGNOTICE)
@@ -232,9 +232,9 @@ class FavoritesMenu(pyxbmctExtended.BackgroundDialogWindow):
                 pass
     # fin fonction launchPlayingItem
 
-    # copier/coller de la fonction de FrameMenu.py
+    # copier/coller de la fonction de frameMenu.py
     def update_now_is_playing(self):
-        '''copier/coller de la fonction de FrameMenu.py'''
+        '''copier/coller de la fonction deframeMenu.py'''
 
         self.Window_is_playing = xbmcgui.getCurrentWindowId()
 
@@ -263,9 +263,9 @@ class FavoritesMenu(pyxbmctExtended.BackgroundDialogWindow):
 
                 recupropre = self.InterfaceCLI.receptionReponseEtDecodage()
 
-                if 'subscribe:-' in recupropre: # fin souscription the resiliersouscription is send by FramePlaying or
+                if 'subscribe:-' in recupropre: # fin souscription the resiliersouscription is send by framePlaying or
                                                 # else diplaying
-                                                # the FramePlaying  exits - function quit()
+                                                # the framePlaying  exits - function quit()
                     self.breakBoucle_A = True   # must exit the loop A
                     self.Abonnement.clear()     # must exit the main loop
                     break
@@ -363,13 +363,13 @@ class FavoritesMenu(pyxbmctExtended.BackgroundDialogWindow):
         xbmc.log('End of Boucle of Squueze , Bye', xbmc.LOGNOTICE)
         self.subscribe.resiliersouscription()
         reponse = self.InterfaceCLI.receptionReponseEtDecodage()
-        xbmc.log('Send resiliersouscription in A update now_is_playing() in FrameMenuFavorites', xbmc.LOGNOTICE)
+        xbmc.log('Send resiliersouscription in A update now_is_playing() in frameMenuFavorites', xbmc.LOGNOTICE)
         self.InterfaceCLI.viderLeBuffer()
-        xbmc.log('End of fonction update_now_is_playing in FrameMenuFavorites , Bye', xbmc.LOGNOTICE)
+        xbmc.log('End of fonction update_now_is_playing in frameMenuFavorites , Bye', xbmc.LOGNOTICE)
     # fin fonction update_now_is_playing
 
     def connectInterface(self):
-        self.InterfaceCLI = ConnexionClient.InterfaceCLIduLMS()
+        self.InterfaceCLI = connexionClient.InterfaceCLIduLMS()
 
     def get_playerid(self):
         self.Players = outils.WhatAreThePlayers()

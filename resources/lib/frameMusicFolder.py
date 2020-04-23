@@ -13,8 +13,8 @@ import time
 import urllib
 import os
 
-from resources.lib import ConnexionClient, Ecoute, FramePLaying, outils
-from resources.lib.Ecoute import Souscription
+from resources.lib import connexionClient, ecoute, framePlaying, outils
+from resources.lib.ecoute import Souscription
 from resources.lib import pyxbmctExtended
 
 
@@ -62,7 +62,7 @@ if Kodi:
     ACTION_MOUSE_LEFT_CLICK = 100
     """Mouse click"""
 
-    TIME_OF_LOOP_SUBCRIBE = Ecoute.TIME_OF_LOOP_SUBSCRIBE
+    TIME_OF_LOOP_SUBCRIBE = ecoute.TIME_OF_LOOP_SUBSCRIBE
 
     global savepath
     savepath = xbmc.translatePath('special://temp')
@@ -167,7 +167,7 @@ class ViewMusicFolder(pyxbmctExtended.BackgroundDialogWindow):
         self.placeControl(self.listMusicFolder , row_depart , col_depart , espace_row, self.nbre_columns - 6 )
 
         # TRES IMPORTANT POUR AVOIR LE FOCUS
-        # Add items to the list , need to ask the focus before filling the list from Plugin.Plugin
+        # Add items to the list , need to ask the focus before filling the list from plugin.Plugin
         self.listMusicFolder.addItem('.')
         self.listMusicFolder.setEnabled(True)
 
@@ -196,7 +196,7 @@ class ViewMusicFolder(pyxbmctExtended.BackgroundDialogWindow):
             xbmc.log('nav_back' , xbmc.LOGNOTICE)
             self.quit_listing()
         else:
-            xbmc.log('else condition onAction in FrameList' , xbmc.LOGNOTICE)
+            xbmc.log('else condition onAction in frameMusicFolder' , xbmc.LOGNOTICE)
             self._executeConnected(action, self.actions_connected)
 
     def quit_listing(self):# todo : à tester
@@ -389,7 +389,7 @@ class ViewMusicFolder(pyxbmctExtended.BackgroundDialogWindow):
                 debug('fenetre origine n° : ' + str(self.WindowPlaying), xbmc.LOGNOTICE)
 
                 self.Abonnement.set()  # need to renew subscribe after interupt
-                self.jivelette = FramePLaying.SlimIsPlaying()
+                self.jivelette = framePlaying.SlimIsPlaying()
 
                 # todo : test inversion show et doModal
                 self.jivelette.show()
@@ -459,7 +459,7 @@ class ViewMusicFolder(pyxbmctExtended.BackgroundDialogWindow):
                 debug('fenetre origine n° : ' + str(self.WindowPlaying), xbmc.LOGNOTICE)
 
                 self.Abonnement.set()  # need to renew subscribe after interupt
-                self.jivelette = FramePLaying.SlimIsPlaying()
+                self.jivelette = framePlaying.SlimIsPlaying()
 
                 # todo : test inversion show et doModal
                 self.jivelette.show()
@@ -476,7 +476,7 @@ class ViewMusicFolder(pyxbmctExtended.BackgroundDialogWindow):
 
 
 
-    def launchPlayingItem(self, menudeprovenance): # this is a copy from FrameList ? Todo Delete it here
+    def launchPlayingItem(self, menudeprovenance): # this is a copy from frameList ? Todo Delete it here
         ''' when an app or a radio is selected  launch the command to play
         mainly : cmd playlist play item_id
         example : radioparadise playlist play item_id:25478.1
@@ -535,7 +535,7 @@ class ViewMusicFolder(pyxbmctExtended.BackgroundDialogWindow):
 
                 # then launch now is playing FramePlaying
                 self.Abonnement.set() # need to renew subscribe after interupt
-                self.jivelette = FramePLaying.SlimIsPlaying()
+                self.jivelette = framePlaying.SlimIsPlaying()
 
                 self.WindowPlaying = xbmcgui.getCurrentWindowId()
                 xbmc.log('fenetre en cours n° : ' + str(self.WindowPlaying), xbmc.LOGNOTICE)
@@ -657,7 +657,7 @@ class ViewMusicFolder(pyxbmctExtended.BackgroundDialogWindow):
                     lachainedesItemsFleurs = lesItemsFleursNormalised.split('|')#
                     xbmc.log('Frame: ' + str(lachainedesItemsFleurs) , xbmc.LOGNOTICE)
                 except IndexError:
-                    xbmc.log('FrameList.py : functionNotYetImplemented Ligne 422', xbmc.LOGNOTICE)
+                    xbmc.log('frameMusicFolder.py : functionNotYetImplemented', xbmc.LOGNOTICE)
                     outils.functionNotYetImplemented()
                     return
 
@@ -693,7 +693,7 @@ class ViewMusicFolder(pyxbmctExtended.BackgroundDialogWindow):
                         itemtampon.setProperty(clef, valeur)
 
                 for item in itemsFleur:
-                    xbmc.log('ajout de item dans menu FrameList::listMenu_2 : ' + item.getLabel() , xbmc.LOGNOTICE)
+                    xbmc.log('ajout de item dans menu frameList::listMenu_2 : ' + item.getLabel() , xbmc.LOGNOTICE)
                     #self.longListing.ArrayOfMenu[indicedesmenus].addItem(item)
                     self.listMenu_2.addItem(item)
 
@@ -728,9 +728,9 @@ class ViewMusicFolder(pyxbmctExtended.BackgroundDialogWindow):
 
         # fin fonction fin fonction functionNotYetImplemented, class Plugin_Generique
 
-    # copier/coller de la fonction de FrameMenu.py
+    # copier/coller de la fonction de frameMenu.py
     def update_now_is_playing(self):
-        '''copier/coller de la fonction de FrameMenu.py'''
+        '''copier/coller de la fonction de frameMenu.py'''
 
         self.Window_is_playing = xbmcgui.getCurrentWindowId()
         # xbmc.log('fenetre de player en maj n° : ' + str(self.WindowPlaying), xbmc.LOGDEBUG)
@@ -880,16 +880,16 @@ class ViewMusicFolder(pyxbmctExtended.BackgroundDialogWindow):
                     self.Abonnement.clear()
             # fin de la boucle A : sortie de subscribe
         # fin boucle while
-        xbmc.log('End of Boucle of Squeeze in FrameList , Bye', xbmc.LOGNOTICE)
+        xbmc.log('End of Boucle of Squeeze in FrameMusicFolder , Bye', xbmc.LOGNOTICE)
         self.subscribe.resiliersouscription()
         reponse = self.InterfaceCLI.receptionReponseEtDecodage()
-        xbmc.log('Send resiliersouscription in A update now_is_playing() in FrameList', xbmc.LOGNOTICE)
+        xbmc.log('Send resiliersouscription in A update now_is_playing() in frameMusicFolder', xbmc.LOGNOTICE)
         self.InterfaceCLI.viderLeBuffer()
-        xbmc.log('End of fonction update_now_is_playing in FrameList , Bye', xbmc.LOGNOTICE)
+        xbmc.log('End of fonction update_now_is_playing in frameMusicFolder , Bye', xbmc.LOGNOTICE)
     # fin fonction update_now_is_playing
 
     def connectInterface(self):
-        self.InterfaceCLI = ConnexionClient.InterfaceCLIduLMS()
+        self.InterfaceCLI = connexionClient.InterfaceCLIduLMS()
 
     def get_playerid(self):
         self.Players = outils.WhatAreThePlayers()

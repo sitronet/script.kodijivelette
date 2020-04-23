@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-#from ConnexionClient import InterFaceCliduLMS
+#from connexionClient import InterFaceCliduLMS
 import threading
 
 

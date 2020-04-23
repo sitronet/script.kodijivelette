@@ -13,8 +13,8 @@ import time
 import urllib
 import os
 
-from resources.lib import ConnexionClient, Ecoute, outils
-from resources.lib.Ecoute import Souscription
+from resources.lib import connexionClient, ecoute, outils
+from resources.lib.ecoute import Souscription
 from resources.lib import pyxbmctExtended
 
 from resources.lib.outils import debug
@@ -62,7 +62,7 @@ if Kodi:
     ACTION_MOUSE_LEFT_CLICK = 100
     """Mouse click"""
 
-    TIME_OF_LOOP_SUBSCRIBE = Ecoute.TIME_OF_LOOP_SUBSCRIBE
+    TIME_OF_LOOP_SUBSCRIBE = ecoute.TIME_OF_LOOP_SUBSCRIBE
 
 TAGS = 'aCdejJKlstuwxy'
 
@@ -251,12 +251,12 @@ class MyMusic(pyxbmctExtended.BackgroundDialogWindow):
         #xbmc.log('fenetre enregistrée dans methode now_is_playing n° : ' + str(self.Window_is_playing), xbmc.LOGNOTICE) # attribute error here
         #self.Abonnement.clear() # -> AttributeError: 'SlimIsPlaying' object has no attribute 'Abonnement'
         # todo : tester appel fonction du prg principal
-        # FrameMenu.fenetreMenu.desabonner() -> TypeError: unbound method desabonner() must be called with fenetreMenu
+        # frameMenu.FenetreMenu.desabonner() -> TypeError: unbound method desabonner() must be called with FenetreMenu
         # instance as first argument (got nothing instead)
         # self.subscribe.resiliersouscription() # -> AttributeError: 'SlimIsPlaying' object has no attribute subscribe
         self.connectInterface()
         self.get_playerid()
-        self.subscribe = Ecoute.Souscription(self.InterfaceCLI, self.playerid)
+        self.subscribe = ecoute.Souscription(self.InterfaceCLI, self.playerid)
         self.subscribe.resiliersouscription()
         # doit on récupérer la réponse ?
         self.Abonnement.clear()
@@ -540,7 +540,7 @@ class MyMusic(pyxbmctExtended.BackgroundDialogWindow):
                 self.listMenu_playlist.getSelectedPosition()).getProperty('tracked_id')
         self.connectInterface()
         self.get_playerid()
-        self.subscribe = Ecoute.Souscription(self.InterfaceCLI, self.playerid)
+        self.subscribe = ecoute.Souscription(self.InterfaceCLI, self.playerid)
         self.subscribe.resiliersouscription()
         self.InterfaceCLI.viderLeBuffer()
         requete = self.playerid + ' songinfo 0 100 track_id:' + str(track_id)
@@ -559,7 +559,7 @@ class MyMusic(pyxbmctExtended.BackgroundDialogWindow):
         dialogSongInfo = xbmcgui.Dialog()
         dialogSongInfo.textviewer('Song Info : ' + labelajouer , textInfo )
 
-    # copier/coller de la fonction de FrameMenu.py
+    # copier/coller de la fonction de frameMenu.py
     def update_current_track_playing(self):
 
         self.subscribe = Souscription(self.InterfaceCLI, self.playerid )
@@ -605,7 +605,7 @@ class MyMusic(pyxbmctExtended.BackgroundDialogWindow):
 
                 listeB = recupropre.split('subscribe:' + TIME_OF_LOOP_SUBSCRIBE + '|')  # on élimine le début de la trame
                 # attention doit correpondre à
-                # la même valeur de subscribe dans Ecoute.py
+                # la même valeur de subscribe dans ecoute.py
 
                 try:
                     textC = listeB[1]  # on conserve la deuximème trame après suscribe...
@@ -694,7 +694,7 @@ class MyMusic(pyxbmctExtended.BackgroundDialogWindow):
     # fin fonction update_current_track_is_playing
 
     def connectInterface(self):
-        self.InterfaceCLI = ConnexionClient.InterfaceCLIduLMS()
+        self.InterfaceCLI = connexionClient.InterfaceCLIduLMS()
 
     def get_playerid(self):
         self.Players = outils.WhatAreThePlayers()

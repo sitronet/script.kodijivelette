@@ -24,12 +24,11 @@ if Kodi:
 
     from resources.lib.outils import debug
     from resources.lib import frameMusicFolder
-    from resources.lib import frameMyMusic
-    from resources.lib import FrameList
+    from resources.lib import frameList
     from resources.lib import frameMyMusicAllArtists
     from resources.lib import frameMyMusicAlbums
-    from resources.lib import FrameMenuFavorites
-    from resources.lib import ConnexionClient, outils
+    from resources.lib import frameMenuFavorites
+    from resources.lib import connexionClient, outils
 
 import urllib
 import os
@@ -69,7 +68,7 @@ class Plugin_Generique():
         paramètre plugin should be : 'radios' , 'myapps', 'favorites' ...to try
         '''
 
-        xbmc.log(' entrée dans le_menus_Branche_des_Plugins ', xbmc.LOGNOTICE)
+        xbmc.log(' entrée dans le_menus_Branche_des_plugins ', xbmc.LOGNOTICE)
         self.origine.listMenu_Branches.reset()
         self.origine.InterfaceCLI.sendtoCLISomething( plugin + ' 0 count')
         reponse = self.origine.InterfaceCLI.receptionReponseEtDecodage()
@@ -244,8 +243,8 @@ class Plugin_Generique():
         xbmc.log( 'menu fleur , cmd & id ' + cmd + ' ' + item_id , xbmc.LOGNOTICE)
 
         # creation  d'une nouvelle fenêtre
-        #self.longListing = FrameList.ViewListPlugin(labeldetete)
-        self.longListing = FrameList.ViewListPlugin()
+        #self.longListing = frameList.ViewListPlugin(labeldetete)
+        self.longListing = frameList.ViewListPlugin()
         #self.longListing.show()
         #self.longListing.doModal()
 
@@ -412,7 +411,7 @@ class Plugin_Generique():
                         itemtampon.setProperty(clef, valeur)
 
                 for item in itemsFleur:
-                    xbmc.log('ajout de item dans menu FrameList::listMenu_1 : ' + item.getLabel() , xbmc.LOGNOTICE)
+                    xbmc.log('ajout de item dans menu frameList::listMenu_1 : ' + item.getLabel() , xbmc.LOGNOTICE)
                     #self.longListing.ArrayOfMenu[indicedesmenus].addItem(item)
                     self.longListing.listMenu_1.addItem(item)
                     #self.origine.listMenu_Fleur.addItem(item)
@@ -471,7 +470,7 @@ class Plugin_Generique():
 
 
     def connectInterface(self):
-        self.InterfaceCLI = ConnexionClient.InterfaceCLIduLMS()
+        self.InterfaceCLI = connexionClient.InterfaceCLIduLMS()
 
     def get_playerid(self):
         self.Players = outils.WhatAreThePlayers()
@@ -504,11 +503,11 @@ class Plugin_Favorites(Plugin_Generique):
         self.origine.listMenu_Branches.reset()
 
         # creation  d'une nouvelle fenêtre
-        #self.longListing = FrameList.ViewListPlugin(plugin)
+        #self.longListing = frameList.ViewListPlugin(plugin)
         #self.longListing.show()
         # self.longListing.doModal()
         # remplacé pour test  (Todo)
-        self.longListing = FrameMenuFavorites.FavoritesMenu()
+        self.longListing = frameMenuFavorites.FavoritesMenu()
         self.longListing.show()
 
         # for indice in (1,2, 3 ,4):
@@ -612,7 +611,7 @@ class Plugin_Favorites(Plugin_Generique):
     def le_menu_feuille(self, numeroItemSelectionBranche):
 
         '''
-        Don't need as the list of favorites is opened in the FrameList  by menu_branches
+        Don't need as the list of favorites is opened in the frameList  by menu_branches
 
          le menu feuille des Favoris : joue directement si audio et n'a pas de suite
 
@@ -654,9 +653,9 @@ class Plugin_Favorites(Plugin_Generique):
             reponse = self.InterfaceCLI.receptionReponseEtDecodage()
             del reponse
 
-            # then launch now is playing FramePlaying
+            # then launch now is playing framePlaying
             self.Abonnement.set() # need to renew subscribe after interupt
-            self.jivelette = FramePLaying.SlimIsPlaying()
+            self.jivelette = framePlaying.SlimIsPlaying()
 
             self.WindowPlaying = xbmcgui.getCurrentWindowId()
             xbmc.log('fenetre en cours n° : ' + str(self.WindowPlaying), xbmc.LOGNOTICE)
@@ -703,14 +702,14 @@ class MyMusic(Plugin_Generique):
     def le_menu_feuille(self, numeroItemSelectionBranche):
         '''
          (listMenu_Racine) item : My Music-> (listMenu_MyMusic) iem : All Artist -> (by menu_feuille : listMenu_Feuilles_all_artists)
-         then by menu_fleur : FrameList::list_menu_1
+         then by menu_fleur : frameList::list_menu_1
 
         remplit la liste selon la demande (numeroItemSelectionBranche = selection ie artists, albums ... )
         ['Album Artists', 'All Artists', 'Composers', 'Albums', 'Compilations', 'Genres', \
                                      'Years', 'New Music', 'Random Mix', 'Music Folder', 'Playlists', 'Search', \
                                      'Remote Music Librairies']
 
-        For now function populate the list menu feuille in FrameMenu of all artists (choice 1 )
+        For now function populate the list menu feuille in frameMenu of all artists (choice 1 )
 
         but it must do other like random music except if in a new plugin
         '''
@@ -971,14 +970,14 @@ class MyMusic(Plugin_Generique):
             # end if lister All Artist
 
         elif numeroItemSelectionBranche == 8: #random mix
-            # this will open a new frame  FramePlaylist
+            # this will open a new frame  framePlaylist
             # first listen then launch the command and compute the answer
             xbmc.log(' entrée dans le menu random mix du_plugin MyMusic', xbmc.LOGNOTICE)
 
             '''all is erased and moved somewhere else  in the app ->
-            FrameMenu:: update_random_mix_playlist '''
+            frameMenu:: update_random_mix_playlist '''
 
-        elif numeroItemSelectionBranche == 9:   # music folder call by FrameMenu->
+        elif numeroItemSelectionBranche == 9:   # music folder call by frameMenu->
 
             debug(' entrée dans le menu music folder du_plugin MyMusic', xbmc.LOGNOTICE)
             if self.origine.all_dossiers_populated:
@@ -1139,8 +1138,6 @@ class MyMusic(Plugin_Generique):
             #labeldetete = itemdelisteOrigine.getLabel()
 
             # affichage nouvelle fenêtre:
-            #self.myMusic = FrameMyMusic.MyMusicPlugin(artist)
-            #self.myMusic = FrameMyMusic.MyMusicPlugin()
             self.myMusic = frameMyMusicAllArtists.MyMusicAllArtists()
 
             self.myMusic.listMenu_principal.reset()
@@ -1234,7 +1231,6 @@ class MyMusic(Plugin_Generique):
             # labeldetete = itemdelisteOrigine.getLabel()
 
             # affichage nouvelle fenêtre:
-            # self.myMusic = FrameMyMusic.MyMusicPlugin(artist)
             self.myMusic = frameMyMusicAlbums.MyMusicAllAlbums()
 
             #self.myMusic.show()
@@ -1339,7 +1335,6 @@ class MyMusic(Plugin_Generique):
                 self.origine.listMenu_Feuilles_all_Dossiers.getSelectedPosition()).getLabel()
 
             # affichage nouvelle fenêtre:
-            # self.myMusic = FrameMyMusic.MyMusicPlugin(artist)
             self.myMusic = frameMusicFolder.ViewMusicFolder()
             #self.myMusic.show()
 

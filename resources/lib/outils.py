@@ -22,7 +22,7 @@ import urllib
 import random
 import os
 
-from resources.lib.ConnexionClient import InterfaceCLIduLMS
+from resources.lib.connexionClient import InterfaceCLIduLMS
 from resources.lib import pyxbmctExtended
 
 
@@ -44,9 +44,6 @@ if Kodi:
     ADDONNAME = ADDON.getAddonInfo('name')
     ADDONVERSION = ADDON.getAddonInfo('version')
     ARTWORK = xbmc.translatePath(os.path.join(ADDON.getAddonInfo('path'), 'resources', 'skins', 'Default', 'media'))
-
-
-#from ConnexionClient import InterfaceCLIduLMS
 
 def singleton(cls):
     instance = [None]
@@ -212,7 +209,7 @@ class WhereIsTheLMSServer():
                 print ('le nom du serveur est : ' +  self.LMSnom)
         return
 
-    def Ecoute(self): # fonction pas encore utilisée, ça viendra plus tard
+    def ecoute(self): # fonction pas encore utilisée, ça viendra plus tard
         '''
         Cette fonction est pour un usage futur
 

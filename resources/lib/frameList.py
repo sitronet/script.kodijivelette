@@ -13,8 +13,8 @@ import time
 import urllib
 import os
 
-from resources.lib import ConnexionClient, Ecoute, FramePLaying, outils
-from resources.lib.Ecoute import Souscription
+from resources.lib import connexionClient, ecoute, framePlaying, outils
+from resources.lib.ecoute import Souscription
 from resources.lib import pyxbmctExtended
 
 
@@ -57,7 +57,7 @@ if Kodi:
     ACTION_MOUSE_LEFT_CLICK = 100
     """Mouse click"""
 
-    TIME_OF_LOOP_SUBCRIBE = Ecoute.TIME_OF_LOOP_SUBSCRIBE
+    TIME_OF_LOOP_SUBCRIBE = ecoute.TIME_OF_LOOP_SUBSCRIBE
 
     global savepath
     savepath = xbmc.translatePath('special://temp')
@@ -169,7 +169,7 @@ class ViewListPlugin(pyxbmctExtended.BackgroundDialogWindow):
         self.placeControl(self.listMenu_4 , row_depart , col_depart + espace_col * 3 , espace_row, espace_col)
 
         # TRES IMPORTANT POUR AVOIR LE FOCUS
-        # Add items to the list , need to ask the focus before filling the list from Plugin.Plugin
+        # Add items to the list , need to ask the focus before filling the list from plugin.Plugin
         test = [ 'test1' , 'test2' , 'test3' ]
         self.listMenu_1.addItems(test)
         self.listMenu_1.setEnabled(True)
@@ -209,7 +209,7 @@ class ViewListPlugin(pyxbmctExtended.BackgroundDialogWindow):
             xbmc.log('nav_back' , xbmc.LOGNOTICE)
             self.quit_listing()
         else:
-            xbmc.log('else condition onAction in FrameList' , xbmc.LOGNOTICE)
+            xbmc.log('else condition onAction in frameList' , xbmc.LOGNOTICE)
             self._executeConnected(action, self.actions_connected)
 
     def quit_listing(self):# todo : à tester
@@ -218,12 +218,12 @@ class ViewListPlugin(pyxbmctExtended.BackgroundDialogWindow):
             #xbmc.log('fenetre enregistrée dans methode now_is_playing n° : ' + str(self.Window_is_playing), xbmc.LOGNOTICE) # attribute error here
             #self.Abonnement.clear() # -> AttributeError: 'SlimIsPlaying' object has no attribute 'Abonnement'
             # todo : tester appel fonction du prg principal
-            # FrameMenu.fenetreMenu.desabonner() -> TypeError: unbound method desabonner() must be called with fenetreMenu
+            # frameMenu.FenetreMenu.desabonner() -> TypeError: unbound method desabonner() must be called with FenetreMenu
             # instance as first argument (got nothing instead)
             # self.subscribe.resiliersouscription() # -> AttributeError: 'SlimIsPlaying' object has no attribute subscribe
             self.connectInterface()
             self.get_playerid()
-            self.subscribe = Ecoute.Souscription(self.InterfaceCLI, self.playerid)
+            self.subscribe = ecoute.Souscription(self.InterfaceCLI, self.playerid)
             self.subscribe.resiliersouscription()
             self.Abonnement.clear()
             self.threadRunning = False
@@ -323,9 +323,9 @@ class ViewListPlugin(pyxbmctExtended.BackgroundDialogWindow):
                 reponse = self.InterfaceCLI.receptionReponseEtDecodage()
                 del reponse
 
-                # then launch now is playing FramePlaying
+                # then launch now is playing framePlaying
                 self.Abonnement.set() # need to renew subscribe after interupt
-                self.jivelette = FramePLaying.SlimIsPlaying()
+                self.jivelette = framePlaying.SlimIsPlaying()
 
                 self.WindowPlaying = xbmcgui.getCurrentWindowId()
                 xbmc.log('fenetre en cours n° : ' + str(self.WindowPlaying), xbmc.LOGNOTICE)
@@ -445,9 +445,9 @@ class ViewListPlugin(pyxbmctExtended.BackgroundDialogWindow):
 
                 try:
                     lachainedesItemsFleurs = lesItemsFleursNormalised.split('|')#
-                    xbmc.log('FrameList.py : ligne 422 : ' + str(lachainedesItemsFleurs) , xbmc.LOGNOTICE)
+                    xbmc.log('frameList.py : ligne 422 : ' + str(lachainedesItemsFleurs) , xbmc.LOGNOTICE)
                 except IndexError:
-                    xbmc.log('FrameList.py : functionNotYetImplemented Ligne 422', xbmc.LOGNOTICE)
+                    xbmc.log('frameList.py : functionNotYetImplemented Ligne 422', xbmc.LOGNOTICE)
                     outils.functionNotYetImplemented()
                     return
 
@@ -483,16 +483,16 @@ class ViewListPlugin(pyxbmctExtended.BackgroundDialogWindow):
                         itemtampon.setProperty(clef, valeur)
 
                 for item in itemsFleur:
-                    xbmc.log('ajout de item dans menu FrameList::listMenu_2 : ' + item.getLabel() , xbmc.LOGNOTICE)
+                    xbmc.log('ajout de item dans menu frameList::listMenu_2 : ' + item.getLabel() , xbmc.LOGNOTICE)
                     #self.longListing.ArrayOfMenu[indicedesmenus].addItem(item)
                     self.listMenu_2.addItem(item)
 
 
             #outils.functionNotYetImplemented()
 
-    # copier/coller de la fonction de FrameMenu.py
+    # copier/coller de la fonction de frameMenu.py
     def update_now_is_playing(self):
-        '''copier/coller de la fonction de FrameMenu.py'''
+        '''copier/coller de la fonction de frameMenu.py'''
 
         self.Window_is_playing = xbmcgui.getCurrentWindowId()
         # xbmc.log('fenetre de player en maj n° : ' + str(self.WindowPlaying), xbmc.LOGDEBUG)
@@ -642,16 +642,16 @@ class ViewListPlugin(pyxbmctExtended.BackgroundDialogWindow):
                     self.Abonnement.clear()
             # fin de la boucle A : sortie de subscribe
         # fin boucle while
-        xbmc.log('End of Boucle of Squeeze in FrameList , Bye', xbmc.LOGNOTICE)
+        xbmc.log('End of Boucle of Squeeze in frameList , Bye', xbmc.LOGNOTICE)
         self.subscribe.resiliersouscription()
         reponse = self.InterfaceCLI.receptionReponseEtDecodage()
-        xbmc.log('Send resiliersouscription in A update now_is_playing() in FrameList', xbmc.LOGNOTICE)
+        xbmc.log('Send resiliersouscription in A update now_is_playing() in frameList', xbmc.LOGNOTICE)
         self.InterfaceCLI.viderLeBuffer()
-        xbmc.log('End of fonction update_now_is_playing in FrameList , Bye', xbmc.LOGNOTICE)
+        xbmc.log('End of fonction update_now_is_playing in frameList , Bye', xbmc.LOGNOTICE)
     # fin fonction update_now_is_playing
 
     def connectInterface(self):
-        self.InterfaceCLI = ConnexionClient.InterfaceCLIduLMS()
+        self.InterfaceCLI = connexionClient.InterfaceCLIduLMS()
 
     def get_playerid(self):
         self.Players = outils.WhatAreThePlayers()
