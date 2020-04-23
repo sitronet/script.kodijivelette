@@ -24,8 +24,8 @@
 			<fanart>docs/fanart.jpg</fanart>
 			<icon>resources/icon-ori.png</icon>
 			<screenshot>docs/screenshot/screenshot000.png</screenshot>
-			<screenshot>docs/screenshot/screenshot001.png</screenshot>
-			<screenshot>docs/screenshot/screenshot010.png</screenshot>
+			<screenshot>docs/screenshot/screenshot012.png</screenshot>
+			<screenshot>docs/screenshot/screenshot027.png</screenshot>
         </assets>
 	</extension>
 </addon>

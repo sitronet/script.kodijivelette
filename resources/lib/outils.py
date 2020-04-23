@@ -998,6 +998,10 @@ def functionNotYetImplemented():
     dialog = xbmcgui.Dialog()
     dialog.notification('nobody is perfect', 'This function is not yet implemented', xbmcgui.NOTIFICATION_INFO, 5000)
 
+def functionNotPossible():
+    dialog = xbmcgui.Dialog()
+    dialog.notification('function not possible', 'Your server has not this capability', xbmcgui.NOTIFICATION_INFO, 5000)
+
 
 
 # procédure de test 
