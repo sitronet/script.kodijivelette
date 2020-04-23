@@ -26,8 +26,8 @@ I hope that this little kodi addon will please you
 
 Screenshots
 -----------
-![](https://i.imgur.com/Uf1PV7U.png)
-![](https://i.imgur.com/w7ZmBEH.png)
-![](https://i.imgur.com/WWRaSVf.png)
-![](https://i.imgur.com/Ls2AOt0.png)
-![](https://i.imgur.com/6VSkHZ3.png)
+![](https://i.imgur.com/uvdCLdE.png)
+![](https://i.imgur.com/AJWWwYY.png)
+![](https://i.imgur.com/twdg9mW.png)
+![](https://i.imgur.com/A3xyyqI.png)
+![](https://i.imgur.com/hbp3rDE.png)
