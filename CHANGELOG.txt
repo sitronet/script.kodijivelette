@@ -1,3 +1,10 @@
+-------------------------------------------------------------
+version 0.0.k00
+MyMusic : add  Folders
+new frame pour All Artists, Albums, Folders
+review random mix
+TODO : playlist in folders ; MyMusic - Playlists ; songinfo - navigate throught menu Extra
+
 ------------------------------------------------------------
 version 0.0.j00
 use of the fonction debug by elParaguayo (script.squeezeinfo) rather direct xbmc.log()
@@ -7,8 +14,6 @@ rewrite closeconnexionCLI()
 add closeconnexionCLI to function quit() in main FrameMenu
 Ajout parcours des dossiers
 manque le play de l'item dossier
-
-
 
 -------------------------------------------------------------
 version 0.0.i__
