@@ -1,9 +1,14 @@
+version 0.0.l00
+fix bug in Albums , ArtistAlbum
+review navigation bugs
+
 -------------------------------------------------------------
 version 0.0.k00
 MyMusic : add  Folders
 new frame pour All Artists, Albums, Folders
 review random mix
-TODO : playlist in folders ; MyMusic - Playlists ; songinfo - navigate throught menu Extra
+TODO : playlist in folders ; MyMusic - Playlists ; songinfo
+- navigate throught menu Extra
 
 ------------------------------------------------------------
 version 0.0.j00
