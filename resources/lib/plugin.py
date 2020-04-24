@@ -32,6 +32,7 @@ if Kodi:
 
 import urllib
 import os
+import sys
 import time
 
 
@@ -70,6 +71,7 @@ class Plugin_Generique():
 
         xbmc.log(' entrée dans le_menus_Branche_des_plugins ', xbmc.LOGNOTICE)
         self.origine.listMenu_Branches.reset()
+        self.origine.listMenu_Branches.setVisible(True)
         self.origine.InterfaceCLI.sendtoCLISomething( plugin + ' 0 count')
         reponse = self.origine.InterfaceCLI.receptionReponseEtDecodage()
 
@@ -140,6 +142,8 @@ class Plugin_Generique():
             itemdeListe.setArt({'thumb': completeNameofFile})
             self.origine.listMenu_Branches.addItem(itemdeListe)
 
+
+        self.origine.setFocus(self.origine.listMenu_Branches)
         return self.listepropredesItemsduPlugin #   c'est une liste, chaque entrée de la liste est un dictionnaire
 
     # fin fonction le_menu_branche , class Plugin_Generique
@@ -154,6 +158,7 @@ class Plugin_Generique():
 
         xbmc.log(' entrée dans le_menu_feuille_des_plugins', xbmc.LOGNOTICE)
         self.origine.listMenu_Feuilles.reset()
+        self.origine.listMenu_Feuilles.setVisible(True)
 
         dictionnaireSelectioned = self.origine.liste_du_menu_branche_des_plugins[numeroItemSelectionBranche]
 
@@ -226,7 +231,7 @@ class Plugin_Generique():
                 itemdeListe.setArt({'thumb': completeNameofFile})
                 self.command = dictionnairedUnItemApp.get('cmd')
             self.origine.listMenu_Feuilles.addItem(itemdeListe)
-
+        self.origine.setFocus(self.origine.listMenu_Feuilles)
         # fin fonction le_menu_feuille, class Plugin_Generique
 
     def le_menu_fleurs(self, numeroItemSelectionFeuille):
@@ -250,7 +255,8 @@ class Plugin_Generique():
 
         #for indice in (1,2, 3 ,4):
         #    self.longListing.ArrayOfMenu[indice].reset()
-        self.longListing.ArrayOfMenu[1].reset()
+        #self.longListing.ArrayOfMenu[1].reset()
+        self.longListing.listMenu_1.reset()
         #self.origine.listMenu_Fleur.reset()
 
         if itemdelisteOrigine.getProperty('hasitems') == '1':
@@ -438,11 +444,14 @@ class Plugin_Generique():
         else:
             if urlicone.startswith('/'):
                 xbmc.log('url icone avec /: ' + urlicone ,xbmc.LOGDEBUG )
-            #urltoopen = 'http://' + self.origine.rechercheduserveur.LMSCLIip + ':' + self.origine.rechercheduserveur.LMSwebport + '/' + urlicone
-                urltoopen = 'http://' + self.origine.rechercheduserveur.LMSCLIip + ':' + self.origine.rechercheduserveur.LMSwebport + urlicone
+            #urltoopen = 'http://' + self.origine.rechercheduserveur.LMSCLIip + ':' +
+            #               self.origine.rechercheduserveur.LMSwebport + '/' + urlicone
+                urltoopen = 'http://' + self.origine.rechercheduserveur.LMSCLIip + ':' \
+                            + self.origine.rechercheduserveur.LMSwebport + urlicone
             else:
                 xbmc.log('url icone sans /: ' + urlicone ,xbmc.LOGDEBUG )
-                urltoopen = 'http://' + self.origine.rechercheduserveur.LMSCLIip + ':' + self.origine.rechercheduserveur.LMSwebport + '/' + urlicone
+                urltoopen = 'http://' + self.origine.rechercheduserveur.LMSCLIip + ':' \
+                            + self.origine.rechercheduserveur.LMSwebport + '/' + urlicone
         try:
             urllib.urlretrieve(urltoopen, completeNameofFile)
         except IOError:
@@ -458,14 +467,13 @@ class Plugin_Generique():
         completeNameofFile = os.path.join(savepath, filename)
 
         urlimage = 'http://' + self.lmsip + ':' + self.lmswebport + '/music/' + str(hashcode_artwork) + '/cover.jpg'
-
+        debug('urlToGet : ' + str(urlimage), xbmc.LOGNOTICE)
         try:
             urllib.urlretrieve(urlimage, completeNameofFile)
         except IOError:
-            pass
+            debug('erreur download artwork', xbmc.LOGNOTICE)
             outils.functionNotYetImplemented()
-
-        xbmc.log('nom du fichier image : ' + completeNameofFile, xbmc.LOGNOTICE)
+        xbmc.log('nom du fichier image in get_artwork : ' + completeNameofFile, xbmc.LOGNOTICE)
         return completeNameofFile
 
 
@@ -713,12 +721,10 @@ class MyMusic(Plugin_Generique):
 
         but it must do other like random music except if in a new plugin
         '''
-
-        xbmc.log(' entrée dans le_menu_feuille_du_plugin MyMusic', xbmc.LOGNOTICE)
+        debug('entry in : ' + self.__class__.__name__  + ' ' +  sys._getframe().f_code.co_name , xbmc.LOGNOTICE)
 
         # todo : not necessary need, could be in the initial menu switch (self.origine)
-        if numeroItemSelectionBranche == 0 or \
-            numeroItemSelectionBranche == 2 or \
+        if  numeroItemSelectionBranche == 2 or \
             numeroItemSelectionBranche == 4 or \
             numeroItemSelectionBranche == 5 or \
             numeroItemSelectionBranche == 6 or \
@@ -727,14 +733,13 @@ class MyMusic(Plugin_Generique):
             numeroItemSelectionBranche == 11:
             
             outils.functionNotYetImplemented()
-    
 
-        elif numeroItemSelectionBranche == 3:  # liste 'all Albums
-            xbmc.log(' entrée dans le menu all albums du_plugin MyMusic', xbmc.LOGNOTICE)
-            if self.origine.all_albums_populated:
+        elif numeroItemSelectionBranche == 0 :  # liste ArtistAlbums
+            debug(' entrée dans plugin.MyMusic.le_menu_feuille', xbmc.LOGNOTICE)
+            if self.origine.ArtistAlbums_populated:
                 return
 
-            # the same porcessing as all artists
+            # the same processing as all albums excepted few change
             self.origine.InterfaceCLI.viderLeBuffer()
             self.origine.InterfaceCLI.sendtoCLISomething('info total albums ?')
             reponse = self.origine.InterfaceCLI.receptionReponseEtDecodage()
@@ -742,8 +747,8 @@ class MyMusic(Plugin_Generique):
                 nbre_a_traiter = reponse.split('|')
                 nbre_total_albums = nbre_a_traiter.pop()
             except IndexError:
+                debug('FNYI : recherche ArtistAlbum nbre_a_traiter plugin.py', xbmc.LOGNOTICE)
                 outils.functionNotYetImplemented()
-
                 return
 
             buddydialog = xbmcgui.DialogProgress()
@@ -759,23 +764,24 @@ class MyMusic(Plugin_Generique):
             nbre_pour_calculer_buddydialog = 0
             percent = 0
             buddydialog.update(percent)
+            TAGSARTFLOW = 'ijl'
             while nbre_recolted < nbre_a_recolter:
                 if nbre_restant_a_recolter > step:
-                    self.origine.InterfaceCLI.sendtoCLISomething('albums ' + str(start) + '  ' + str(end))
+                    requete = 'albums ' + str(start) + ' ' + str(end) + ' sort:artistalbum'
+                    self.origine.InterfaceCLI.sendtoCLISomething(requete)
                     nbre_recolted = nbre_recolted + step
-                    nbre_restant_a_recolter = nbre_restant_a_recolter - step # = nbre_a_recolter - nbre_recolted
+                    nbre_restant_a_recolter = nbre_restant_a_recolter - step  # = nbre_a_recolter - nbre_recolted
                     start = start + step
                     end = start + step
-                    nbre_pour_calculer_buddydialog = nbre_pour_calculer_buddydialog + step
-                else:  #reste  moins d'items que le step
-                    requete_construite = 'albums ' + str(start) + ' ' + str(nbre_a_recolter)
-                    self.origine.InterfaceCLI.sendtoCLISomething(requete_construite)
+                else:  # reste  moins d'items que le step
+                    requete= 'albums ' + str(start) + ' ' + str(nbre_a_recolter) + ' sort:artistalbum'
+                    self.origine.InterfaceCLI.sendtoCLISomething(requete)
                     nbre_recolted = nbre_recolted + nbre_restant_a_recolter
 
-                xbmc.log('la récolte a été bonne de  : ' + str(nbre_recolted), xbmc.LOGNOTICE)
+                debug('la récolte a été bonne de  : ' + str(nbre_recolted), xbmc.LOGNOTICE)
 
                 reponsepropre = self.origine.InterfaceCLI.receptionReponseEtDecodage()
-                xbmc.log('Les albums unefoispropre : ' + str(reponsepropre), xbmc.LOGNOTICE)
+                debug('Les albums unefoispropre : ' + str(reponsepropre), xbmc.LOGNOTICE)
 
                 # if the buffer is truncated we need to colapse it
                 while not ('count:' + str(nbre_total_albums)) in reponsepropre:
@@ -789,39 +795,34 @@ class MyMusic(Plugin_Generique):
 
                     lesItemsAlbums_text = lesItemsAlbums[0]
                 except IndexError:
+                    debug('FNYI : recherche ArtistAlbum lesItemsAlbums plugin.py', xbmc.LOGNOTICE)
                     outils.functionNotYetImplemented()
-
                     return
                 # trim the head :
                 try:
-                    index_du_debut = lesItemsAlbums_text.find('albums ' + str(start) + ' ' + str(step) + '|')
-                    xbmc.log('index count : ' + str(index_du_debut), xbmc.LOGDEBUG)
-                    index_du_fin_de_titre = lesItemsAlbums_text.find('id')
-                    xbmc.log('index fin du  titre : ' + str(index_du_fin_de_titre), xbmc.LOGDEBUG)
-                    lesItemsAlbumsNormalised = lesItemsAlbums_text[index_du_fin_de_titre : ]
-                    xbmc.log('les Items Albums Normalised : ' + lesItemsAlbumsNormalised, xbmc.LOGNOTICE)
-                except:
-                    outils.functionNotYetImplemented()
 
+                    index_de_fin_de_artflow = lesItemsAlbums_text.find('sort:artistalbum|')
+                    debug('index fin du artflow : ' + str(index_de_fin_de_artflow), xbmc.LOGNOTICE)
+                    lesItemsAlbumsNormalised = lesItemsAlbums_text[index_de_fin_de_artflow :]
+                    debug('les Items Albums Normalised : ' + lesItemsAlbumsNormalised, xbmc.LOGNOTICE)
+                except:
+                    debug('FNYI : recherche ArtistAlbum indexdefin artflow plugin.py', xbmc.LOGNOTICE)
+                    outils.functionNotYetImplemented()
                     return
 
                 # here we have a nice string of albums ' id:xxx|album:AAAA|id:yyy|album:BBBB etc...
                 try:
                     lachainedesItemsAlbums = lesItemsAlbumsNormalised.split('|')  #
-                    xbmc.log('chaine des items albums  : ' + str(lachainedesItemsAlbums), xbmc.LOGDEBUG)
+                    debug('chaine des items albums  : ' + str(lachainedesItemsAlbums), xbmc.LOGDEBUG)
                 except:
-                    xbmc.log('functionNotYetImplemented recherche Album plugin.py', xbmc.LOGNOTICE)
+                    debug('FNYI :  recherche artist Albums lachainedesItemsAlbums plugin.py', xbmc.LOGNOTICE)
                     outils.functionNotYetImplemented()
-
                     return
 
-                itemtampon = xbmcgui.ListItem()     # prepare le menulist
-                # prepare update buddydialogprogress
-                nbre_pour_calculer = 0 if nbre_a_recolter < step else nbre_pour_calculer_buddydialog - step
-                xbmc.log('nbre pour calculer : ' + str(nbre_pour_calculer) + ' nbre buddy : ' + str(
-                    nbre_pour_calculer_buddydialog), xbmc.LOGNOTICE)
-
+                itemtampon = xbmcgui.ListItem()  # prepare le menulist
                 for chaine in lachainedesItemsAlbums:
+                    # prepare update buddydialogprogress
+                    nbre_pour_calculer_buddydialog = nbre_pour_calculer_buddydialog + 1
                     try:
                         clef, valeur = chaine.split(':', 1)
                     except ValueError:
@@ -834,16 +835,17 @@ class MyMusic(Plugin_Generique):
 
                     elif clef == 'album':
                         itemtampon.setLabel(valeur)
-                        self.origine.listMenu_Feuilles_all_Albums.addItem(itemtampon)
-                        xbmc.log('Id item album : ' + str(itemtampon.getProperty('album_id')) + valeur, xbmc.LOGNOTICE)
+                        self.origine.listMenu_Feuilles_ArtistAlbums.addItem(itemtampon)
+                        debug('Id item album : ' + str(itemtampon.getProperty('album_id')) + valeur, xbmc.LOGNOTICE)
                         itemtampon = xbmcgui.ListItem()
 
-                percent = int ( 100 * int(nbre_recolted) / int(nbre_a_recolter))
-                buddydialog.update(percent)
+                    percent = int(nbre_pour_calculer_buddydialog / int(nbre_a_recolter)) * 100
+                    buddydialog.update(percent)
 
             buddydialog.close()
-            self.origine.all_albums_populated = True
-        # end if lister All Albums
+            self.origine.ArtistAlbums_populated = True
+            return
+        # end if lister ArtistAlbums
 
         elif numeroItemSelectionBranche == 1: # liste 'all artists'
             xbmc.log(' entrée dans le menu all artists du_plugin MyMusic', xbmc.LOGNOTICE)
@@ -888,7 +890,6 @@ class MyMusic(Plugin_Generique):
                     nbre_restant_a_recolter = nbre_restant_a_recolter - step # = nbre_a_recolter - nbre_recolted
                     start = start + step
                     end = start + step
-                    nbre_pour_calculer_buddydialog = nbre_pour_calculer_buddydialog + step
                 else:  #reste  moins d'items que le step
                     requete_construite = 'artists ' + str(start) + ' ' + str(nbre_a_recolter)
                     self.origine.InterfaceCLI.sendtoCLISomething(requete_construite)
@@ -898,9 +899,6 @@ class MyMusic(Plugin_Generique):
 
                 reponsepropre = self.origine.InterfaceCLI.receptionReponseEtDecodage()
                 xbmc.log('Les artists unefoispropre : ' + str(reponsepropre), xbmc.LOGDEBUG)
-
-                while not ('count:'+ str(nbre_a_recolter)) in reponsepropre:
-                    reponsepropre = reponsepropre + self.origine.InterfaceCLI.receptionReponseEtDecodage()
 
                 # trim the count and trim the title
                 try:
@@ -936,14 +934,9 @@ class MyMusic(Plugin_Generique):
 
                 itemsArtist = []  # une liste
                 itemtampon = xbmcgui.ListItem()
-                nbre_pour_calculer = 0 if nbre_a_recolter < step else nbre_pour_calculer_buddydialog - step
-                xbmc.log('nbre pour calculer : ' + str(nbre_pour_calculer) + ' nbre buddy : ' + str(nbre_pour_calculer_buddydialog) , xbmc.LOGNOTICE)
 
                 for chaine in lachainedesItemsArtists:
-
-                    #nbre_pour_calculer = nbre_pour_calculer + 1
-                    #percent = int ( 100 * int(nbre_pour_calculer) / int(nbre_a_recolter))
-                    #buddydialog.update(percent)
+                    nbre_pour_calculer_buddydialog = nbre_pour_calculer_buddydialog + 1
 
                     try:
                         clef, valeur = chaine.split(':', 1)
@@ -961,13 +954,155 @@ class MyMusic(Plugin_Generique):
                         xbmc.log('Id item dasn menu feuilles : ' + str(itemtampon.getProperty('artist_id')) + valeur, xbmc.LOGDEBUG)
                         itemtampon = xbmcgui.ListItem()
 
-                percent = int ( 100 * int(nbre_recolted) / int(nbre_a_recolter))
-                buddydialog.update(percent)
+                    percent = int(nbre_pour_calculer_buddydialog / int(nbre_a_recolter)) * 100
+                    buddydialog.update(percent)
 
             buddydialog.close()
             self.origine.all_Artists_populated = True
 
             # end if lister All Artist
+
+        elif numeroItemSelectionBranche == 3:  # liste 'all Albums
+            xbmc.log(' entrée dans le menu all albums du_plugin MyMusic', xbmc.LOGNOTICE)
+            if self.origine.all_albums_populated:
+                return
+
+            # the same porcessing as all artists
+            self.origine.InterfaceCLI.viderLeBuffer()
+            self.origine.InterfaceCLI.sendtoCLISomething('info total albums ?')
+            reponse = self.origine.InterfaceCLI.receptionReponseEtDecodage()
+            try:
+                nbre_a_traiter = reponse.split('|')
+                nbre_total_albums = nbre_a_traiter.pop()
+            except IndexError:
+                debug('FNYI : recherche all Album nbre_a_traiter plugin.py', xbmc.LOGDEBUG)
+                outils.functionNotYetImplemented()
+                return
+
+            buddydialog = xbmcgui.DialogProgress()
+            buddydialog.create('look after ' + nbre_total_albums + ' Albums')
+
+            start = 0
+            step = 800
+            end = step
+            nbre_recolted = 0
+            nbre_a_recolter = int(nbre_total_albums)
+            nbre_restant = nbre_a_recolter
+            nbre_restant_a_recolter = nbre_restant
+            nbre_pour_calculer_buddydialog = 0
+            percent = 0
+            buddydialog.update(percent)
+            compteur_buddy = 0
+            while nbre_recolted < nbre_a_recolter:
+                if nbre_restant_a_recolter > step:
+                    requete = 'albums ' + str(start) + '  ' + str(end) + ' tags:ijls'
+                    self.origine.InterfaceCLI.sendtoCLISomething(requete)
+                    nbre_recolted = nbre_recolted + step
+                    nbre_restant_a_recolter = nbre_restant_a_recolter - step # = nbre_a_recolter - nbre_recolted
+                    start = start + step
+                    end = start + step
+                else:  #reste  moins d'items que le step
+                    requete= 'albums ' + str(start) + ' ' + str(nbre_a_recolter)+ ' tags:ijls'
+                    self.origine.InterfaceCLI.sendtoCLISomething(requete)
+                    nbre_recolted = nbre_recolted + nbre_restant_a_recolter
+
+                xbmc.log('la récolte a été bonne de  : ' + str(nbre_recolted), xbmc.LOGNOTICE)
+
+                reponsepropre = self.origine.InterfaceCLI.receptionReponseEtDecodage()
+                xbmc.log('Les albums unefoispropre : ' + str(reponsepropre), xbmc.LOGNOTICE)
+
+                # if the buffer is truncated we need to colapse it
+                while not ('count:' + str(nbre_total_albums)) in reponsepropre:
+                    reponsepropre = reponsepropre + self.origine.InterfaceCLI.receptionReponseEtDecodage()
+
+                # here we get a string with albums we need to analyse it
+                # trim the tail count
+                try:
+                    lesItemsAlbums = reponsepropre.split('|count:')
+                    xbmc.log('listetemp des Albums' + str(lesItemsAlbums), xbmc.LOGDEBUG)
+                    lesItemsAlbums_text = lesItemsAlbums[0]
+                except IndexError:
+                    debug('FNYI : recherche all Album lesItemsAlbums plugin.py', xbmc.LOGDEBUG)
+                    outils.functionNotYetImplemented()
+                    return
+                # trim the head :
+                try:
+                    index_du_debut = lesItemsAlbums_text.find('albums|' + str(start) + '|' + str(step) + '|')
+                    xbmc.log('index count : ' + str(index_du_debut), xbmc.LOGDEBUG)
+                    index_du_fin_de_titre = lesItemsAlbums_text.find('tags:ijls')
+                    xbmc.log('index fin du  titre : ' + str(index_du_fin_de_titre), xbmc.LOGDEBUG)
+                    lesItemsAlbumsNormalised = lesItemsAlbums_text[index_du_fin_de_titre : ]
+                    xbmc.log('les Items Albums Normalised : ' + lesItemsAlbumsNormalised, xbmc.LOGNOTICE)
+                except:
+                    debug('FNYI : recherche all Album index_du_debut plugin.py', xbmc.LOGDEBUG)
+                    outils.functionNotYetImplemented()
+
+                    return
+
+                # here we have a nice string of albums ' id:xxx|album:AAAA|id:yyy|album:BBBB etc...
+                try:
+                    lachainedesItemsAlbums = lesItemsAlbumsNormalised.split('|')  #
+                    xbmc.log('chaine des items albums  : ' + str(lachainedesItemsAlbums), xbmc.LOGDEBUG)
+                except:
+                    debug('FNYI : recherche all Album lachainedesItemsAlbums plugin.py', xbmc.LOGDEBUG)
+                    outils.functionNotYetImplemented()
+                    return
+
+                itemtampon = xbmcgui.ListItem()     # prepare le menulist
+                # prepare update buddydialogprogress
+
+                for chaine in lachainedesItemsAlbums:
+                    nbre_pour_calculer_buddydialog = nbre_pour_calculer_buddydialog + 1
+                    try:
+                        clef, valeur = chaine.split(':', 1)
+                    except ValueError:
+                        # some time the field send by server is not good, there is a real space rather an encoded space
+                        # exemple in my library : id:2806|artist:Bruno Mars | www.RNBxBeatz.com|
+                        pass
+
+                    if clef == 'id':
+                        album_id = valeur
+                        itemtampon.setProperty('album_id', album_id)
+
+                    elif clef == 'album':
+                        itemtampon.setLabel(valeur)
+
+                    elif clef == 'artwork_track_id':
+                        itemtampon.setProperty('artwork_track_id', str(valeur))
+
+                    elif clef == 'textkey':
+                        itemtampon.setProperty('textkey', valeur)
+
+                        self.origine.listMenu_Feuilles_all_Albums.addItem(itemtampon)
+                        debug('Id item album : ' + album_id  , xbmc.LOGNOTICE)
+                        itemtampon = xbmcgui.ListItem()
+
+                    percent = int(nbre_pour_calculer_buddydialog / int(nbre_a_recolter)) * 100
+                    buddydialog.update(percent)
+
+            buddydialog.close()
+
+            # todo : extend the setArt each time the user go down in the list
+            # for now just the 20 item of the list
+            # because if the list (number of album) is very long take too much time
+            # so dig the artwork by fragment
+            for indice in range(20):
+            #for indice in range(self.origine.listMenu_Feuilles_all_Albums.size() - 1 ):
+                item = self.origine.listMenu_Feuilles_all_Albums.getListItem(indice)
+                try:
+                    artwork_track_id = item.getProperty('artwork_track_id')
+                    debug('artwork_track_id : ' + str(artwork_track_id))
+                    if artwork_track_id:
+                        filename_coverart = self.get_artwork(hashcode_artwork=artwork_track_id)
+                        item.setArt({'thumb': filename_coverart})
+                        item.setProperty('image' , filename_coverart)
+                except:
+                    debug('could not get artwork')
+                    #outils.functionNotYetImplemented()
+            #fin loop for indice
+            self.origine.all_albums_populated = True
+        # end if lister All Albums
+
 
         elif numeroItemSelectionBranche == 8: #random mix
             # this will open a new frame  framePlaylist
@@ -1017,7 +1152,6 @@ class MyMusic(Plugin_Generique):
                     nbre_restant_a_recolter = nbre_restant_a_recolter - step # = nbre_a_recolter - nbre_recolted
                     start = start + step
                     end = start + step
-                    nbre_pour_calculer_buddydialog = nbre_pour_calculer_buddydialog + step
                 else:  #reste  moins d'items que le step
                     requete_construite = 'musicfolder ' + str(start) + ' ' + str(nbre_a_recolter)
                     self.origine.InterfaceCLI.sendtoCLISomething(requete_construite)
@@ -1068,13 +1202,11 @@ class MyMusic(Plugin_Generique):
 
                 itemtampon = xbmcgui.ListItem()     # prepare le menulist
                 # prepare update buddydialogprogress
-                nbre_pour_calculer = 0 if nbre_a_recolter < step else nbre_pour_calculer_buddydialog - step
-                xbmc.log('nbre pour calculer : ' + str(nbre_pour_calculer) + ' nbre buddy : ' + str(
-                    nbre_pour_calculer_buddydialog), xbmc.LOGNOTICE)
 
                 debug('à decrypter : ' + str(lachainedesItemsDossiers), xbmc.LOGNOTICE)
 
                 for chaine in lachainedesItemsDossiers:
+                    nbre_pour_calculer_buddydialog = nbre_pour_calculer_buddydialog + 1
                     debug('la chaine : ' + str(chaine), xbmc.LOGNOTICE)
                     try:
                         clef, valeur = chaine.split(':', 1)
@@ -1098,8 +1230,8 @@ class MyMusic(Plugin_Generique):
                         debug('Id item dossier : ' + str(itemtampon.getProperty('folder_id')) + valeur, xbmc.LOGNOTICE)
                         itemtampon = xbmcgui.ListItem()
 
-                percent = int ( 100 * int(nbre_recolted) / int(nbre_a_recolter))
-                buddydialog.update(percent)
+                    percent = int(nbre_pour_calculer_buddydialog / int(nbre_a_recolter)) * 100
+                    buddydialog.update(percent)
 
             buddydialog.close()
             self.origine.all_dossiers_populated= True
@@ -1138,14 +1270,14 @@ class MyMusic(Plugin_Generique):
             #labeldetete = itemdelisteOrigine.getLabel()
 
             # affichage nouvelle fenêtre:
-            self.myMusic = frameMyMusicAllArtists.MyMusicAllArtists()
+            self.frameAllArtits = frameMyMusicAllArtists.MyMusicAllArtists()
 
-            self.myMusic.listMenu_principal.reset()
+            self.frameAllArtits.listMenu_principal.reset()
 
-            #self.myMusic.show()
+            #self.frameAllArtits.show()
             # initialise focus ans navigation
-            self.myMusic.listMenu_principal.controlRight(self.myMusic.listMenu_detailAlbums)
-            self.myMusic.listMenu_detailAlbums.controlLeft(self.myMusic.listMenu_principal)
+            self.frameAllArtits.listMenu_principal.controlRight(self.frameAllArtits.listMenu_detailAlbums)
+            self.frameAllArtits.listMenu_detailAlbums.controlLeft(self.frameAllArtits.listMenu_principal)
 
             self.origine.InterfaceCLI.viderLeBuffer() # need because resiliersouscription() let some data in the buffer
             self.origine.InterfaceCLI.sendtoCLISomething('albums 0 100 artist_id:' + numeroItemSelectionFeuille + ' tags:' + TAGS )
@@ -1197,28 +1329,120 @@ class MyMusic(Plugin_Generique):
                 elif clef == 'album':
                     itemtampon.setLabel(valeur)
                 elif clef == 'artwork_track_id':
-                    filename = 'artwork_' + valeur + '.tmp'
-                    completeNameofFile = os.path.join(savepath, filename)
-                    xbmc.log('filename cover : ' + str(completeNameofFile), xbmc.LOGNOTICE)
-                    ulricone = 'http://' + self.origine.rechercheduserveur.LMSCLIip + ':' + \
-                               self.origine.rechercheduserveur.LMSwebport + '/music/' + valeur + '/cover.jpg'
-                    try:
-                        urllib.urlretrieve(ulricone, completeNameofFile)
-                        itemtampon.setArt({'thumb': completeNameofFile})
-                        itemtampon.setProperty('image' , completeNameofFile)
-                    except IOError:
-                        pass
+                    hascode_coverart = valeur
+                    filename_coverart = self.get_artwork(hashcode_artwork=hascode_coverart)
+                    itemtampon.setArt({'thumb': filename_coverart})
+                    itemtampon.setProperty('image', filename_coverart)
 
                 elif clef == 'textkey':
-                    self.myMusic.listMenu_principal.addItem(itemtampon)
+                    self.frameAllArtits.listMenu_principal.addItem(itemtampon)
                     itemtampon = xbmcgui.ListItem()
                 else:
                     itemtampon.setProperty(clef,valeur)
 
-            self.myMusic.listMenu_principal.setVisible(True)
-            self.myMusic.doModal()
-            del self.myMusic
+            self.frameAllArtits.listMenu_principal.setVisible(True)
+            self.frameAllArtits.doModal()
+            del self.frameAllArtits
         #fin if All_Artist
+
+        elif plugOrigine == 'ArtistAlbums':
+
+            debug(' entrée dans plugin.py.MyMusic.le_menu_fleur', xbmc.LOGNOTICE)
+            album = self.origine.listMenu_Feuilles_ArtistAlbums.getListItem(
+                self.origine.listMenu_Feuilles_ArtistAlbums.getSelectedPosition()).getLabel()
+            # title = self.origine.listMenu_Feuilles_all_Artists.getListItem(numeroItemSelectionFeuille).getLabel()
+            # same :
+            # itemdelisteOrigine = self.origine.listMenu_Feuilles_all_Artists.getListItem(numeroItemSelectionFeuille)
+            # labeldetete = itemdelisteOrigine.getLabel()
+
+            # affichage nouvelle fenêtre:
+            self.frameAlbums = frameMyMusicAlbums.MyMusicAllAlbums()
+
+            # self.frameAlbums.show()
+
+            # initialise focus ans navigation
+            self.frameAlbums.listMenu_principal.controlRight(self.frameAlbums.listMenu_detailAlbums)
+            self.frameAlbums.listMenu_detailAlbums.controlLeft(self.frameAlbums.listMenu_principal)
+
+            self.origine.InterfaceCLI.viderLeBuffer()  # need because resiliersouscription() let some data in the buffer
+            self.origine.InterfaceCLI.sendtoCLISomething(
+                'albums 0 100 album_id:' + numeroItemSelectionFeuille + ' tags:' + TAGS)
+
+            reception = self.origine.InterfaceCLI.receptionReponseEtDecodage()
+
+            try:
+                nbre_a_traiter = reception.split('count:')
+            except ValueError:
+                pass
+
+            try:
+                nombreDItems = nbre_a_traiter.pop()
+            except IndexError:
+                outils.functionNotYetImplemented()
+
+                return
+            try:
+                nbreEntier = int(nombreDItems)
+            except:
+                outils.functionNotYetImplemented()
+
+                return
+
+            # trim head and queue
+            try:
+                # poubelle, tampon = reponsepropre.split(TAGS+'|')
+                poubelle, tampon = reception.split(TAGS + '|')
+                lesItemsAlbumsNormalised, poubelle = tampon.split('|count:')
+            except ValueError:
+                return
+
+            try:
+                lachainedesItemsAlbums = lesItemsAlbumsNormalised.split('|')  #
+                xbmc.log('Plugin_music:: Fleurs chainedesAlbums : ' + str(lachainedesItemsAlbums), xbmc.LOGNOTICE)
+            except:
+                xbmc.log('functionNotYetImplemented plugin_music::fleurs::Albums', xbmc.LOGNOTICE)
+                outils.functionNotYetImplemented()
+
+                return
+
+            itemtampon = xbmcgui.ListItem()
+            for chaine in lachainedesItemsAlbums:
+
+                try:
+                    clef, valeur = chaine.split(':', 1)
+                except ValueError:
+                    pass
+
+                if clef == 'id':
+                    itemtampon.setProperty(clef, valeur)
+                    itemtampon.setProperty('cmd', 'ArtistAlbums')
+                    itemtampon.setProperty('album_id', numeroItemSelectionFeuille)
+
+                elif clef == 'album':
+                    itemtampon.setLabel(valeur)
+
+                elif clef == 'artwork_track_id':
+                    hascode_coverart = valeur
+                    filename_coverart = self.get_artwork(hashcode_artwork=hascode_coverart)
+                    itemtampon.setArt({'thumb': filename_coverart})
+                    itemtampon.setProperty('image', filename_coverart)
+
+
+                # elif clef == 'year':
+                #    title
+                #    compilation
+                #    artist
+
+                elif clef == 'textkey':
+                    itemtampon.setProperty(clef, valeur)
+                    self.frameAlbums.listMenu_principal.addItem(itemtampon)
+                    itemtampon = xbmcgui.ListItem()
+                else:
+                    itemtampon.setProperty(clef, valeur)
+
+            self.frameAlbums.doModal()
+            del self.frameAlbums
+        # fin if ArtistAlbums
 
         elif plugOrigine == 'Albums':
 
@@ -1231,13 +1455,13 @@ class MyMusic(Plugin_Generique):
             # labeldetete = itemdelisteOrigine.getLabel()
 
             # affichage nouvelle fenêtre:
-            self.myMusic = frameMyMusicAlbums.MyMusicAllAlbums()
+            self.frameAllAbums = frameMyMusicAlbums.MyMusicAllAlbums()
 
-            #self.myMusic.show()
+            #self.frameAllAlbums.show()
 
             # initialise focus ans navigation
-            self.myMusic.listMenu_principal.controlRight(self.myMusic.listMenu_detailAlbums)
-            self.myMusic.listMenu_detailAlbums.controlLeft(self.myMusic.listMenu_principal)
+            self.frameAllAbums.listMenu_principal.controlRight(self.frameAllAbums.listMenu_detailAlbums)
+            self.frameAllAbums.listMenu_detailAlbums.controlLeft(self.frameAllAbums.listMenu_principal)
 
             self.origine.InterfaceCLI.viderLeBuffer()  # need because resiliersouscription() let some data in the buffer
             self.origine.InterfaceCLI.sendtoCLISomething(
@@ -1301,17 +1525,13 @@ class MyMusic(Plugin_Generique):
                     itemtampon.setLabel(valeur)
 
                 elif clef == 'artwork_track_id':
-                    filename = 'artwork_' + valeur + '.tmp'
-                    completeNameofFile = os.path.join(savepath, filename)
-                    xbmc.log('filename cover : ' + str(completeNameofFile), xbmc.LOGNOTICE)
-                    ulricone = 'http://' + self.origine.rechercheduserveur.LMSCLIip + ':' + \
-                               self.origine.rechercheduserveur.LMSwebport + '/music/' + valeur + '/cover.jpg'
-                    try:
-                        urllib.urlretrieve(ulricone, completeNameofFile)
-                        itemtampon.setArt({'thumb': completeNameofFile})
-                        itemtampon.setProperty('image', completeNameofFile)
-                    except IOError:
-                        pass
+                    hascode_coverart = valeur
+                    filename_coverart = self.get_artwork(hashcode_artwork=hascode_coverart)
+                    itemtampon.setArt({'thumb': filename_coverart})
+                    itemtampon.setProperty('image', filename_coverart)
+
+
+
                 # elif clef == 'year':
                 #    title
                 #    compilation
@@ -1319,14 +1539,14 @@ class MyMusic(Plugin_Generique):
 
                 elif clef == 'textkey':
                     itemtampon.setProperty(clef , valeur)
-                    self.myMusic.listMenu_principal.addItem(itemtampon)
+                    self.frameAllAbums.listMenu_principal.addItem(itemtampon)
                     itemtampon = xbmcgui.ListItem()
                 else:
                     itemtampon.setProperty(clef, valeur)
 
-            self.myMusic.doModal()
-            del self.myMusic
-        #fin if Albums
+            self.frameAllAbums.doModal()
+            del self.frameAllAbums
+        #fin if all Albums
 
         elif plugOrigine == 'Dossiers':
 
@@ -1335,8 +1555,8 @@ class MyMusic(Plugin_Generique):
                 self.origine.listMenu_Feuilles_all_Dossiers.getSelectedPosition()).getLabel()
 
             # affichage nouvelle fenêtre:
-            self.myMusic = frameMusicFolder.ViewMusicFolder()
-            #self.myMusic.show()
+            self.frameFolders = frameMusicFolder.ViewMusicFolder()
+            #self.frameFolders.show()
 
             # initialise focus ans navigation
             self.origine.InterfaceCLI.viderLeBuffer()  # need because resiliersouscription() let some data in the buffer
@@ -1421,12 +1641,12 @@ class MyMusic(Plugin_Generique):
                         else:
                             itemtampon.setArt({'thumb': self.image_musique})
 
-                    self.myMusic.listMusicFolder.addItem(itemtampon)
+                    self.frameFolders.listMusicFolder.addItem(itemtampon)
                     itemtampon = xbmcgui.ListItem()
 
-            self.myMusic.doModal()
+            self.frameFolders.doModal()
             #xbmc.Monitor().waitForAbort()
-            del self.myMusic
+            del self.frameFolders
         #fin if Plugorigine Dossier
     # fin fonction le_menu_fleurs
 # fin class MyMusic

@@ -142,7 +142,7 @@ class MyMusicAllAlbums(pyxbmctExtended.BackgroundDialogWindow):
         ligneButton = NEUF - 3
         SLIDER_INIT_VALUE = 0
         # reserve pour afficher cover.jpg
-        self.cover_jpg = self.image_dir + '/vinyl.png'      # pour le démarrage then updated
+        self.cover_jpg = self.image_dir + '/music.png'      # pour le démarrage then updated
         # need some adjustment
         # reserve pour afficher cover.jpg
         self.pochette = pyxbmct.Image(self.cover_jpg)

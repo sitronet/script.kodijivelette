@@ -284,11 +284,22 @@ class WhereIsTheLMSServer():
         # l'ordre du datagram est important pour la fonction de décodage
         # le serveur répond dans l'ordre de la question
         # changer l'ordre implique de changer la fonction décodage
+        #
+        # on the Slim server software the funcion to discover servers is in
+        # package Slim::Networking::Discovery::Server;
+        # and the discovery_packet (Perl)  is : pack 'a5xa4xa4xa4xa4x', 'eIPAD', 'NAME', 'JSON', 'UUID', 'VERS';
+        # not easy to understand : pack 'template' , data, data, ....
+        #  a ->  A string with arbitrary binary data, will be null padded.
+        # number 5 or 4  -> length ?
+        # on the slim server it get a list of servers on the network
+        # and regularly explores the loss or the arrival of a new server on the network
+        # dont' do that here, just ask for one server
+        # Todo : do the same : ask several and with regularly
         try:
             data = bytes('eIPAD\x00NAME\x00JSON\x00UUID\x00VERS\x00', 'ascii') #python 3.7
         except TypeError:
-            data = bytes('eIPAD\x00NAME\x00JSON\x00UUID\x00VERS\x00\JVID\x00')  # python 2.7
-
+            #data = bytes('eIPAD\x00NAME\x00JSON\x00UUID\x00VERS\x00\JVID\x00')  # python 2.7
+            data = bytes('eIPAD\x00NAME\x00JSON\x00UUID\x00VERS\x00')  # python 2.7
         # création du socket UDP
         if Kodi:
             #xbmc.log("creation du socket, envoi du datagram de découverte" + str(data) , xbmc.LOGDEBUG) # erreur sur kodi

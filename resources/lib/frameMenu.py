@@ -222,7 +222,7 @@ class FenetreMenu(pyxbmct.AddonFullWindow):
         self.Abonnement.set()  # etrange erreur à l'execution
         # take care : When abonnement is set the flag is True and don't block the external thread subscribe
         #            When abonnement is clear the flag is False and must block the thread subscribe
-
+        debug('entry in : ' + self.__class__.__name__  + ' ' +  sys._getframe().f_code.co_name , xbmc.LOGNOTICE)
         debug('Starting Frame for the menu  with window  pyxbmct , ' + str(self.Window_is_playing) , xbmc.LOGNOTICE)
         debug('special temp is : ' + str(savepath) , xbmc.LOGNOTICE )
 
@@ -442,7 +442,7 @@ class FenetreMenu(pyxbmct.AddonFullWindow):
         #                                translation(32062 , 'Remote Music Librairies') ]
 
         self.listeMyMusicPourMenuMyMusic = [
-            translation(32050, 'TODO'),
+            translation(32050, 'Album Artists'),
             translation(32051, 'All Artists'),
             translation(32052, 'TODO'),
             translation(32053, 'Albums'),
@@ -481,6 +481,7 @@ class FenetreMenu(pyxbmct.AddonFullWindow):
         self.listMenu_Feuilles = pyxbmct.List(buttonFocusTexture=self.image_list_focus, _imageWidth=38, _imageHeight=38, _itemHeight=40)
         self.listMenu_Feuilles_all_Artists = pyxbmct.List(buttonFocusTexture=self.image_list_focus, _imageWidth=38, _imageHeight=38, _itemHeight=40)
         self.listMenu_Feuilles_all_Albums = pyxbmct.List(buttonFocusTexture=self.image_list_focus, _imageWidth=38, _imageHeight=38, _itemHeight=40)
+        self.listMenu_Feuilles_ArtistAlbums = pyxbmct.List(buttonFocusTexture=self.image_list_focus, _imageWidth=38, _imageHeight=38, _itemHeight=40)
         self.listMenu_Feuilles_all_Dossiers = pyxbmct.List(buttonFocusTexture=self.image_list_focus, _imageWidth=38, _imageHeight=38, _itemHeight=40)
         self.listMenu_Feuilles_RandomMix= pyxbmct.List(buttonFocusTexture=self.image_list_focus, _imageWidth=38, _imageHeight=38, _itemHeight=40)
         self.listMenu_Feuilles_Extras= pyxbmct.List(buttonFocusTexture=self.image_list_focus, _imageWidth=38, _imageHeight=38, _itemHeight=40)
@@ -579,6 +580,9 @@ class FenetreMenu(pyxbmct.AddonFullWindow):
         self.placeControl(self.listMenu_Feuilles_all_Albums, self.row_depart, self.col_depart_menu_feuille, \
                           self.row_hauteur_menu_branche, self.col_largeur_menu_feuille)
 
+        self.placeControl(self.listMenu_Feuilles_ArtistAlbums, self.row_depart, self.col_depart_menu_feuille, \
+                          self.row_hauteur_menu_branche, self.col_largeur_menu_feuille)
+
         self.placeControl(self.listMenu_Feuilles_all_Dossiers, self.row_depart, self.col_depart_menu_feuille, \
                           self.row_hauteur_menu_branche, self.col_largeur_menu_feuille)
 
@@ -606,6 +610,7 @@ class FenetreMenu(pyxbmct.AddonFullWindow):
         self.connect(self.listMenu_MyMusic, self.navigationFromMenusMyMusic)
         self.connect(self.listMenu_Branches, self.navigationFromMenuBranche)
         self.connect(self.listMenu_Feuilles, self.navigationFromMenuFeuilles)
+        self.connect(self.listMenu_Feuilles_ArtistAlbums, self.navigationFromMenuFeuilles_ArtistAlbums)
         self.connect(self.listMenu_Feuilles_all_Artists, self.navigationFromMenuFeuilles_all_Artists)
         self.connect(self.listMenu_Feuilles_all_Albums, self.navigationFromMenuFeuilles_all_Albums)
         self.connect(self.listMenu_Feuilles_all_Dossiers, self.navigationFromMenuFeuilles_all_Dossiers)
@@ -640,6 +645,7 @@ class FenetreMenu(pyxbmct.AddonFullWindow):
         self.all_Artists_populated = False
         self.all_albums_populated = False
         self.all_dossiers_populated = False
+        self.ArtistAlbums_populated = False
 
     def set_navigation_lateral(self):
 
@@ -659,6 +665,7 @@ class FenetreMenu(pyxbmct.AddonFullWindow):
         self.listMenu_Feuilles.controlLeft(self.listMenu_Branches)
         self.listMenu_Feuilles_all_Artists.controlLeft(self.listMenu_MyMusic)
         self.listMenu_Feuilles_all_Albums.controlLeft(self.listMenu_MyMusic)
+        self.listMenu_Feuilles_ArtistAlbums.controlLeft(self.listMenu_MyMusic)
         self.listMenu_Feuilles_all_Dossiers.controlLeft(self.listMenu_MyMusic)
         self.listMenu_Feuilles_RandomMix.controlLeft(self.listMenu_MyMusic)
 
@@ -743,6 +750,7 @@ class FenetreMenu(pyxbmct.AddonFullWindow):
                 self.listMenu_Feuilles.setVisible(False)
                 self.listMenu_Feuilles_all_Artists.setVisible(False)
                 self.listMenu_Feuilles_all_Albums.setVisible(False)
+                self.listMenu_Feuilles_ArtistAlbums.setVisible(False)
                 self.listMenu_Feuilles_all_Dossiers.setVisible(False)
 
                 self.listMenu_Fleur.setVisible(False)
@@ -785,6 +793,7 @@ class FenetreMenu(pyxbmct.AddonFullWindow):
             self.listMenu_Feuilles.setVisible(False)
             self.listMenu_Feuilles_all_Artists.setVisible(False)
             self.listMenu_Feuilles_all_Albums.setVisible(False)
+            self.listMenu_Feuilles_ArtistAlbums.setVisible(False)
             self.listMenu_Feuilles_all_Dossiers.setVisible(False)
 
             self.listMenu_Fleur.setVisible(False)
@@ -917,7 +926,34 @@ class FenetreMenu(pyxbmct.AddonFullWindow):
         except:
                 pass
 
-        if self.itemSelectionBranche == translation(32051 , 'All Artists'):
+        if self.itemSelectionBranche == translation(32050, 'Album Artists'):
+            try:
+                # root
+                self.listMenu_Racine.setVisible(True)
+                # branch
+                self.listMenu_MyMusic.setVisible(True)
+                self.listMenu_Branches.setVisible(False)
+                self.listMenu_Extras.setVisible(False)
+                # leaves
+                self.listMenu_Feuilles.setVisible(False)
+                self.listMenu_Feuilles_all_Artists.setVisible(False)
+                self.listMenu_Feuilles_all_Albums.setVisible(False)
+                self.listMenu_Feuilles_ArtistAlbums.setVisible(True)
+                self.listMenu_Feuilles_all_Dossiers.setVisible(False)
+                self.listMenu_Feuilles_RandomMix.setVisible(False)
+                # flower
+                self.listMenu_Fleur.setVisible(False)
+            except:
+                pass
+
+            self.listMenu_MyMusic.controlRight(self.listMenu_Feuilles_ArtistAlbums)
+            self.listMenu_Feuilles_ArtistAlbums.controlLeft(self.listMenu_MyMusic)
+
+            if not self.ArtistAlbums_populated:
+                new_music_ArtistAlbums = plugin.MyMusic(self)
+                new_music_ArtistAlbums.le_menu_feuille(numeroItemSelectionBranche=NumeroItemSelectionBranche)
+
+        elif self.itemSelectionBranche == translation(32051 , 'All Artists'):
             try:
                 # root
                 self.listMenu_Racine.setVisible(True)
@@ -929,6 +965,7 @@ class FenetreMenu(pyxbmct.AddonFullWindow):
                 self.listMenu_Feuilles.setVisible(False)
                 self.listMenu_Feuilles_all_Artists.setVisible(True)
                 self.listMenu_Feuilles_all_Albums.setVisible(False)
+                self.listMenu_Feuilles_ArtistAlbums.setVisible(False)
                 self.listMenu_Feuilles_all_Dossiers.setVisible(False)
                 self.listMenu_Feuilles_RandomMix.setVisible(False)
                 #flower
@@ -954,6 +991,7 @@ class FenetreMenu(pyxbmct.AddonFullWindow):
                 self.listMenu_Feuilles.setVisible(False)
                 self.listMenu_Feuilles_all_Artists.setVisible(False)
                 self.listMenu_Feuilles_all_Albums.setVisible(True)
+                self.listMenu_Feuilles_ArtistAlbums.setVisible(False)
                 self.listMenu_Feuilles_all_Dossiers.setVisible(False)
                 self.listMenu_Feuilles_RandomMix.setVisible(False)
 
@@ -980,6 +1018,7 @@ class FenetreMenu(pyxbmct.AddonFullWindow):
                 self.listMenu_Feuilles.setVisible(False)
                 self.listMenu_Feuilles_all_Artists.setVisible(False)
                 self.listMenu_Feuilles_all_Albums.setVisible(False)
+                self.listMenu_Feuilles_ArtistAlbums.setVisible(False)
                 self.listMenu_Feuilles_RandomMix.setVisible(True)
                 self.listMenu_Feuilles_all_Dossiers.setVisible(False)
 
@@ -1024,6 +1063,7 @@ class FenetreMenu(pyxbmct.AddonFullWindow):
                 self.listMenu_Feuilles.setVisible(False)
                 self.listMenu_Feuilles_all_Artists.setVisible(False)
                 self.listMenu_Feuilles_all_Albums.setVisible(False)
+                self.listMenu_Feuilles_ArtistAlbums.setVisible(False)
                 self.listMenu_Feuilles_all_Dossiers.setVisible(True)
                 self.listMenu_Feuilles_RandomMix.setVisible(False)
 
@@ -1040,13 +1080,9 @@ class FenetreMenu(pyxbmct.AddonFullWindow):
 
         else:
             #todo :  write the other actions from the menu_music
-            self.listMenu_Feuilles_RandomMix.setVisible(False)
-            self.listMenu_Feuilles_all_Artists.setVisible(False)
-            self.listMenu_Feuilles_all_Albums.setVisible(False)
-
-            self.listMenu_Feuilles.setVisible(True)
 
             self.listMenu_Feuilles.reset()
+            debug('FNYI : frameMenu.py navigationFromMenusMyMusic ', xbmc.LOGNOTICE)
             outils.functionNotYetImplemented()
 
     def navigationFromMenuBranche(self):
@@ -1080,6 +1116,7 @@ class FenetreMenu(pyxbmct.AddonFullWindow):
                 self.listMenu_Feuilles.setVisible(True)
                 self.listMenu_Feuilles_all_Artists.setVisible(False)
                 self.listMenu_Feuilles_all_Albums.setVisible(False)
+                self.listMenu_Feuilles_ArtistAlbums.setVisible(False)
                 self.listMenu_Feuilles_all_Dossiers.setVisible(False)
                 self.listMenu_Feuilles_RandomMix.setVisible(False)
 
@@ -1188,6 +1225,7 @@ class FenetreMenu(pyxbmct.AddonFullWindow):
         self.listMenu_Feuilles.setVisible(False)
         self.listMenu_Feuilles_all_Artists.setVisible(True)
         self.listMenu_Feuilles_all_Albums.setVisible(False)
+        self.listMenu_Feuilles_ArtistAlbums.setVisible(False)
         self.listMenu_Feuilles_all_Dossiers.setVisible(False)
         self.listMenu_Feuilles_RandomMix.setVisible(False)
 
@@ -1241,6 +1279,7 @@ class FenetreMenu(pyxbmct.AddonFullWindow):
         self.listMenu_Feuilles.setVisible(False)
         self.listMenu_Feuilles_all_Artists.setVisible(False)
         self.listMenu_Feuilles_all_Albums.setVisible(True)
+        self.listMenu_Feuilles_ArtistAlbums.setVisible(False)
         self.listMenu_Feuilles_all_Dossiers.setVisible(False)
         self.listMenu_Feuilles_RandomMix.setVisible(False)
 
@@ -1256,7 +1295,60 @@ class FenetreMenu(pyxbmct.AddonFullWindow):
 
         new_menu = plugin.MyMusic(self)
         new_menu.le_menu_fleurs('Albums', itemSelection)
-    # fin navigationFromMenuDeuilles_all_Albums
+    # fin navigationFromMenuFeuilles_all_Albums
+
+    def navigationFromMenuFeuilles_ArtistAlbums(self):
+        # todo write it
+
+        itemSelectionFeuille = self.listMenu_Feuilles_ArtistAlbums.getListItem(
+            self.listMenu_Feuilles_ArtistAlbums.getSelectedPosition()).getLabel()
+        listitemSelection = self.listMenu_Feuilles_ArtistAlbums.getSelectedItem()
+        itemIdSelection = self.listMenu_Feuilles_ArtistAlbums.getListItem(
+            self.listMenu_Feuilles_ArtistAlbums.getSelectedPosition()).getProperty('id')
+
+        artist = self.listMenu_Feuilles_ArtistAlbums.getListItem(
+            self.listMenu_Feuilles_ArtistAlbums.getSelectedPosition()).getProperty('artist')
+        NumeroItemSelectionFeuille = self.listMenu_Feuilles_ArtistAlbums.getSelectedPosition()
+
+        debug('label dans menu Feuille ArtistAlbums : ' + itemSelectionFeuille, xbmc.LOGNOTICE)
+        debug('id dans menu Feuille ArtistAlbums : ' + itemIdSelection, xbmc.LOGNOTICE)
+        debug('artist dans menu Feuille ArtistAlbums : ' + artist, xbmc.LOGNOTICE)
+        debug('numéro dans menu Feuille ArtistAlbums : ' + str(NumeroItemSelectionFeuille), xbmc.LOGNOTICE)
+
+        self.list_item_feuille_label.setLabel(' :: ' + itemSelectionFeuille)
+
+        # if hasitem == 1:
+        # dig one  more time (no recursive)
+        # if hasitems == '1':
+        # self.les_menus_fleurs_Generic(NumeroItemSelectionFeuille)  # is it possible todo a recursive fonction ?
+
+        # reset the screen invisible
+        self.listMenu_Racine.setVisible(True)
+
+        self.listMenu_MyMusic.setVisible(True)
+        self.listMenu_Branches.setVisible(False)
+        self.listMenu_Extras.setVisible(False)
+
+        self.listMenu_Feuilles.setVisible(False)
+        self.listMenu_Feuilles_all_Artists.setVisible(False)
+        self.listMenu_Feuilles_all_Albums.setVisible(True)
+        self.listMenu_Feuilles_ArtistAlbums.setVisible(False)
+        self.listMenu_Feuilles_all_Dossiers.setVisible(False)
+        self.listMenu_Feuilles_RandomMix.setVisible(False)
+
+        self.listMenu_Fleur.setVisible(False)
+
+        self.setFocus(self.listMenu_Feuilles_ArtistAlbums)
+
+        itemSelection = self.listMenu_Feuilles_ArtistAlbums.getListItem(
+            self.listMenu_Feuilles_ArtistAlbums.getSelectedPosition()).getProperty('album_id')
+        debug('id item album : ' + str(itemSelection), xbmc.LOGNOTICE)
+        itemalternate = self.listMenu_Feuilles_ArtistAlbums.getSelectedItem().getProperty('album_id')
+        debug('id item album alternate : ' + str(itemalternate), xbmc.LOGNOTICE)
+
+        new_menuArtistAlbum = plugin.MyMusic(self)
+        new_menuArtistAlbum.le_menu_fleurs('ArtistAlbums', itemSelection)
+    # fin navigationFromMenuFeuilles_ArtistAlbums
 
     def navigationFromMenuFeuilles_RandomMix(self):
         # reset the screen invisible
@@ -1269,6 +1361,7 @@ class FenetreMenu(pyxbmct.AddonFullWindow):
         self.listMenu_Feuilles.setVisible(False)
         self.listMenu_Feuilles_all_Artists.setVisible(False)
         self.listMenu_Feuilles_all_Albums.setVisible(False)
+        self.listMenu_Feuilles_ArtistAlbums.setVisible(False)
         self.listMenu_Feuilles_RandomMix.setVisible(True)
         self.listMenu_Feuilles_all_Dossiers.setVisible(False)
 
@@ -1344,6 +1437,7 @@ class FenetreMenu(pyxbmct.AddonFullWindow):
         self.listMenu_Feuilles.setVisible(False)
         self.listMenu_Feuilles_all_Artists.setVisible(False)
         self.listMenu_Feuilles_all_Albums.setVisible(False)
+        self.listMenu_Feuilles_ArtistAlbums.setVisible(False)
         self.listMenu_Feuilles_all_Dossiers.setVisible(True)
         self.listMenu_Feuilles_RandomMix.setVisible(False)
 
@@ -1505,6 +1599,7 @@ class FenetreMenu(pyxbmct.AddonFullWindow):
                 self.listMenu_Feuilles.setVisible(False)
                 self.listMenu_Feuilles_all_Artists.setVisible(False)
                 self.listMenu_Feuilles_all_Albums.setVisible(False)
+                self.listMenu_Feuilles_ArtistAlbums.setVisible(False)
                 self.listMenu_Feuilles_RandomMix.setVisible(False)
                 self.listMenu_Feuilles_all_Dossiers.setVisible(False)
                 self.listMenu_Feuilles_Extras.setVisible(False)
@@ -1530,6 +1625,7 @@ class FenetreMenu(pyxbmct.AddonFullWindow):
                 self.listMenu_Feuilles.setVisible(False)
                 self.listMenu_Feuilles_all_Artists.setVisible(False)
                 self.listMenu_Feuilles_all_Albums.setVisible(False)
+                self.listMenu_Feuilles_ArtistAlbums.setVisible(False)
                 self.listMenu_Feuilles_RandomMix.setVisible(False)
                 self.listMenu_Feuilles_all_Dossiers.setVisible(False)
                 self.listMenu_Feuilles_Extras.setVisible(False)
@@ -1568,6 +1664,7 @@ class FenetreMenu(pyxbmct.AddonFullWindow):
                     self.listMenu_Feuilles.setVisible(False)
                     self.listMenu_Feuilles_all_Artists.setVisible(False)
                     self.listMenu_Feuilles_all_Albums.setVisible(False)
+                    self.listMenu_Feuilles_ArtistAlbums.setVisible(False)
                     self.listMenu_Feuilles_RandomMix.setVisible(False)
                     self.listMenu_Feuilles_all_Dossiers.setVisible(False)
                     self.listMenu_Feuilles_Extras.setVisible(False)
@@ -1579,6 +1676,205 @@ class FenetreMenu(pyxbmct.AddonFullWindow):
                         self.listMenu_MyMusic.controlLeft(self.listMenu_Racine)
                     except:
                         pass
+
+                    if self.getFocus() == self.listMenu_MyMusic:
+                        self.listMenu_Initialisation_server.setVisible(False)
+                        self.listMenu_Initialisation_players.setVisible(False)
+
+                        self.listMenu_Racine.setVisible(True)
+
+                        self.listMenu_MyMusic.setVisible(True)
+                        self.listMenu_Branches.setVisible(False)
+                        self.listMenu_Extras.setVisible(False)
+
+                        self.listMenu_Feuilles.setVisible(False)
+                        self.listMenu_Feuilles_all_Artists.setVisible(False)
+                        self.listMenu_Feuilles_all_Albums.setVisible(False)
+                        self.listMenu_Feuilles_ArtistAlbums.setVisible(False)
+                        self.listMenu_Feuilles_RandomMix.setVisible(False)
+                        self.listMenu_Feuilles_all_Dossiers.setVisible(False)
+                        self.listMenu_Feuilles_Extras.setVisible(False)
+
+                        self.listMenu_Fleur.setVisible(False)
+
+                        # on récupère le label de l'item sur lequel on est positionné
+                        itemSelectionBranche = self.listMenu_MyMusic.getListItem(
+                            self.listMenu_MyMusic.getSelectedPosition()).getLabel()
+                        debug('position dans menu My Music : ' + itemSelectionBranche, xbmc.LOGDEBUG)
+                        self.list_item_feuille_label.setLabel('')
+
+                        # affichage en bas écran dans un label le menu en cours
+                        self.list_item_branche_label.setLabel(' :: ' + itemSelectionBranche)
+
+                        NumeroItemSelectionBranche = self.listMenu_MyMusic.getSelectedPosition()
+
+                        self.listMenu_Racine.controlRight(self.listMenu_MyMusic)
+                        self.listMenu_MyMusic.controlLeft(self.listMenu_Racine)
+                        # à xompléter en descendant dans les menus
+
+                        if self.getFocus() == self.listMenu_Feuilles_all_Artists:
+
+                            try:
+                                self.listMenu_Initialisation_server.setVisible(False)
+                                self.listMenu_Initialisation_players.setVisible(False)
+
+                                self.listMenu_Racine.setVisible(True)
+
+                                self.listMenu_MyMusic.setVisible(True)
+                                self.listMenu_Branches.setVisible(False)
+                                self.listMenu_Extras.setVisible(False)
+
+                                self.listMenu_Feuilles.setVisible(False)
+                                self.listMenu_Feuilles_all_Artists.setVisible(True)
+                                self.listMenu_Feuilles_all_Albums.setVisible(False)
+                                self.listMenu_Feuilles_ArtistAlbums.setVisible(False)
+                                self.listMenu_Feuilles_RandomMix.setVisible(False)
+                                self.listMenu_Feuilles_all_Dossiers.setVisible(False)
+                                self.listMenu_Feuilles_Extras.setVisible(False)
+
+                                self.listMenu_Fleur.setVisible(False)
+                            except:
+                                pass
+
+                            itemSelectionFeuille = self.listMenu_Feuilles_all_Artists.getListItem(
+                                self.listMenu_Feuilles_all_Artists.getSelectedPosition()).getLabel()
+                            debug('label dans menu Feuille All Artists : ' + itemSelectionFeuille, xbmc.LOGNOTICE)
+                            self.list_item_feuille_label.setLabel(' :: ' + itemSelectionFeuille)
+                            # remise à blanc sous-label
+                            self.list_item_fleur_label.setLabel('')
+                            NumeroItemSelectionFeuille = self.listMenu_Feuilles_all_Artists.getSelectedPosition()
+                            hasitems = self.listMenu_Feuilles_all_Artists.getListItem(
+                                self.listMenu_Feuilles_all_Artists.getSelectedPosition()).getProperty('hasitems')
+
+                            debug('flowers get an hasitem : ' + str(hasitems), xbmc.LOGNOTICE)
+                            # if hasitem == 1:
+                            # dig one  more time (no recursive)
+                            debug('NumeroItemSelectionFeuille : ' + str(NumeroItemSelectionFeuille), xbmc.LOGNOTICE)
+
+                            self.listMenu_MyMusic.controlLeft(self.listMenu_Racine)
+                            self.listMenu_MyMusic.controlRight(self.listMenu_Feuilles_all_Artists)
+                            self.listMenu_Feuilles_all_Artists.controlLeft(self.listMenu_MyMusic)
+
+                        # go to the connect lambda function
+
+                        elif self.getFocus() == self.listMenu_Feuilles_RandomMix:
+
+                            try:
+                                self.listMenu_Initialisation_server.setVisible(False)
+                                self.listMenu_Initialisation_players.setVisible(False)
+
+                                self.listMenu_Racine.setVisible(True)
+
+                                self.listMenu_MyMusic.setVisible(True)
+                                self.listMenu_Branches.setVisible(False)
+                                self.listMenu_Extras.setVisible(False)
+
+                                self.listMenu_Feuilles.setVisible(False)
+                                self.listMenu_Feuilles_all_Artists.setVisible(False)
+                                self.listMenu_Feuilles_all_Albums.setVisible(False)
+                                self.listMenu_Feuilles_ArtistAlbums.setVisible(False)
+                                self.listMenu_Feuilles_RandomMix.setVisible(True)
+                                self.listMenu_Feuilles_all_Dossiers.setVisible(False)
+                                self.listMenu_Feuilles_Extras.setVisible(False)
+
+                                self.listMenu_Fleur.setVisible(False)
+                            except:
+                                pass
+
+                            itemSelectionFeuille = self.listMenu_Feuilles_RandomMix.getListItem(
+                                self.listMenu_Feuilles_RandomMix.getSelectedPosition()).getLabel()
+                            debug('label dans menu Feuille Random mix : ' + itemSelectionFeuille, xbmc.LOGNOTICE)
+                            self.list_item_feuille_label.setLabel(' :: ' + itemSelectionFeuille)
+                            # remise à blanc sous-label
+                            self.list_item_fleur_label.setLabel('')
+
+                            NumeroItemSelectionFeuille = self.listMenu_Feuilles_RandomMix.getSelectedPosition()
+                            debug('NumeroItemSelectionFeuille : ' + str(NumeroItemSelectionFeuille), xbmc.LOGNOTICE)
+
+                            self.listMenu_Racine.controlRight(self.listMenu_MyMusic)
+                            self.listMenu_MyMusic.controlLeft(self.listMenu_Racine)
+                            self.listMenu_MyMusic.controlRight(self.listMenu_Feuilles_RandomMix)
+                            self.listMenu_Feuilles_RandomMix.controlLeft(self.listMenu_MyMusic)
+
+                        elif self.getFocus() == self.listMenu_Feuilles_all_Albums:
+
+                            try:
+                                self.listMenu_Initialisation_server.setVisible(False)
+                                self.listMenu_Initialisation_players.setVisible(False)
+
+                                self.listMenu_Racine.setVisible(True)
+
+                                self.listMenu_MyMusic.setVisible(True)
+                                self.listMenu_Branches.setVisible(False)
+                                self.listMenu_Extras.setVisible(False)
+
+                                self.listMenu_Feuilles.setVisible(False)
+                                self.listMenu_Feuilles_all_Artists.setVisible(False)
+                                self.listMenu_Feuilles_all_Albums.setVisible(True)
+                                self.listMenu_Feuilles_ArtistAlbums.setVisible(False)
+                                self.listMenu_Feuilles_RandomMix.setVisible(False)
+                                self.listMenu_Feuilles_all_Dossiers.setVisible(False)
+                                self.listMenu_Feuilles_Extras.setVisible(False)
+
+                                self.listMenu_Fleur.setVisible(False)
+                            except:
+                                pass
+
+                            itemSelectionFeuille = self.listMenu_Feuilles_all_Albums.getListItem(
+                                self.listMenu_Feuilles_all_Albums.getSelectedPosition()).getLabel()
+                            debug('label dans menu Feuille Album mix : ' + itemSelectionFeuille, xbmc.LOGNOTICE)
+                            self.list_item_feuille_label.setLabel(' :: ' + itemSelectionFeuille)
+                            # remise à blanc sous-label
+                            self.list_item_fleur_label.setLabel('')
+
+                            NumeroItemSelectionFeuille = self.listMenu_Feuilles_all_Albums.getSelectedPosition()
+                            debug('NumeroItemSelectionFeuille : ' + str(NumeroItemSelectionFeuille), xbmc.LOGNOTICE)
+
+                            self.listMenu_Racine.controlRight(self.listMenu_MyMusic)
+                            self.listMenu_MyMusic.controlLeft(self.listMenu_Racine)
+                            self.listMenu_MyMusic.controlRight(self.listMenu_Feuilles_all_Albums)
+                            self.listMenu_Feuilles_all_Albums.controlLeft(self.listMenu_MyMusic)
+
+                        elif self.getFocus() == self.listMenu_Feuilles_all_Dossiers:
+
+                            try:
+                                self.listMenu_Initialisation_server.setVisible(False)
+                                self.listMenu_Initialisation_players.setVisible(False)
+
+                                self.listMenu_Racine.setVisible(True)
+
+                                self.listMenu_MyMusic.setVisible(True)
+                                self.listMenu_Branches.setVisible(False)
+                                self.listMenu_Extras.setVisible(False)
+
+                                self.listMenu_Feuilles.setVisible(False)
+                                self.listMenu_Feuilles_all_Artists.setVisible(False)
+                                self.listMenu_Feuilles_all_Albums.setVisible(False)
+                                self.listMenu_Feuilles_ArtistAlbums.setVisible(False)
+                                self.listMenu_Feuilles_RandomMix.setVisible(False)
+                                self.listMenu_Feuilles_all_Dossiers.setVisible(True)
+                                self.listMenu_Feuilles_Extras.setVisible(False)
+
+                                self.listMenu_Fleur.setVisible(False)
+                            except:
+                                pass
+
+                            itemSelectionFeuille = self.listMenu_Feuilles_all_Dossiers.getListItem(
+                                self.listMenu_Feuilles_all_Dossiers.getSelectedPosition()).getLabel()
+                            debug('label dans menu Feuille Random mix : ' + itemSelectionFeuille, xbmc.LOGNOTICE)
+                            self.list_item_feuille_label.setLabel(' :: ' + itemSelectionFeuille)
+                            # remise à blanc sous-label
+                            self.list_item_fleur_label.setLabel('')
+
+                            NumeroItemSelectionFeuille = self.listMenu_Feuilles_all_Dossiers.getSelectedPosition()
+                            debug('NumeroItemSelectionFeuille : ' + str(NumeroItemSelectionFeuille), xbmc.LOGNOTICE)
+
+                            self.listMenu_Racine.controlRight(self.listMenu_MyMusic)
+                            self.listMenu_MyMusic.controlLeft(self.listMenu_Racine)
+                            self.listMenu_MyMusic.controlRight(self.listMenu_Feuilles_all_Dossiers)
+                            self.listMenu_Feuilles_all_Dossiers.controlLeft(self.listMenu_MyMusic)
+
+
 
                 elif self.itemSelectionRacine == translation(32042 , 'I-Radio' ):
 
@@ -1595,6 +1891,7 @@ class FenetreMenu(pyxbmct.AddonFullWindow):
                         self.listMenu_Feuilles.setVisible(False)
                         self.listMenu_Feuilles_all_Artists.setVisible(False)
                         self.listMenu_Feuilles_all_Albums.setVisible(False)
+                        self.listMenu_Feuilles_ArtistAlbums.setVisible(False)
                         self.listMenu_Feuilles_RandomMix.setVisible(False)
                         self.listMenu_Feuilles_all_Dossiers.setVisible(False)
                         self.listMenu_Feuilles_Extras.setVisible(False)
@@ -1610,7 +1907,78 @@ class FenetreMenu(pyxbmct.AddonFullWindow):
                     except:
                         pass
 
-                elif self.itemSelectionRacine == translation(32043 , 'My Apps'): 
+                    if self.getFocus() == self.listMenu_Branches:
+
+                        self.listMenu_Initialisation_server.setVisible(False)
+                        self.listMenu_Initialisation_players.setVisible(False)
+
+                        self.listMenu_Racine.setVisible(True)
+
+                        self.listMenu_MyMusic.setVisible(False)
+                        self.listMenu_Branches.setVisible(True)
+                        self.listMenu_Extras.setVisible(False)
+
+                        self.listMenu_Feuilles.setVisible(False)
+                        self.listMenu_Feuilles_all_Artists.setVisible(False)
+                        self.listMenu_Feuilles_all_Albums.setVisible(False)
+                        self.listMenu_Feuilles_ArtistAlbums.setVisible(False)
+                        self.listMenu_Feuilles_RandomMix.setVisible(False)
+                        self.listMenu_Feuilles_all_Dossiers.setVisible(False)
+                        self.listMenu_Feuilles_Extras.setVisible(False)
+
+                        self.listMenu_Fleur.setVisible(False)
+
+                        self.itemSelectionBranche = self.listMenu_Branches.getListItem(
+                            self.listMenu_Branches.getSelectedPosition()).getLabel()
+
+                        # affichage en bas écran dans un label le menu en cours
+                        self.list_item_branche_label.setLabel(':: ' + self.itemSelectionBranche)
+                        debug('position curseur sur menu : ' + self.itemSelectionBranche, xbmc.LOGNOTICE)
+                        # remise à blanc des sous-labels
+                        self.list_item_feuille_label.setLabel('')
+
+                        self.listMenu_Racine.controlRight(self.listMenu_Branches)
+
+                        if self.getFocus() == self.listMenu_Feuilles:
+
+                            try:
+                                self.listMenu_Initialisation_server.setVisible(False)
+                                self.listMenu_Initialisation_players.setVisible(False)
+
+                                self.listMenu_Racine.setVisible(True)
+
+                                self.listMenu_MyMusic.setVisible(False)
+                                self.listMenu_Branches.setVisible(True)
+                                self.listMenu_Extras.setVisible(False)
+
+                                self.listMenu_Feuilles.setVisible(True)
+                                self.listMenu_Feuilles_all_Artists.setVisible(False)
+                                self.listMenu_Feuilles_all_Albums.setVisible(False)
+                                self.listMenu_Feuilles_ArtistAlbums.setVisible(False)
+                                self.listMenu_Feuilles_RandomMix.setVisible(False)
+                                self.listMenu_Feuilles_all_Dossiers.setVisible(False)
+                                self.listMenu_Feuilles_Extras.setVisible(False)
+
+                                self.listMenu_Fleur.setVisible(False)
+                            except:
+                                pass
+
+                            itemSelectionFeuille = self.listMenu_Feuilles.getListItem(
+                                self.listMenu_Feuilles.getSelectedPosition()).getLabel()
+                            debug('label dans menu Feuille : ' + itemSelectionFeuille, xbmc.LOGNOTICE)
+                            self.list_item_feuille_label.setLabel(' :: ' + itemSelectionFeuille)
+                            # remise à blanc sous-label
+                            self.list_item_fleur_label.setLabel('')
+                            NumeroItemSelectionFeuille = self.listMenu_Feuilles.getSelectedPosition()
+                            hasitems = self.listMenu_Feuilles.getListItem(
+                                self.listMenu_Feuilles.getSelectedPosition()).getProperty('hasitems')
+
+                            debug('flowers get an hasitem : ' + str(hasitems), xbmc.LOGNOTICE)
+                            # if hasitem == 1:
+                            # dig one  more time (no recursive)
+                            debug('NumeroItemSelectionFeuille : ' + str(NumeroItemSelectionFeuille), xbmc.LOGNOTICE)
+
+                elif self.itemSelectionRacine == translation(32043 , 'My Apps'):
 
                     try:
                         self.listMenu_Initialisation_server.setVisible(False)
@@ -1625,6 +1993,7 @@ class FenetreMenu(pyxbmct.AddonFullWindow):
                         self.listMenu_Feuilles.setVisible(False)
                         self.listMenu_Feuilles_all_Artists.setVisible(False)
                         self.listMenu_Feuilles_all_Albums.setVisible(False)
+                        self.listMenu_Feuilles_ArtistAlbums.setVisible(False)
                         self.listMenu_Feuilles_RandomMix.setVisible(False)
                         self.listMenu_Feuilles_all_Dossiers.setVisible(False)
                         self.listMenu_Feuilles_Extras.setVisible(False)
@@ -1633,6 +2002,79 @@ class FenetreMenu(pyxbmct.AddonFullWindow):
 
                     except:
                         pass
+
+                    if self.getFocus() == self.listMenu_Branches:
+
+                        self.listMenu_Initialisation_server.setVisible(False)
+                        self.listMenu_Initialisation_players.setVisible(False)
+
+                        self.listMenu_Racine.setVisible(True)
+
+                        self.listMenu_MyMusic.setVisible(False)
+                        self.listMenu_Branches.setVisible(True)
+                        self.listMenu_Extras.setVisible(False)
+
+                        self.listMenu_Feuilles.setVisible(False)
+                        self.listMenu_Feuilles_all_Artists.setVisible(False)
+                        self.listMenu_Feuilles_all_Albums.setVisible(False)
+                        self.listMenu_Feuilles_ArtistAlbums.setVisible(False)
+                        self.listMenu_Feuilles_RandomMix.setVisible(False)
+                        self.listMenu_Feuilles_all_Dossiers.setVisible(False)
+                        self.listMenu_Feuilles_Extras.setVisible(False)
+
+                        self.listMenu_Fleur.setVisible(False)
+
+                        self.itemSelectionBranche = self.listMenu_Branches.getListItem(
+                            self.listMenu_Branches.getSelectedPosition()).getLabel()
+
+                        # affichage en bas écran dans un label le menu en cours
+                        self.list_item_branche_label.setLabel(':: ' + self.itemSelectionBranche)
+                        debug('position curseur sur menu : ' + self.itemSelectionBranche, xbmc.LOGNOTICE)
+                        # remise à blanc des sous-labels
+                        self.list_item_feuille_label.setLabel('')
+
+                        self.listMenu_Racine.controlRight(self.listMenu_Branches)
+
+                        if self.getFocus() == self.listMenu_Feuilles:
+
+                            try:
+                                self.listMenu_Initialisation_server.setVisible(False)
+                                self.listMenu_Initialisation_players.setVisible(False)
+
+                                self.listMenu_Racine.setVisible(True)
+
+                                self.listMenu_MyMusic.setVisible(False)
+                                self.listMenu_Branches.setVisible(True)
+                                self.listMenu_Extras.setVisible(False)
+
+                                self.listMenu_Feuilles.setVisible(True)
+                                self.listMenu_Feuilles_all_Artists.setVisible(False)
+                                self.listMenu_Feuilles_all_Albums.setVisible(False)
+                                self.listMenu_Feuilles_ArtistAlbums.setVisible(False)
+                                self.listMenu_Feuilles_RandomMix.setVisible(False)
+                                self.listMenu_Feuilles_all_Dossiers.setVisible(False)
+                                self.listMenu_Feuilles_Extras.setVisible(False)
+
+                                self.listMenu_Fleur.setVisible(False)
+                            except:
+                                pass
+
+                            itemSelectionFeuille = self.listMenu_Feuilles.getListItem(
+                                self.listMenu_Feuilles.getSelectedPosition()).getLabel()
+                            debug('label dans menu Feuille : ' + itemSelectionFeuille, xbmc.LOGNOTICE)
+                            self.list_item_feuille_label.setLabel(' :: ' + itemSelectionFeuille)
+                            # remise à blanc sous-label
+                            self.list_item_fleur_label.setLabel('')
+                            NumeroItemSelectionFeuille = self.listMenu_Feuilles.getSelectedPosition()
+                            hasitems = self.listMenu_Feuilles.getListItem(
+                                self.listMenu_Feuilles.getSelectedPosition()).getProperty('hasitems')
+
+                            debug('flowers get an hasitem : ' + str(hasitems), xbmc.LOGNOTICE)
+                            # if hasitem == 1:
+                            # dig one  more time (no recursive)
+                            debug('NumeroItemSelectionFeuille : ' + str(NumeroItemSelectionFeuille), xbmc.LOGNOTICE)
+
+
 
                 elif self.itemSelectionRacine == translation(32044 , 'Favorites'):
                     # favorites has a special frame rather a sub-menu ; it's a try
@@ -1649,6 +2091,7 @@ class FenetreMenu(pyxbmct.AddonFullWindow):
                         self.listMenu_Feuilles.setVisible(False)
                         self.listMenu_Feuilles_all_Artists.setVisible(False)
                         self.listMenu_Feuilles_all_Albums.setVisible(False)
+                        self.listMenu_Feuilles_ArtistAlbums.setVisible(False)
                         self.listMenu_Feuilles_RandomMix.setVisible(False)
                         self.listMenu_Feuilles_all_Dossiers.setVisible(False)
                         self.listMenu_Feuilles_Extras.setVisible(False)
@@ -1672,6 +2115,7 @@ class FenetreMenu(pyxbmct.AddonFullWindow):
                         self.listMenu_Feuilles.setVisible(False)
                         self.listMenu_Feuilles_all_Artists.setVisible(False)
                         self.listMenu_Feuilles_all_Albums.setVisible(False)
+                        self.listMenu_Feuilles_ArtistAlbums.setVisible(False)
                         self.listMenu_Feuilles_RandomMix.setVisible(False)
                         self.listMenu_Feuilles_all_Dossiers.setVisible(False)
                         self.listMenu_Feuilles_Extras.setVisible(False)
@@ -1680,343 +2124,89 @@ class FenetreMenu(pyxbmct.AddonFullWindow):
                     except:
                         pass
 
+                    if self.getFocus() == self.listMenu_Extras:
+
+                        self.listMenu_Initialisation_server.setVisible(False)
+                        self.listMenu_Initialisation_players.setVisible(False)
+
+                        self.listMenu_Racine.setVisible(True)
+
+                        self.listMenu_MyMusic.setVisible(False)
+                        self.listMenu_Branches.setVisible(False)
+                        self.listMenu_Extras.setVisible(True)
+
+                        self.listMenu_Feuilles.setVisible(False)
+                        self.listMenu_Feuilles_all_Artists.setVisible(False)
+                        self.listMenu_Feuilles_all_Albums.setVisible(False)
+                        self.listMenu_Feuilles_ArtistAlbums.setVisible(False)
+                        self.listMenu_Feuilles_RandomMix.setVisible(False)
+                        self.listMenu_Feuilles_all_Dossiers.setVisible(False)
+                        self.listMenu_Feuilles_Extras.setVisible(True)
+
+                        self.listMenu_Fleur.setVisible(False)
+
+                        self.listMenu_Racine.controlRight(self.listMenu_Extras)
+                        self.listMenu_Extras.controlLeft(self.listMenu_Racine)
+                        self.listMenu_Extras.controlRight(self.listMenu_Feuilles_Extras)
+
+                        itemSelectionBranche = self.listMenu_Extras.getListItem(
+                            self.listMenu_Extras.getSelectedPosition()).getLabel()
+                        # affichage en bas écran dans un label le menu en cours
+                        self.list_item_branche_label.setLabel(' :: ' + itemSelectionBranche)
+                        debug('position dans menu Extras : ' + str(itemSelectionBranche), xbmc.LOGNOTICE)
+                        # remise à blanc
+                        self.list_item_feuille_label.setLabel('')
+
+                        NumeroItemSelectionBranche = self.listMenu_Branches.getSelectedPosition()
+
+                        if self.getFocus() == self.listMenu_Feuilles_Extras:
+
+                            try:
+                                self.listMenu_Initialisation_server.setVisible(False)
+                                self.listMenu_Initialisation_players.setVisible(False)
+
+                                self.listMenu_Racine.setVisible(True)
+
+                                self.listMenu_MyMusic.setVisible(False)
+                                self.listMenu_Branches.setVisible(False)
+                                self.listMenu_Extras.setVisible(True)
+
+                                self.listMenu_Feuilles.setVisible(False)
+                                self.listMenu_Feuilles_all_Artists.setVisible(False)
+                                self.listMenu_Feuilles_all_Albums.setVisible(False)
+                                self.listMenu_Feuilles_ArtistAlbums.setVisible(False)
+                                self.listMenu_Feuilles_RandomMix.setVisible(False)
+                                self.listMenu_Feuilles_all_Dossiers.setVisible(False)
+                                self.listMenu_Feuilles_Extras.setVisible(True)
+
+                                self.listMenu_Fleur.setVisible(False)
+                            except:
+                                pass
+
+                            itemSelectionFeuille = self.listMenu_Feuilles_Extras.getListItem(
+                                self.listMenu_Feuilles_Extras.getSelectedPosition()).getLabel()
+                            debug('label dans menu Feuille des Extras : ' + itemSelectionFeuille, xbmc.LOGNOTICE)
+                            self.list_item_feuille_label.setLabel(' :: ' + itemSelectionFeuille)
+                            # remise à blanc sous-label
+                            self.list_item_fleur_label.setLabel('')
+
+                            NumeroItemSelectionFeuille = self.listMenu_Feuilles_Extras.getSelectedPosition()
+                            debug('NumeroItemSelectionFeuilleExtra : ' + str(NumeroItemSelectionFeuille), xbmc.LOGNOTICE)
+
+                            self.listMenu_Racine.controlRight(self.listMenu_Extras)
+                            self.listMenu_Extras.controlLeft(self.listMenu_Racine)
+                            self.listMenu_Extras.controlRight(self.listMenu_Feuilles_Extras)
+                            self.listMenu_Feuilles_Extras.controlLeft(self.listMenu_Extras)
+
+
                 elif self.itemSelectionRacine == translation(32046 , 'Quit'):
                     pass
 
-            elif self.getFocus() == self.listMenu_MyMusic:
 
-                self.listMenu_Initialisation_server.setVisible(False)
-                self.listMenu_Initialisation_players.setVisible(False)
 
-                self.listMenu_Racine.setVisible(True)
 
-                self.listMenu_MyMusic.setVisible(True)
-                self.listMenu_Branches.setVisible(False)
-                self.listMenu_Extras.setVisible(False)
 
-                self.listMenu_Feuilles.setVisible(False)
-                self.listMenu_Feuilles_all_Artists.setVisible(False)
-                self.listMenu_Feuilles_all_Albums.setVisible(False)
-                self.listMenu_Feuilles_RandomMix.setVisible(False)
-                self.listMenu_Feuilles_all_Dossiers.setVisible(False)
-                self.listMenu_Feuilles_Extras.setVisible(False)
 
-                self.listMenu_Fleur.setVisible(False)
-
-                # on récupère le label de l'item sur lequel on est positionné
-                itemSelectionBranche = self.listMenu_MyMusic.getListItem(
-                    self.listMenu_MyMusic.getSelectedPosition()).getLabel()
-                debug('position dans menu My Music : ' + itemSelectionBranche, xbmc.LOGDEBUG)
-                self.list_item_feuille_label.setLabel('')
-
-                # affichage en bas écran dans un label le menu en cours
-                self.list_item_branche_label.setLabel(' :: ' + itemSelectionBranche)
-
-                NumeroItemSelectionBranche = self.listMenu_MyMusic.getSelectedPosition()
-
-                self.listMenu_Racine.controlRight(self.listMenu_MyMusic)
-                self.listMenu_MyMusic.controlLeft(self.listMenu_Racine)
-                # à xompléter en descendant dans les menus
-
-            elif self.getFocus() == self.listMenu_Branches:
-
-                self.listMenu_Initialisation_server.setVisible(False)
-                self.listMenu_Initialisation_players.setVisible(False)
-
-                self.listMenu_Racine.setVisible(True)
-
-                self.listMenu_MyMusic.setVisible(False)
-                self.listMenu_Branches.setVisible(True)
-                self.listMenu_Extras.setVisible(False)
-
-                self.listMenu_Feuilles.setVisible(False)
-                self.listMenu_Feuilles_all_Artists.setVisible(False)
-                self.listMenu_Feuilles_all_Albums.setVisible(False)
-                self.listMenu_Feuilles_RandomMix.setVisible(False)
-                self.listMenu_Feuilles_all_Dossiers.setVisible(False)
-                self.listMenu_Feuilles_Extras.setVisible(False)
-
-                self.listMenu_Fleur.setVisible(False)
-
-                self.itemSelectionBranche = self.listMenu_Branches.getListItem(
-                    self.listMenu_Branches.getSelectedPosition()).getLabel()
-
-                # affichage en bas écran dans un label le menu en cours
-                self.list_item_branche_label.setLabel(':: ' + self.itemSelectionBranche)
-                debug( 'position curseur sur menu : ' + self.itemSelectionBranche, xbmc.LOGNOTICE)
-                #remise à blanc des sous-labels
-                self.list_item_feuille_label.setLabel('')
-                
-                self.listMenu_Racine.controlRight(self.listMenu_Branches)
-
-            elif self.getFocus() == self.listMenu_Extras:
-
-                self.listMenu_Initialisation_server.setVisible(False)
-                self.listMenu_Initialisation_players.setVisible(False)
-
-                self.listMenu_Racine.setVisible(True)
-
-                self.listMenu_MyMusic.setVisible(False)
-                self.listMenu_Branches.setVisible(False)
-                self.listMenu_Extras.setVisible(True)
-
-                self.listMenu_Feuilles.setVisible(False)
-                self.listMenu_Feuilles_all_Artists.setVisible(False)
-                self.listMenu_Feuilles_all_Albums.setVisible(False)
-                self.listMenu_Feuilles_RandomMix.setVisible(False)
-                self.listMenu_Feuilles_all_Dossiers.setVisible(False)
-                self.listMenu_Feuilles_Extras.setVisible(False)
-
-                self.listMenu_Fleur.setVisible(False)
-
-                self.listMenu_Racine.controlRight(self.listMenu_Extras)
-                self.listMenu_Extras.controlLeft(self.listMenu_Racine)
-                self.listMenu_Extras.controlRight(self.listMenu_Feuilles_Extras)
-
-                itemSelectionBranche = self.listMenu_Extras.getListItem(
-                    self.listMenu_Extras.getSelectedPosition()).getLabel()
-                # affichage en bas écran dans un label le menu en cours
-                self.list_item_branche_label.setLabel(' :: ' + itemSelectionBranche)
-                debug('position dans menu Extras : ' + str(itemSelectionBranche), xbmc.LOGNOTICE)
-                #remise à blanc
-                self.list_item_feuille_label.setLabel('')
-
-                NumeroItemSelectionBranche = self.listMenu_Branches.getSelectedPosition()
-
-            elif self.getFocus() == self.listMenu_Feuilles:
-
-                try:
-                    self.listMenu_Initialisation_server.setVisible(False)
-                    self.listMenu_Initialisation_players.setVisible(False)
-
-                    self.listMenu_Racine.setVisible(True)
-
-                    self.listMenu_MyMusic.setVisible(False)
-                    self.listMenu_Branches.setVisible(True)
-                    self.listMenu_Extras.setVisible(False)
-
-                    self.listMenu_Feuilles.setVisible(True)
-                    self.listMenu_Feuilles_all_Artists.setVisible(False)
-                    self.listMenu_Feuilles_all_Albums.setVisible(False)
-                    self.listMenu_Feuilles_RandomMix.setVisible(False)
-                    self.listMenu_Feuilles_all_Dossiers.setVisible(False)
-                    self.listMenu_Feuilles_Extras.setVisible(False)
-
-                    self.listMenu_Fleur.setVisible(False)
-                except  :
-                    pass
-
-                itemSelectionFeuille = self.listMenu_Feuilles.getListItem(
-                    self.listMenu_Feuilles.getSelectedPosition()).getLabel()
-                debug('label dans menu Feuille : ' + itemSelectionFeuille, xbmc.LOGNOTICE)
-                self.list_item_feuille_label.setLabel(' :: ' + itemSelectionFeuille)
-                #remise à blanc sous-label
-                self.list_item_fleur_label.setLabel('')
-                NumeroItemSelectionFeuille = self.listMenu_Feuilles.getSelectedPosition()
-                hasitems = self.listMenu_Feuilles.getListItem(
-                    self.listMenu_Feuilles.getSelectedPosition()).getProperty('hasitems')
-
-                debug('flowers get an hasitem : ' + str(hasitems), xbmc.LOGNOTICE)
-                # if hasitem == 1:
-                # dig one  more time (no recursive)
-                debug('NumeroItemSelectionFeuille : ' + str(NumeroItemSelectionFeuille), xbmc.LOGNOTICE)
-
-            elif self.getFocus() == self.listMenu_Feuilles_all_Artists:
-
-                try:
-                    self.listMenu_Initialisation_server.setVisible(False)
-                    self.listMenu_Initialisation_players.setVisible(False)
-
-                    self.listMenu_Racine.setVisible(True)
-
-                    self.listMenu_MyMusic.setVisible(True)
-                    self.listMenu_Branches.setVisible(False)
-                    self.listMenu_Extras.setVisible(False)
-
-                    self.listMenu_Feuilles.setVisible(False)
-                    self.listMenu_Feuilles_all_Artists.setVisible(True)
-                    self.listMenu_Feuilles_all_Albums.setVisible(False)
-                    self.listMenu_Feuilles_RandomMix.setVisible(False)
-                    self.listMenu_Feuilles_all_Dossiers.setVisible(False)
-                    self.listMenu_Feuilles_Extras.setVisible(False)
-
-                    self.listMenu_Fleur.setVisible(False)
-                except  :
-                    pass
-
-                itemSelectionFeuille = self.listMenu_Feuilles_all_Artists.getListItem(
-                    self.listMenu_Feuilles_all_Artists.getSelectedPosition()).getLabel()
-                debug('label dans menu Feuille All Artists : ' + itemSelectionFeuille, xbmc.LOGNOTICE)
-                self.list_item_feuille_label.setLabel(' :: ' + itemSelectionFeuille)
-                #remise à blanc sous-label
-                self.list_item_fleur_label.setLabel('')
-                NumeroItemSelectionFeuille = self.listMenu_Feuilles_all_Artists.getSelectedPosition()
-                hasitems = self.listMenu_Feuilles_all_Artists.getListItem(
-                    self.listMenu_Feuilles_all_Artists.getSelectedPosition()).getProperty('hasitems')
-
-                debug('flowers get an hasitem : ' + str(hasitems), xbmc.LOGNOTICE)
-                # if hasitem == 1:
-                # dig one  more time (no recursive)
-                debug('NumeroItemSelectionFeuille : ' + str(NumeroItemSelectionFeuille), xbmc.LOGNOTICE)
-
-                self.listMenu_MyMusic.controlLeft(self.listMenu_Racine)
-                self.listMenu_MyMusic.controlRight(self.listMenu_Feuilles_all_Artists)
-                self.listMenu_Feuilles_all_Artists.controlLeft(self.listMenu_MyMusic)
-
-                # go to the connect lambda function
-
-            elif self.getFocus() == self.listMenu_Feuilles_RandomMix:
-
-                try:
-                    self.listMenu_Initialisation_server.setVisible(False)
-                    self.listMenu_Initialisation_players.setVisible(False)
-
-                    self.listMenu_Racine.setVisible(True)
-
-                    self.listMenu_MyMusic.setVisible(True)
-                    self.listMenu_Branches.setVisible(False)
-                    self.listMenu_Extras.setVisible(False)
-
-                    self.listMenu_Feuilles.setVisible(False)
-                    self.listMenu_Feuilles_all_Artists.setVisible(False)
-                    self.listMenu_Feuilles_all_Albums.setVisible(False)
-                    self.listMenu_Feuilles_RandomMix.setVisible(True)
-                    self.listMenu_Feuilles_all_Dossiers.setVisible(False)
-                    self.listMenu_Feuilles_Extras.setVisible(False)
-
-                    self.listMenu_Fleur.setVisible(False)
-                except  :
-                    pass
-
-                itemSelectionFeuille = self.listMenu_Feuilles_RandomMix.getListItem(
-                    self.listMenu_Feuilles_RandomMix.getSelectedPosition()).getLabel()
-                debug('label dans menu Feuille Random mix : ' + itemSelectionFeuille, xbmc.LOGNOTICE)
-                self.list_item_feuille_label.setLabel(' :: ' + itemSelectionFeuille)
-                #remise à blanc sous-label
-                self.list_item_fleur_label.setLabel('')
-
-                NumeroItemSelectionFeuille = self.listMenu_Feuilles_RandomMix.getSelectedPosition()
-                debug('NumeroItemSelectionFeuille : ' + str(NumeroItemSelectionFeuille), xbmc.LOGNOTICE)
-
-                self.listMenu_Racine.controlRight(self.listMenu_MyMusic)
-                self.listMenu_MyMusic.controlLeft(self.listMenu_Racine)
-                self.listMenu_MyMusic.controlRight(self.listMenu_Feuilles_RandomMix)
-                self.listMenu_Feuilles_RandomMix.controlLeft(self.listMenu_MyMusic)
-
-            elif self.getFocus() == self.listMenu_Feuilles_all_Albums:
-
-                try:
-                    self.listMenu_Initialisation_server.setVisible(False)
-                    self.listMenu_Initialisation_players.setVisible(False)
-
-                    self.listMenu_Racine.setVisible(True)
-
-                    self.listMenu_MyMusic.setVisible(True)
-                    self.listMenu_Branches.setVisible(False)
-                    self.listMenu_Extras.setVisible(False)
-
-                    self.listMenu_Feuilles.setVisible(False)
-                    self.listMenu_Feuilles_all_Artists.setVisible(False)
-                    self.listMenu_Feuilles_all_Albums.setVisible(True)
-                    self.listMenu_Feuilles_RandomMix.setVisible(False)
-                    self.listMenu_Feuilles_all_Dossiers.setVisible(False)
-                    self.listMenu_Feuilles_Extras.setVisible(False)
-
-                    self.listMenu_Fleur.setVisible(False)
-                except  :
-                    pass
-
-                itemSelectionFeuille = self.listMenu_Feuilles_all_Albums.getListItem(
-                    self.listMenu_Feuilles_all_Albums.getSelectedPosition()).getLabel()
-                debug('label dans menu Feuille Album mix : ' + itemSelectionFeuille, xbmc.LOGNOTICE)
-                self.list_item_feuille_label.setLabel(' :: ' + itemSelectionFeuille)
-                #remise à blanc sous-label
-                self.list_item_fleur_label.setLabel('')
-
-                NumeroItemSelectionFeuille = self.listMenu_Feuilles_all_Albums.getSelectedPosition()
-                debug('NumeroItemSelectionFeuille : ' + str(NumeroItemSelectionFeuille), xbmc.LOGNOTICE)
-
-                self.listMenu_Racine.controlRight(self.listMenu_MyMusic)
-                self.listMenu_MyMusic.controlLeft(self.listMenu_Racine)
-                self.listMenu_MyMusic.controlRight(self.listMenu_Feuilles_all_Albums)
-                self.listMenu_Feuilles_all_Albums.controlLeft(self.listMenu_MyMusic)
-
-            elif self.getFocus() == self.listMenu_Feuilles_all_Dossiers:
-
-                try:
-                    self.listMenu_Initialisation_server.setVisible(False)
-                    self.listMenu_Initialisation_players.setVisible(False)
-
-                    self.listMenu_Racine.setVisible(True)
-
-                    self.listMenu_MyMusic.setVisible(True)
-                    self.listMenu_Branches.setVisible(False)
-                    self.listMenu_Extras.setVisible(False)
-
-                    self.listMenu_Feuilles.setVisible(False)
-                    self.listMenu_Feuilles_all_Artists.setVisible(False)
-                    self.listMenu_Feuilles_all_Albums.setVisible(False)
-                    self.listMenu_Feuilles_RandomMix.setVisible(False)
-                    self.listMenu_Feuilles_all_Dossiers.setVisible(True)
-                    self.listMenu_Feuilles_Extras.setVisible(False)
-
-                    self.listMenu_Fleur.setVisible(False)
-                except  :
-                    pass
-
-                itemSelectionFeuille = self.listMenu_Feuilles_all_Dossiers.getListItem(
-                    self.listMenu_Feuilles_all_Dossiers.getSelectedPosition()).getLabel()
-                debug('label dans menu Feuille Random mix : ' + itemSelectionFeuille, xbmc.LOGNOTICE)
-                self.list_item_feuille_label.setLabel(' :: ' + itemSelectionFeuille)
-                #remise à blanc sous-label
-                self.list_item_fleur_label.setLabel('')
-
-                NumeroItemSelectionFeuille = self.listMenu_Feuilles_all_Dossiers.getSelectedPosition()
-                debug('NumeroItemSelectionFeuille : ' + str(NumeroItemSelectionFeuille), xbmc.LOGNOTICE)
-
-                self.listMenu_Racine.controlRight(self.listMenu_MyMusic)
-                self.listMenu_MyMusic.controlLeft(self.listMenu_Racine)
-                self.listMenu_MyMusic.controlRight(self.listMenu_Feuilles_all_Dossiers)
-                self.listMenu_Feuilles_all_Dossiers.controlLeft(self.listMenu_MyMusic)
-
-
-            elif self.getFocus() == self.listMenu_Feuilles_Extras:
-
-                try:
-                    self.listMenu_Initialisation_server.setVisible(False)
-                    self.listMenu_Initialisation_players.setVisible(False)
-
-                    self.listMenu_Racine.setVisible(True)
-
-                    self.listMenu_MyMusic.setVisible(False)
-                    self.listMenu_Branches.setVisible(False)
-                    self.listMenu_Extras.setVisible(True)
-
-                    self.listMenu_Feuilles.setVisible(False)
-                    self.listMenu_Feuilles_all_Artists.setVisible(False)
-                    self.listMenu_Feuilles_all_Albums.setVisible(False)
-                    self.listMenu_Feuilles_RandomMix.setVisible(False)
-                    self.listMenu_Feuilles_all_Dossiers.setVisible(False)
-                    self.listMenu_Feuilles_Extras.setVisible(True)
-
-                    self.listMenu_Fleur.setVisible(False)
-                except  :
-                    pass
-
-                itemSelectionFeuille = self.listMenu_Feuilles_Extras.getListItem(
-                    self.listMenu_Feuilles_Extras.getSelectedPosition()).getLabel()
-                debug('label dans menu Feuille des Extras : ' + itemSelectionFeuille, xbmc.LOGNOTICE)
-                self.list_item_feuille_label.setLabel(' :: ' + itemSelectionFeuille)
-                #remise à blanc sous-label
-                self.list_item_fleur_label.setLabel('')
-
-                NumeroItemSelectionFeuille = self.listMenu_Feuilles_Extras.getSelectedPosition()
-                debug('NumeroItemSelectionFeuilleExtra : ' + str(NumeroItemSelectionFeuille), xbmc.LOGNOTICE)
-
-                self.listMenu_Racine.controlRight(self.listMenu_Extras)
-                self.listMenu_Extras.controlLeft(self.listMenu_Racine)
-                self.listMenu_Extras.controlRight(self.listMenu_Feuilles_Extras)
-                self.listMenu_Feuilles_Extras.controlLeft(self.listMenu_Extras)
 
 
         except  (RuntimeError, SystemError): # take from original pyxbmct demo code
