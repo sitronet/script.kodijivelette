@@ -187,7 +187,7 @@ class MyMusicAllAlbums(pyxbmctExtended.BackgroundDialogWindow):
     def controlMenus(self):
         ''' Fix the size of itemlists in menus lists'''
 
-        self.title_label = pyxbmct.Label('', textColor='0xFF808080')
+        self.title_label = pyxbmct.Label('', textColor='0xFF888888')
         self.placeControl(self.title_label, 0 , 2 , 1 , 10)
 
         row_depart = 2
@@ -210,7 +210,8 @@ class MyMusicAllAlbums(pyxbmctExtended.BackgroundDialogWindow):
 
         # TRES IMPORTANT POUR AVOIR LE FOCUS
         # Add items to the list , need to ask the focus before filling the list from plugin.Plugin
-        self.listMenu_principal.addItem('.')        # then be filling by the Plugin
+        self.listMenu_principal.addItem('.')
+        self.listMenu_principal.addItem('..')# then be filling by the Plugin
         self.listMenu_playlist.addItem('.')
 
     def connexionEvent(self):
