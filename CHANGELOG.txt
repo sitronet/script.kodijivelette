@@ -1,3 +1,7 @@
+version 0.0.m00
+fix some bugs in navigation and function Artists Albums
+
+-------------------------------------------------------------
 version 0.0.l00
 fix bug in Albums , ArtistAlbum
 review navigation bugs
