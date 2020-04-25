@@ -1,0 +1,11 @@
+change the Pause/play process
+make the frame ContextMenu (add previous, pause/play , next ) and select player
+add new entry in MyMusic : New Music, Composers , Compilations, Genres , Years , Playlists , Search , Remote Music Librairies
+rewrite discovery of server , to get a list
+rewrite discovery of players and selection of player controled (use list rather dic, or change the struc of dic)
+change process progressDialog when dig artists albums ...
+write search advanced
+rewrite radio by language (bug)
+write extra , utils, settings
+for albums add function to get artwork when moving in the menu feuille
+add icon to the list Menu MyMusic
