@@ -11,3 +11,5 @@ for albums add function to get artwork when moving in the menu feuille
 add icon to the list Menu MyMusic
 
 Clean the code
+
+write a fake slimproto player for the fun
