@@ -7,7 +7,7 @@ change process progressDialog when dig artists albums ...
 write search advanced
 rewrite radio by language (bug)
 write extra , utils, settings
-for albums add function to get artwork when moving in the menu feuille
+for albums add function to get artwork (icon menu )  when moving in the menu feuille
 add icon to the list Menu MyMusic
 
 Clean the code
