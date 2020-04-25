@@ -242,12 +242,20 @@ class SlimIsPlaying(pyxbmctExtended.BackgroundDialogWindow):
 
         # title of radio , apps songs ...
         self.labeltitre_1 = pyxbmct.FadeLabel( font= 'font50caps_title' , textColor ='0xFF888888' )
-        self.placeControl(self.labeltitre_1,  8 , 4 , 3 , 25 )
+        self.placeControl(control= self.labeltitre_1,
+                          row= 8 ,
+                          column= 4 ,
+                          rowspan= 3 ,
+                          columnspan= 25 )
         self.labeltitre_1.addLabel('')
 
         self.labeltitre_2 = pyxbmct.FadeLabel( font = 'font13', textColor ='0xFF888888' )
-        self.placeControl(self.labeltitre_2, 12 , 4 , 2 , 25 )
-        self.labeltitre_1.addLabel('')
+        self.placeControl(control= self.labeltitre_2,
+                          row= 12 ,
+                          column= 4 ,
+                          rowspan= 2 ,
+                          columnspan= 25 )
+        self.labeltitre_2.addLabel('')
 
         self.labelAlbum = pyxbmct.FadeLabel( font = 'font13', textColor ='0xFF888888' )
         self.placeControl(self.labelAlbum, 14 , 4 , 2 , 25 )
@@ -269,7 +277,7 @@ class SlimIsPlaying(pyxbmctExtended.BackgroundDialogWindow):
         self.slider_duration.setPercent(SLIDER_INIT_VALUE)
 
         # labels des durée
-        self.labelduree_jouee = pyxbmct.Label('')
+        self.labelduree_jouee = pyxbmct.Label('', textColor ='0xFF888888')
         self.placeControl(control=self.labelduree_jouee,
                           row=ligneButton - 2 ,
                           column= ( SEIZE // 2 ) - 2 ,
@@ -277,7 +285,7 @@ class SlimIsPlaying(pyxbmctExtended.BackgroundDialogWindow):
                           columnspan = 5 ,
                           pad_x = 5 ,
                           pad_y = 5 )
-        self.labelduree_fin = pyxbmct.Label('')
+        self.labelduree_fin = pyxbmct.Label('',textColor ='0xFF888888')
         self.placeControl(control=self.labelduree_fin,
                           row= ligneButton - 2 ,
                           column= ( SEIZE // 2 ) - 2  + ( 29 - 3 ) ,
@@ -610,7 +618,7 @@ class SlimIsPlaying(pyxbmctExtended.BackgroundDialogWindow):
                 try:
                     nouveautitre = dico['title']
                 except KeyError:
-                    nouveautitre = ''
+                    titre = ''
                     pass
 
                 if not ( nouveautitre == titreenlecture ):
