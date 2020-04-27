@@ -38,6 +38,9 @@ if Kodi:
     ARTWORK = xbmc.translatePath(os.path.join(ADDON.getAddonInfo('path'), 'resources', 'skins', 'Default', 'media'))
     savepath = xbmc.translatePath('special://temp')
 
+    from resources.lib.outils import debug
+    DEBUG_LEVEL = xbmc.LOGDEBUG
+
     # Kodi key action codes.
     # More codes available in xbmcgui module
     ACTION_PREVIOUS_MENU = 10
@@ -98,14 +101,14 @@ class PlaylistPlugin(pyxbmctExtended.BackgroundDialogWindow):
         self.Abonnement = threading.Event()
         self.threadRunning = True
         self.WindowPlaying = xbmcgui.getCurrentWindowId()
-        xbmc.log('fenetre de class PlaylistPlugin n° : ' + str(self.WindowPlaying), xbmc.LOGNOTICE)
-        xbmc.log('Create Instance PlaylistPlugin KodiJivelette...' , xbmc.LOGNOTICE)
+        debug('fenetre de class PlaylistPlugin n° : ' + str(self.WindowPlaying), DEBUG_LEVEL)
+        debug('Create Instance PlaylistPlugin KodiJivelette...' , DEBUG_LEVEL)
         self.playerid = ''
         self.geometrie()
-        xbmc.log('geometrie set', xbmc.LOGNOTICE)
+        debug('geometrie set', DEBUG_LEVEL)
         self.controlMenus()
-        xbmc.log('control set', xbmc.LOGNOTICE)
-        xbmc.log('navigation  set', xbmc.LOGNOTICE)
+        debug('control set', DEBUG_LEVEL)
+        debug('navigation  set', DEBUG_LEVEL)
 
         self.connexionEvent()
         self.connect(self.listMenu_playlist, self.selectActionofItem)
@@ -134,7 +137,7 @@ class PlaylistPlugin(pyxbmctExtended.BackgroundDialogWindow):
 
         self.screenx = SIZESCREEN_WIDTH
         self.screeny = SIZESCREEN_HEIGHT
-        xbmc.log('Real Size of Screen : ' + str(self.screenx) + ' x ' + str(self.screeny), xbmc.LOGNOTICE)
+        debug('Real Size of Screen : ' + str(self.screenx) + ' x ' + str(self.screeny), DEBUG_LEVEL)
 
         if self.screenx > SIZE_WIDTH_pyxbmct:
             self.screenx = SIZE_WIDTH_pyxbmct  # try
@@ -157,12 +160,12 @@ class PlaylistPlugin(pyxbmctExtended.BackgroundDialogWindow):
 
         #pyxbmct :
         self.setGeometry(self.screenx  , self.screeny , NEUF, SEIZE)
-        xbmc.log('Size of Screen pyxbmct fix to : ' + str(self.screenx) + ' x ' + str(self.screeny), xbmc.LOGNOTICE)
+        debug('Size of Screen pyxbmct fix to : ' + str(self.screenx) + ' x ' + str(self.screeny), DEBUG_LEVEL)
         # cover when playing
         SIZECOVER_X = (SEIZE // 2) - 6  #  int(self.screenx / SEIZE * 28 )
         self.sizecover_x = SIZECOVER_X
         #SIZECOVER_Y = self.GRIDSCREEN_Y * 3  # and reserve a sized frame to covers,attention SIZECOVER_X != SIZECOVER_Y
-        xbmc.log('Taille pochette : ' + str(SIZECOVER_X) + ' x ' + str(SIZECOVER_X) , xbmc.LOGNOTICE)
+        debug('Taille pochette : ' + str(SIZECOVER_X) + ' x ' + str(SIZECOVER_X) , DEBUG_LEVEL)
 
         ligneButton = NEUF - 3
         SLIDER_INIT_VALUE = 0
@@ -288,46 +291,46 @@ class PlaylistPlugin(pyxbmctExtended.BackgroundDialogWindow):
         ``action`` is an instance of :class:`xbmcgui.Action` class.
         """
         if action == ACTION_PREVIOUS_MENU:
-            xbmc.log('Previous_menu' + str(action), xbmc.LOGNOTICE)
+            debug('Previous_menu' + str(action), DEBUG_LEVEL)
             self.quit_listing()
 
         elif action == ACTION_NAV_BACK:
-            xbmc.log('nav_back', xbmc.LOGNOTICE)
+            debug('nav_back', DEBUG_LEVEL)
             self.quit_listing()
 
         elif action == ACTION_PAUSE:  # currently it's the space on my keyboard
-            xbmc.log('Action Pause', xbmc.LOGNOTICE)
+            debug('Action Pause', DEBUG_LEVEL)
             self.pause_play()
 
         elif action == ACTION_PLAY or action == ACTION_PLAYER_PLAY:
-            xbmc.log('Action Play', xbmc.LOGNOTICE)
+            debug('Action Play', DEBUG_LEVEL)
             self.pause_play()
 
         elif action == ACTION_VOLUME_UP:  # it's the volume key Vol+  on my remote
-            xbmc.log('Action Volume' +  str(action), xbmc.LOGNOTICE)
+            debug('Action Volume' +  str(action), DEBUG_LEVEL)
             self.promptVolume()
 
         elif action == ACTION_VOLUME_DOWN:  # it's the volume key Vol-  on my remote
-            xbmc.log('Action Volume', xbmc.LOGNOTICE)
+            debug('Action Volume', DEBUG_LEVEL)
             self.promptVolume()
 
         elif action == xbmcgui.ACTION_CONTEXT_MENU:
-            xbmc.log('Action context Menu', xbmc.LOGNOTICE)
+            debug('Action context Menu', DEBUG_LEVEL)
             self.promptContextMenu()
 
         else:
-            xbmc.log('else condition onAction in framePlaylist', xbmc.LOGNOTICE)
+            debug('else condition onAction in framePlaylist', DEBUG_LEVEL)
             self._executeConnected(action, self.actions_connected)
 
     def quit_listing(self):# todo : à tester
         self.WindowPlayinghere = xbmcgui.getCurrentWindowId()
-        xbmc.log('fenetre PlaylistPlugin  is exiting: ' + str(self.WindowPlayinghere), xbmc.LOGNOTICE)
+        debug('fenetre PlaylistPlugin  is exiting: ' + str(self.WindowPlayinghere), DEBUG_LEVEL)
 
         self.connectInterface()
         self.get_playerid()
         self.subscribe = ecoute.Souscription(self.InterfaceCLI, self.playerid )
         self.subscribe.resiliersouscription()
-        xbmc.log('send resiliersouscription in A quit() framePlaylist', xbmc.LOGNOTICE)
+        debug('send resiliersouscription in A quit() framePlaylist', DEBUG_LEVEL)
         self.threadRunning = False
         self.close()
 
@@ -376,7 +379,7 @@ class PlaylistPlugin(pyxbmctExtended.BackgroundDialogWindow):
 
     def randomPlaylist(self): # not used , Todo  Delete it or change logic
 
-        xbmc.log(' entrée dans le random mix de la framePlaylist', xbmc.LOGNOTICE)
+        debug(' entrée dans le random mix de la framePlaylist', DEBUG_LEVEL)
 
         self.connectInterface()
         self.get_ident_server()
@@ -436,24 +439,24 @@ class PlaylistPlugin(pyxbmctExtended.BackgroundDialogWindow):
                 '''
                 indexdecurrentTitle = atraiter.find('cur_index:')
                 indexFincurrentTitle = atraiter.find('|', indexdecurrentTitle)
-                # xbmc.log('index debut : ' + str(indexdecurrentTitle) + ' fin : ' + str(indexFincurrentTitle), xbmc.LOGDEBUG)
+                # debug('index debut : ' + str(indexdecurrentTitle) + ' fin : ' + str(indexFincurrentTitle), xbmc.LOGDEBUG)
                 playlist_current_title = atraiter[indexdecurrentTitle + 10: indexFincurrentTitle]
 
                 listedechamps = atraiter.split('|playlist index:')
                 playlistatraiter = listedechamps[1:]
-                xbmc.log('playlist à traiter : ' + str(playlistatraiter), xbmc.LOGNOTICE)
+                debug('playlist à traiter : ' + str(playlistatraiter), DEBUG_LEVEL)
 
                 for champs in playlistatraiter:
-                    xbmc.log('champs : ' + str(champs), xbmc.LOGNOTICE)
+                    debug('champs : ' + str(champs), DEBUG_LEVEL)
 
                     indexdeID = champs.find('|id:')
                     indexdeTitre = champs.find('|title:')
-                    # xbmc.log('index ID : ' + str(indexdeID) + ' titre : ' + str(indexdeTitre), xbmc.LOGDEBUG)
+                    # debug('index ID : ' + str(indexdeID) + ' titre : ' + str(indexdeTitre), xbmc.LOGDEBUG)
 
                     titre = champs[indexdeTitre + 7:]
-                    # xbmc.log('titre : ' + titre , xbmc.LOGDEBUG)
+                    # debug('titre : ' + titre , xbmc.LOGDEBUG)
                     track_id = champs[indexdeID + 4: indexdeTitre]
-                    # xbmc.log('track_id : ' + str(track_id) , xbmc.LOGDEBUG)
+                    # debug('track_id : ' + str(track_id) , xbmc.LOGDEBUG)
                     playlist_index = champs[0: indexdeID]
                     tracktampon = xbmcgui.ListItem()
                     tracktampon.setLabel(titre)
@@ -495,10 +498,10 @@ class PlaylistPlugin(pyxbmctExtended.BackgroundDialogWindow):
     def jumpPlaytoThisItem(self):
         labelajouer = self.listMenu_playlist.getListItem(
                 self.listMenu_playlist.getSelectedPosition()).getLabel()
-        xbmc.log('label info :' + labelajouer , xbmc.LOGNOTICE)
+        debug('label info :' + labelajouer , DEBUG_LEVEL)
         track_id = self.listMenu_playlist.getListItem(
                 self.listMenu_playlist.getSelectedPosition()).getProperty('track_id')
-        xbmc.log('track_id info :' + track_id , xbmc.LOGNOTICE)
+        debug('track_id info :' + track_id , DEBUG_LEVEL)
         playlist_index = self.listMenu_playlist.getListItem(
                 self.listMenu_playlist.getSelectedPosition()).getProperty('index')
 
@@ -517,10 +520,10 @@ class PlaylistPlugin(pyxbmctExtended.BackgroundDialogWindow):
 
         labelajouer = self.listMenu_playlist.getListItem(
                 self.listMenu_playlist.getSelectedPosition()).getLabel()
-        xbmc.log('label info :' + labelajouer , xbmc.LOGNOTICE)
+        debug('label info :' + labelajouer , DEBUG_LEVEL)
         track_id = self.listMenu_playlist.getListItem(
                 self.listMenu_playlist.getSelectedPosition()).getProperty('track_id')
-        xbmc.log('track_id info :' + track_id , xbmc.LOGNOTICE)
+        debug('track_id info :' + track_id , DEBUG_LEVEL)
 
         requete = self.playerid + ' songinfo 0 100 track_id:' + str(track_id)
         self.InterfaceCLI.sendtoCLISomething(requete)
@@ -541,16 +544,16 @@ class PlaylistPlugin(pyxbmctExtended.BackgroundDialogWindow):
     def affichequelquesInfos(self):
         labelajouer = self.listMenu_playlist.getListItem(
                 self.listMenu_playlist.getSelectedPosition()).getLabel()
-        xbmc.log('label info :' + labelajouer , xbmc.LOGNOTICE)
+        debug('label info :' + labelajouer , DEBUG_LEVEL)
         track_id = self.listMenu_playlist.getListItem(
                 self.listMenu_playlist.getSelectedPosition()).getProperty('track_id')
-        xbmc.log('track_id info :' + track_id , xbmc.LOGNOTICE)
+        debug('track_id info :' + track_id , DEBUG_LEVEL)
         requete = self.playerid + ' songinfo 0 100 track_id:' + str(track_id)
         self.InterfaceCLI.sendtoCLISomething(requete)
         reponse = self.InterfaceCLI.receptionReponseEtDecodage()
         try:
             listesonginfo = reponse.split('|')
-            xbmc.log('songinfo : ' + str(listesonginfo), xbmc.LOGNOTICE)
+            debug('songinfo : ' + str(listesonginfo), DEBUG_LEVEL)
         except ValueError:
             outils.functionNotYetImplemented()
             return
@@ -575,7 +578,7 @@ class PlaylistPlugin(pyxbmctExtended.BackgroundDialogWindow):
         while (self.breakBoucle_A == False):  # Boucle A principale de Subscribe
 
             if time.time() > timeoutdeTestdelaBoucle:
-                xbmc.log('Timeout : break A  ', xbmc.LOGNOTICE)
+                debug('Timeout : break A  ', DEBUG_LEVEL)
                 break
 
             if xbmc.Monitor().waitForAbort(0.5):
@@ -613,7 +616,7 @@ class PlaylistPlugin(pyxbmctExtended.BackgroundDialogWindow):
 
             try:
                 pourcentagedureejouee = 100 * float(dico['time']) / float(dico['duration'])
-                xbmc.log('percent duree : ' + str(pourcentagedureejouee) + ' - time: ' + dico['time'],
+                debug('percent duree : ' + str(pourcentagedureejouee) + ' - time: ' + dico['time'],
                          xbmc.LOGDEBUG)
             except KeyError:
                 pourcentagedureejouee = 0
@@ -650,18 +653,18 @@ class PlaylistPlugin(pyxbmctExtended.BackgroundDialogWindow):
             compteur += 1
             timedutour = time.time()
             tempsparcouru = timedutour - timeEntreeDansLaBoucle
-            xbmc.log(str(compteur) + ' tour de boucle : ' + str(tempsparcouru), xbmc.LOGDEBUG)
-            #xbmc.log('bool jivelette.threadRunning : ' + str(self.jivelette.threadRunning), xbmc.LOGNOTICE)
+            debug(str(compteur) + ' tour de boucle : ' + str(tempsparcouru), xbmc.LOGDEBUG)
+            #debug('bool jivelette.threadRunning : ' + str(self.jivelette.threadRunning), DEBUG_LEVEL)
             if pourcentagedureejouee >= 100:
                 self.breakBoucle_A = True
                 break
 
                 # fin de la boucle A : sortie de subscribe
         # fin boucle while
-        xbmc.log('End of Boucle of update_current_track_playing in framePlaylist , Bye', xbmc.LOGNOTICE)
+        debug('End of Boucle of update_current_track_playing in framePlaylist , Bye', DEBUG_LEVEL)
         self.subscribe.resiliersouscription()
         #self.InterfaceCLI.viderLeBuffer()
-        xbmc.log('End of fonction update_current_track_playing in framePlaylist , Bye', xbmc.LOGNOTICE)
+        debug('End of fonction update_current_track_playing in framePlaylist , Bye', DEBUG_LEVEL)
     # fin fonction update_current_track_playing
 
     def connectInterface(self):
@@ -687,23 +690,23 @@ class PlaylistPlugin(pyxbmctExtended.BackgroundDialogWindow):
         '''
         filename = 'icon.image_' + str(index) + '.tmp'
         completeNameofFile = os.path.join(savepath, filename)
-        xbmc.log('filename icon : ' + str(completeNameofFile), xbmc.LOGDEBUG)
+        debug('filename icon : ' + str(completeNameofFile), xbmc.LOGDEBUG)
 
         if 'http' in urlicone:
             urltoopen = urlicone
         else:
             if urlicone.startswith('/'):
-                xbmc.log('url icone avec /: ' + urlicone ,xbmc.LOGDEBUG )
+                debug('url icone avec /: ' + urlicone ,xbmc.LOGDEBUG )
             #urltoopen = 'http://' + self.origine.rechercheduserveur.LMSCLIip + ':' + self.origine.rechercheduserveur.LMSwebport + '/' + urlicone
                 urltoopen = 'http://' + self.lmsip + ':' + self.lmswebport + urlicone
             else:
-                xbmc.log('url icone sans /: ' + urlicone ,xbmc.LOGDEBUG )
+                debug('url icone sans /: ' + urlicone ,xbmc.LOGDEBUG )
                 urltoopen = 'http://' + self.lmsip + ':' + self.lmswebport + '/' + urlicone
         try:
             urllib.urlretrieve(urltoopen, completeNameofFile)
         except IOError:
             outils.functionNotYetImplemented()
-        xbmc.log('nom du fichier image : ' + completeNameofFile , xbmc.LOGNOTICE)
+        debug('nom du fichier image : ' + completeNameofFile , DEBUG_LEVEL)
         return completeNameofFile
         # fin fonction fin fonction get_icon, class Plugin_Generique
         # test
@@ -721,7 +724,7 @@ class PlaylistPlugin(pyxbmctExtended.BackgroundDialogWindow):
             pass
             outils.functionNotYetImplemented()
         
-        xbmc.log('nom du fichier image : ' + completeNameofFile , xbmc.LOGNOTICE)
+        debug('nom du fichier image : ' + completeNameofFile , DEBUG_LEVEL)
         return completeNameofFile
 
     def update_coverbox(self, lmsip, lmswebport, playerid, compteur):
@@ -744,10 +747,10 @@ class PlaylistPlugin(pyxbmctExtended.BackgroundDialogWindow):
             # exemple :
             urlcover = 'http://' + lmsip + ':' + lmswebport + \
                        '/music/current/cover.jpg?player=' + playerid    # or self.playerID ?
-            xbmc.log(urlcover, xbmc.LOGNOTICE)
+            debug(urlcover, DEBUG_LEVEL)
             filename = 'pochette' + str(compteur) + '.tmp'
             completeNameofFile = os.path.join(savepath , filename )
-            xbmc.log('filename tmp : ' + str(completeNameofFile), xbmc.LOGNOTICE)
+            debug('filename tmp : ' + str(completeNameofFile), DEBUG_LEVEL)
             urllib.urlretrieve(urlcover , completeNameofFile)
             self.pochette.setImage(completeNameofFile) # fonction d'xbmcgui
             #os.remove(completeNameofFile)  # suppression du fichier

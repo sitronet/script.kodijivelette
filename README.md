@@ -1,5 +1,13 @@
 **KODIJIVELETTE**
 
+This project is stopped
+It was just to learn a little python. communication between 
+the client and the server is based on the CLI interface.
+Rather than explore this path, I prefer to develop another 
+application based on the more efficient http json interface.
+
+But you can install it and run it, normally it should work as is
+
 kodijive is intented to **watch on the kodi display (commonly a TV) the information about the streamed music from your multiroom SqueezeBox**.
 it is, normally, compliant with the last version of Logitech  media server formely named SqueezeCenter, Squeezebox Server
 or SlimServer

@@ -37,6 +37,9 @@ if Kodi:
     global savepath
     savepath = xbmc.translatePath('special://temp')
 
+    from resources.lib.outils import debug
+    DEBUG_LEVEL = xbmc.LOGDEBUG
+
     TIME_OF_LOOP_SUBCRIBE = ecoute.TIME_OF_LOOP_SUBSCRIBE
 
     # Kodi key action codes.
@@ -90,8 +93,8 @@ class FavoritesMenu(pyxbmctExtended.BackgroundDialogWindow):
         super(FavoritesMenu, self).__init__()
 
         self.WindowPlaying = xbmcgui.getCurrentWindowId()
-        xbmc.log('fenetre de class FavoritesMenu n° : ' + str(self.WindowPlaying), xbmc.LOGDEBUG)
-        xbmc.log('Create Instance FavoritesMenu...' , xbmc.LOGNOTICE)
+        debug('fenetre de class FavoritesMenu n° : ' + str(self.WindowPlaying), xbmc.LOGDEBUG)
+        debug('Create Instance FavoritesMenu...' , DEBUG_LEVEL)
 
         self.recevoirEnAttente = threading.Event()
         self.recevoirEnAttente.clear()
@@ -107,7 +110,7 @@ class FavoritesMenu(pyxbmctExtended.BackgroundDialogWindow):
         Size_H_ChildSelf = 600
         self.screenx = SIZESCREEN_WIDTH
         self.screeny = SIZESCREEN_HEIGHT
-        xbmc.log('Size of Screen : ' + str(self.screenx) + ' x ' + str(self.screeny), xbmc.LOGNOTICE)
+        debug('Size of Screen : ' + str(self.screenx) + ' x ' + str(self.screeny), DEBUG_LEVEL)
         if self.screenx > SIZE_WIDTH_pyxbmct:
             self.screenx = SIZE_WIDTH_pyxbmct
             self.screeny = SIZE_HEIGHT_pyxbmct
@@ -119,7 +122,7 @@ class FavoritesMenu(pyxbmctExtended.BackgroundDialogWindow):
                          pos_x= ( self.screenx // 2 ) - ( Size_W_ChildSelf // 2 ) ,
                          pos_y= ( self.screeny // 2 ) - ( Size_H_ChildSelf // 2 ) )
 
-        xbmc.log('Size of Screen Favorites fix to : ' + str(Size_W_ChildSelf) + ' x ' + str(Size_H_ChildSelf), xbmc.LOGNOTICE)
+        debug('Size of Screen Favorites fix to : ' + str(Size_W_ChildSelf) + ' x ' + str(Size_H_ChildSelf), DEBUG_LEVEL)
 
         self.image_dir = ARTWORK  # path to pictures used in the program
         self.image_list_focus = self.image_dir + '/MenuItemFO.png'        # get from myself
@@ -140,13 +143,13 @@ class FavoritesMenu(pyxbmctExtended.BackgroundDialogWindow):
         ``action`` is an instance of :class:`xbmcgui.Action` class.
         """
         if action == ACTION_PREVIOUS_MENU:
-            xbmc.log('Previous_menu' , xbmc.LOGNOTICE)
+            debug('Previous_menu' , DEBUG_LEVEL)
             self.quit_listing()
         elif action == ACTION_NAV_BACK:
-            xbmc.log('nav_back' , xbmc.LOGNOTICE)
+            debug('nav_back' , DEBUG_LEVEL)
             self.quit_listing()
         else:
-            xbmc.log('else condition onAction' , xbmc.LOGNOTICE)
+            debug('else condition onAction' , DEBUG_LEVEL)
             self._executeConnected(action, self.actions_connected)
 
     def connexionEvent(self):
@@ -163,7 +166,7 @@ class FavoritesMenu(pyxbmctExtended.BackgroundDialogWindow):
 
     def quit_listing(self):# todo : à tester
         self.WindowPlayinghere = xbmcgui.getCurrentWindowId()
-        xbmc.log('fenetre listing is exiting: ' + str(self.WindowPlayinghere), xbmc.LOGNOTICE)
+        debug('fenetre listing is exiting: ' + str(self.WindowPlayinghere), DEBUG_LEVEL)
 
         self.Abonnement.clear()
         self.threadRunning = False
@@ -191,8 +194,8 @@ class FavoritesMenu(pyxbmctExtended.BackgroundDialogWindow):
         audio_type = self.listMenu_1.getListItem(self.listMenu_1.getSelectedPosition()).getProperty('type')
         hasitems = self.listMenu_1.getListItem(self.listMenu_1.getSelectedPosition()).getProperty('hasitems')
 
-        xbmc.log('launch to play : ' + labelajouer + ' -> ' + cmd + ' playlist play item_id:' + item_id , xbmc.LOGNOTICE  )
-        xbmc.log('parametre : ' + str(item_id)  + ' commande :  ' + cmd + ' type : ' + audio_type + ' hasitems ? ' + hasitems  , xbmc.LOGNOTICE  )
+        debug('launch to play : ' + labelajouer + ' -> ' + cmd + ' playlist play item_id:' + item_id , DEBUG_LEVEL  )
+        debug('parametre : ' + str(item_id)  + ' commande :  ' + cmd + ' type : ' + audio_type + ' hasitems ? ' + hasitems  , DEBUG_LEVEL  )
 
         if audio_type == 'audio' and hasitems == '0':
             # Todo : do a function to ask rather xbmcgui.Dialog()
@@ -206,7 +209,7 @@ class FavoritesMenu(pyxbmctExtended.BackgroundDialogWindow):
 
             if not choix < 0:
                 self.connectInterface()
-                xbmc.log('requete : ' + requete , xbmc.LOGNOTICE  )
+                debug('requete : ' + requete , DEBUG_LEVEL  )
 
                 self.InterfaceCLI.sendtoCLISomething(requete)
                 reponse = self.InterfaceCLI.receptionReponseEtDecodage()
@@ -217,7 +220,7 @@ class FavoritesMenu(pyxbmctExtended.BackgroundDialogWindow):
                 self.jivelette = framePlaying.SlimIsPlaying()
 
                 self.WindowPlaying = xbmcgui.getCurrentWindowId()
-                xbmc.log('fenetre en cours n° : ' + str(self.WindowPlaying), xbmc.LOGNOTICE)
+                debug('fenetre en cours n° : ' + str(self.WindowPlaying), DEBUG_LEVEL)
 
                 # todo : test inversion show et doModal
                 self.jivelette.show()
@@ -253,7 +256,7 @@ class FavoritesMenu(pyxbmctExtended.BackgroundDialogWindow):
             while (self.breakBoucle_A == False):  # Boucle A principale de Subscribe
 
                 if time.time() > timeoutdeTestdelaBoucle:
-                    xbmc.log('Timeout : break A  ', xbmc.LOGNOTICE)
+                    debug('Timeout : break A  ', DEBUG_LEVEL)
                     break
                 if not self.Abonnement.is_set:
                     break
@@ -290,7 +293,7 @@ class FavoritesMenu(pyxbmctExtended.BackgroundDialogWindow):
 
                 try:
                     pourcentagedureejouee = 100 * float(dico['time']) / float(dico['duration'])
-                    xbmc.log('percent duree : ' + str(pourcentagedureejouee) + ' - time: ' + dico['time'],
+                    debug('percent duree : ' + str(pourcentagedureejouee) + ' - time: ' + dico['time'],
                              xbmc.LOGDEBUG)
                 except KeyError:
                     pourcentagedureejouee = 0
@@ -351,21 +354,21 @@ class FavoritesMenu(pyxbmctExtended.BackgroundDialogWindow):
                 compteur += 1
                 timedutour = time.time()
                 tempsparcouru = timedutour - timeEntreeDansLaBoucle
-                xbmc.log(str(compteur) + ' tour de boucle : ' + str(tempsparcouru), xbmc.LOGDEBUG)
-                xbmc.log('bool jivelette.threadRunning : ' + str(self.jivelette.threadRunning), xbmc.LOGNOTICE)
+                debug(str(compteur) + ' tour de boucle : ' + str(tempsparcouru), xbmc.LOGDEBUG)
+                debug('bool jivelette.threadRunning : ' + str(self.jivelette.threadRunning), DEBUG_LEVEL)
                 if not self.jivelette.threadRunning:
-                    xbmc.log(' jivelette.threadRunning is not True ', xbmc.LOGNOTICE)
+                    debug(' jivelette.threadRunning is not True ', DEBUG_LEVEL)
                     # self.subscribe.resiliersouscription() # double emploi
                     self.breakBoucle_A = True
                     self.Abonnement.clear()
             # fin de la boucle A : sortie de subscribe
         # fin boucle while
-        xbmc.log('End of Boucle of Squueze , Bye', xbmc.LOGNOTICE)
+        debug('End of Boucle of Squueze , Bye', DEBUG_LEVEL)
         self.subscribe.resiliersouscription()
         reponse = self.InterfaceCLI.receptionReponseEtDecodage()
-        xbmc.log('Send resiliersouscription in A update now_is_playing() in frameMenuFavorites', xbmc.LOGNOTICE)
+        debug('Send resiliersouscription in A update now_is_playing() in frameMenuFavorites', DEBUG_LEVEL)
         self.InterfaceCLI.viderLeBuffer()
-        xbmc.log('End of fonction update_now_is_playing in frameMenuFavorites , Bye', xbmc.LOGNOTICE)
+        debug('End of fonction update_now_is_playing in frameMenuFavorites , Bye', DEBUG_LEVEL)
     # fin fonction update_now_is_playing
 
     def connectInterface(self):

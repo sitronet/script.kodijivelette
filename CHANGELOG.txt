@@ -1,3 +1,12 @@
+-------------------------------------------------------------
+Last version 0.0.n
+
+This project is stopped
+It was just to learn a little python. communication between
+the client and the server is based on the CLI interface.
+Rather than explore this path, I prefer to develop another
+application based on the more efficient http interface
+-------------------------------------------------------------
 version 0.0.m00
 fix some bugs in navigation and function Artists Albums
 

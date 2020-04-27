@@ -64,6 +64,9 @@ if Kodi:
 
     TIME_OF_LOOP_SUBSCRIBE = ecoute.TIME_OF_LOOP_SUBSCRIBE
 
+    from resources.lib.outils import debug
+    DEBUG_LEVEL = xbmc.LOGDEBUG
+
 TAGS = 'aCdejJKlstuwxy'
 
 
@@ -80,16 +83,16 @@ class MyMusic(pyxbmctExtended.BackgroundDialogWindow):
         self.Abonnement = threading.Event()
         self.threadRunning = True
         self.WindowPlaying = xbmcgui.getCurrentWindowId()
-        xbmc.log('fenetre de class MyMusic n° : ' + str(self.WindowPlaying), xbmc.LOGNOTICE)
-        xbmc.log('Create Instance frame MyMusic ' , xbmc.LOGNOTICE)
+        debug('fenetre de class MyMusic n° : ' + str(self.WindowPlaying), DEBUG_LEVEL)
+        debug('Create Instance frame MyMusic ' , DEBUG_LEVEL)
         self.playerid = ''
 
         self.geometrie()
-        xbmc.log('geometrie set', xbmc.LOGNOTICE)
+        debug('geometrie set', DEBUG_LEVEL)
         self.controlMenus()
-        xbmc.log('control set', xbmc.LOGNOTICE)
+        debug('control set', DEBUG_LEVEL)
         #self.set_navigation()
-        xbmc.log('navigation  set', xbmc.LOGNOTICE)
+        debug('navigation  set', DEBUG_LEVEL)
 
         self.connexionEvent()
 
@@ -113,7 +116,7 @@ class MyMusic(pyxbmctExtended.BackgroundDialogWindow):
 
         self.screenx = SIZESCREEN_WIDTH
         self.screeny = SIZESCREEN_HEIGHT
-        xbmc.log('Real Size of Screen : ' + str(self.screenx) + ' x ' + str(self.screeny), xbmc.LOGNOTICE)
+        debug('Real Size of Screen : ' + str(self.screenx) + ' x ' + str(self.screeny), DEBUG_LEVEL)
 
         if self.screenx > SIZE_WIDTH_pyxbmct:
             self.screenx = SIZE_WIDTH_pyxbmct
@@ -134,13 +137,13 @@ class MyMusic(pyxbmctExtended.BackgroundDialogWindow):
 
         #pyxbmct :
         self.setGeometry(self.screenx  , self.screeny , NEUF, SEIZE)
-        xbmc.log('Size of Screen pyxbmct fix to : ' + str(self.screenx) + ' x ' + str(self.screeny), xbmc.LOGNOTICE)
+        debug('Size of Screen pyxbmct fix to : ' + str(self.screenx) + ' x ' + str(self.screeny), DEBUG_LEVEL)
         # cover when playing
         #SIZECOVER_X = int(self.screenx / SEIZE * 28 )
         SIZECOVER_X = (SEIZE // 2) - 6
         self.sizecover_x = SIZECOVER_X
         #SIZECOVER_Y = self.GRIDSCREEN_Y * 3  # and reserve a sized frame to covers,attention SIZECOVER_X != SIZECOVER_Y
-        xbmc.log('Taille pochette : ' + str(SIZECOVER_X) + ' x ' + str(SIZECOVER_X) , xbmc.LOGNOTICE)
+        debug('Taille pochette : ' + str(SIZECOVER_X) + ' x ' + str(SIZECOVER_X) , DEBUG_LEVEL)
 
         ligneButton = NEUF - 3
         SLIDER_INIT_VALUE = 0
@@ -236,19 +239,19 @@ class MyMusic(pyxbmctExtended.BackgroundDialogWindow):
         ``action`` is an instance of :class:`xbmcgui.Action` class.
         """
         if action == ACTION_PREVIOUS_MENU:
-            xbmc.log('Previous_menu' , xbmc.LOGNOTICE)
+            debug('Previous_menu' , DEBUG_LEVEL)
             self.quit_listing()
         elif action == ACTION_NAV_BACK:
-            xbmc.log('nav_back' , xbmc.LOGNOTICE)
+            debug('nav_back' , DEBUG_LEVEL)
             self.quit_listing()
         else:
-            xbmc.log('else condition onAction in FrameMyMusic Class MyMusic' , xbmc.LOGNOTICE)
+            debug('else condition onAction in FrameMyMusic Class MyMusic' , DEBUG_LEVEL)
             self._executeConnected(action, self.actions_connected)
 
     def quit_listing(self):# todo : à tester
         self.WindowPlayinghere = xbmcgui.getCurrentWindowId()
-        xbmc.log('fenetre listing is exiting: ' + str(self.WindowPlayinghere), xbmc.LOGNOTICE)
-        #xbmc.log('fenetre enregistrée dans methode now_is_playing n° : ' + str(self.Window_is_playing), xbmc.LOGNOTICE) # attribute error here
+        debug('fenetre listing is exiting: ' + str(self.WindowPlayinghere), DEBUG_LEVEL)
+        #debug('fenetre enregistrée dans methode now_is_playing n° : ' + str(self.Window_is_playing), DEBUG_LEVEL) # attribute error here
         #self.Abonnement.clear() # -> AttributeError: 'SlimIsPlaying' object has no attribute 'Abonnement'
         # todo : tester appel fonction du prg principal
         # frameMenu.FenetreMenu.desabonner() -> TypeError: unbound method desabonner() must be called with FenetreMenu
@@ -330,7 +333,7 @@ class MyMusic(pyxbmctExtended.BackgroundDialogWindow):
 
         # enlever entête et queue
         texte_en_liste_a_traiter = reponse.split('|count:')
-        xbmc.log('texte_a_traiter : ' +  str(texte_en_liste_a_traiter) , xbmc.LOGNOTICE )
+        debug('texte_a_traiter : ' +  str(texte_en_liste_a_traiter) , DEBUG_LEVEL )
         if texte_en_liste_a_traiter == ['']:
             # erreur dans la réponse
             outils.functionNotYetImplemented()
@@ -344,7 +347,7 @@ class MyMusic(pyxbmctExtended.BackgroundDialogWindow):
         try:
             texte_a_traiter_titre = texte_en_liste_a_traiter.pop()
             texte_en_liste_a_traiter_entete = texte_a_traiter_titre.split('tags:' + TAGS + '|' )
-            xbmc.log('texte_a_traiter titre: ' +  str(texte_en_liste_a_traiter_entete) , xbmc.LOGNOTICE )
+            debug('texte_a_traiter titre: ' +  str(texte_en_liste_a_traiter_entete) , DEBUG_LEVEL )
         except IndexError:
             item = xbmcgui.ListItem()
             item.setLabel('Get an Error from Server! ')
@@ -354,15 +357,15 @@ class MyMusic(pyxbmctExtended.BackgroundDialogWindow):
         # exemple :
         try:
             lesItemsTracksNormalised = texte_en_liste_a_traiter_entete[1]
-            xbmc.log('lesItemsTracksNormalised : ' + lesItemsTracksNormalised, xbmc.LOGNOTICE )
+            debug('lesItemsTracksNormalised : ' + lesItemsTracksNormalised, DEBUG_LEVEL )
         except IndexError:
             return
 
         try:
             lachainedesItemsTracks = lesItemsTracksNormalised.split('|') #
-            xbmc.log('detail Albums : ' + str(lachainedesItemsTracks) , xbmc.LOGNOTICE)
+            debug('detail Albums : ' + str(lachainedesItemsTracks) , DEBUG_LEVEL)
         except IndexError:
-            xbmc.log('functionNotYetImplemented detailAlbums 310', xbmc.LOGNOTICE)
+            debug('functionNotYetImplemented detailAlbums 310', DEBUG_LEVEL)
             outils.functionNotYetImplemented()
             return
         '''
@@ -391,7 +394,7 @@ class MyMusic(pyxbmctExtended.BackgroundDialogWindow):
         itemsTracks= [] # une liste
         itemtampon = xbmcgui.ListItem()
         for chaine in lachainedesItemsTracks:
-            xbmc.log('detail album 1 item : ' + str(chaine), xbmc.LOGNOTICE)
+            debug('detail album 1 item : ' + str(chaine), DEBUG_LEVEL)
             try:
                 clef, valeur = chaine.split(':', 1)
             except ValueError:
@@ -408,7 +411,7 @@ class MyMusic(pyxbmctExtended.BackgroundDialogWindow):
                     itemsTracks.append(itemtampon)
                     itemtampon = xbmcgui.ListItem()
                     index = index + 1
-                    xbmc.log( 'Ajout de l item dans listItem tampon' + titre + ' ' + itemtampon.getProperty('track_id'), xbmc.LOGNOTICE)
+                    debug( 'Ajout de l item dans listItem tampon' + titre + ' ' + itemtampon.getProperty('track_id'), DEBUG_LEVEL)
 
                 itemtampon.setProperty('track_id', valeur)
                 secondEtsuivant = True
@@ -443,13 +446,13 @@ class MyMusic(pyxbmctExtended.BackgroundDialogWindow):
         itemtampon.setProperty('artist_id' , artist_id)
         itemtampon.setLabel(indice + ' - ' + titre + ' - ' + year + ' : ' + duree + ' .')
         itemsTracks.append(itemtampon)
-        xbmc.log( 'Ajout de l item dans listItem tampon ' + titre + ' ' + itemtampon.getProperty('track_id'), xbmc.LOGNOTICE)
+        debug( 'Ajout de l item dans listItem tampon ' + titre + ' ' + itemtampon.getProperty('track_id'), DEBUG_LEVEL)
 
         #sort the itemsTracks list by tracknum todo test this function or similar
         #sorted(itemsTracks, key=lambda tracknum: tracknum[1])   # sort by n° track not always true
 
         for item in itemsTracks:
-            xbmc.log('ajout de item tracks dans menu detailAlbum  : ' + item.getLabel() , xbmc.LOGNOTICE)
+            debug('ajout de item tracks dans menu detailAlbum  : ' + item.getLabel() , DEBUG_LEVEL)
             self.listMenu_detailAlbums.addItem(item)
     # End of funcion f_detailAlbums
 
@@ -470,7 +473,7 @@ class MyMusic(pyxbmctExtended.BackgroundDialogWindow):
             artist_id = self.listMenu_detailAlbums.getListItem(
                 self.listMenu_detailAlbums.getSelectedPosition()).getProperty('artist_id')
 
-            xbmc.log('launch to play : ' + labelajouer + ' playlistcontrol cmd:load track_id:' + track_id , xbmc.LOGNOTICE  )
+            debug('launch to play : ' + labelajouer + ' playlistcontrol cmd:load track_id:' + track_id , DEBUG_LEVEL  )
 
 
             choix = xbmcgui.Dialog().select(heading= labelajouer, list= ['Play Song now', \
@@ -493,7 +496,7 @@ class MyMusic(pyxbmctExtended.BackgroundDialogWindow):
                 requete = self.playerid + ' playlistcontrol cmd:add track_id:' + str(track_id)
 
             if not choix < 0 and not choix > 3 :
-                xbmc.log('requete : ' + requete , xbmc.LOGNOTICE  )
+                debug('requete : ' + requete , DEBUG_LEVEL  )
 
                 self.InterfaceCLI.sendtoCLISomething(requete)
                 reponse = self.InterfaceCLI.receptionReponseEtDecodage()
@@ -586,7 +589,7 @@ class MyMusic(pyxbmctExtended.BackgroundDialogWindow):
             while (self.breakBoucle_A == False):  # Boucle A principale de Subscribe ?same  as 'not self.breakBoucle_A'?
 
                 if time.time() > timeoutdeTestdelaBoucle:
-                    xbmc.log('Timeout : break A  ', xbmc.LOGNOTICE)
+                    debug('Timeout : break A  ', DEBUG_LEVEL)
                     self.breakBoucle_A = True
 
                 if xbmc.Monitor().waitForAbort(0.5):
@@ -615,9 +618,9 @@ class MyMusic(pyxbmctExtended.BackgroundDialogWindow):
                 # mise à jour de la position de l'item dans le menu liste
                 indexdecurrentTitle = textC.find('cur_index:')
                 indexFincurrentTitle = textC.find('|', indexdecurrentTitle)
-                # xbmc.log('index debut : ' + str(indexdecurrentTitle) + ' fin : ' + str(indexFincurrentTitle), xbmc.LOGDEBUG)
+                # debug('index debut : ' + str(indexdecurrentTitle) + ' fin : ' + str(indexFincurrentTitle), xbmc.LOGDEBUG)
                 playlist_current_index_title = textC[indexdecurrentTitle + 10: indexFincurrentTitle]
-                xbmc.log('current_index_title :' + playlist_current_index_title, xbmc.LOGNOTICE)
+                debug('current_index_title :' + playlist_current_index_title, DEBUG_LEVEL)
 
                 self.listMenu_detailAlbums.selectItem(int(playlist_current_index_title))
 
@@ -634,7 +637,7 @@ class MyMusic(pyxbmctExtended.BackgroundDialogWindow):
 
                 try:
                     pourcentagedureejouee = 100 * float(dico['time']) / float(dico['duration'])
-                    xbmc.log('percent duree : ' + str(pourcentagedureejouee) + ' - time: ' + dico['time'],
+                    debug('percent duree : ' + str(pourcentagedureejouee) + ' - time: ' + dico['time'],
                              xbmc.LOGDEBUG)
                 except KeyError:
                     pourcentagedureejouee = 0
@@ -682,15 +685,15 @@ class MyMusic(pyxbmctExtended.BackgroundDialogWindow):
                 compteur += 1
                 timedutour = time.time()
                 tempsparcouru = timedutour - timeEntreeDansLaBoucle
-                xbmc.log(str(compteur) + ' tour de boucle : ' + str(tempsparcouru), xbmc.LOGDEBUG)
+                debug(str(compteur) + ' tour de boucle : ' + str(tempsparcouru), xbmc.LOGDEBUG)
             # fin de la boucle A : sortie de subscribe
         # fin boucle while
-        xbmc.log('End of Boucle in Update_curent_track in FrameMyMusic', xbmc.LOGNOTICE)
+        debug('End of Boucle in Update_curent_track in FrameMyMusic', DEBUG_LEVEL)
         self.subscribe.resiliersouscription()
         reponse = self.InterfaceCLI.receptionReponseEtDecodage()
-        xbmc.log('Send resiliersouscription in A update_current_track in FrameMyMusic', xbmc.LOGNOTICE)
+        debug('Send resiliersouscription in A update_current_track in FrameMyMusic', DEBUG_LEVEL)
         self.InterfaceCLI.viderLeBuffer()
-        xbmc.log('End of fonction update_current_track_is_playing in FrameMyMusic, Bye', xbmc.LOGNOTICE)
+        debug('End of fonction update_current_track_is_playing in FrameMyMusic, Bye', DEBUG_LEVEL)
     # fin fonction update_current_track_is_playing
 
     def connectInterface(self):
@@ -715,23 +718,23 @@ class MyMusic(pyxbmctExtended.BackgroundDialogWindow):
         '''
         filename = 'icon.image_' + str(index) + '.tmp'
         completeNameofFile = os.path.join(savepath, filename)
-        xbmc.log('filename icon : ' + str(completeNameofFile), xbmc.LOGDEBUG)
+        debug('filename icon : ' + str(completeNameofFile), xbmc.LOGDEBUG)
 
         if 'http' in urlicone:
             urltoopen = urlicone
         else:
             if urlicone.startswith('/'):
-                xbmc.log('url icone avec /: ' + urlicone ,xbmc.LOGDEBUG )
+                debug('url icone avec /: ' + urlicone ,xbmc.LOGDEBUG )
             #urltoopen = 'http://' + self.origine.rechercheduserveur.LMSCLIip + ':' + self.origine.rechercheduserveur.LMSwebport + '/' + urlicone
                 urltoopen = 'http://' + self.lmsip + ':' + self.lmswebport + urlicone
             else:
-                xbmc.log('url icone sans /: ' + urlicone ,xbmc.LOGDEBUG )
+                debug('url icone sans /: ' + urlicone ,xbmc.LOGDEBUG )
                 urltoopen = 'http://' + self.lmsip + ':' + self.lmswebport + '/' + urlicone
         try:
             urllib.urlretrieve(urltoopen, completeNameofFile)
         except IOError:
             outils.functionNotYetImplemented()
-        xbmc.log('nom du fichier image : ' + completeNameofFile , xbmc.LOGNOTICE)
+        debug('nom du fichier image : ' + completeNameofFile , DEBUG_LEVEL)
         return completeNameofFile
         # fin fonction fin fonction get_icon, class Plugin_Generique
         # test
@@ -749,7 +752,7 @@ class MyMusic(pyxbmctExtended.BackgroundDialogWindow):
             pass
             outils.functionNotYetImplemented()
         
-        xbmc.log('nom du fichier image : ' + completeNameofFile , xbmc.LOGNOTICE)
+        debug('nom du fichier image : ' + completeNameofFile , DEBUG_LEVEL)
         return completeNameofFile
 
     def update_coverbox(self, lmsip, lmswebport, playerid, compteur):
@@ -772,10 +775,10 @@ class MyMusic(pyxbmctExtended.BackgroundDialogWindow):
             # exemple :
             urlcover = 'http://' + lmsip + ':' + lmswebport + \
                        '/music/current/cover.jpg?player=' + playerid    # or self.playerID ?
-            xbmc.log(urlcover, xbmc.LOGNOTICE)
+            debug(urlcover, DEBUG_LEVEL)
             filename = 'pochette' + str(compteur) + '.tmp'
             completeNameofFile = os.path.join(savepath , filename )
-            xbmc.log('filename tmp : ' + str(completeNameofFile), xbmc.LOGNOTICE)
+            debug('filename tmp : ' + str(completeNameofFile), DEBUG_LEVEL)
             urllib.urlretrieve(urlcover , completeNameofFile)
             self.pochette.setImage(completeNameofFile) # fonction d'xbmcgui
             #os.remove(completeNameofFile)  # suppression du fichier
@@ -810,13 +813,13 @@ class AllArtists(MyMusic):
         ``action`` is an instance of :class:`xbmcgui.Action` class.
         """
         if action == ACTION_PREVIOUS_MENU:
-            xbmc.log('Previous_menu' , xbmc.LOGNOTICE)
+            debug('Previous_menu' , DEBUG_LEVEL)
             self.quit_listing()
         elif action == ACTION_NAV_BACK:
-            xbmc.log('nav_back' , xbmc.LOGNOTICE)
+            debug('nav_back' , DEBUG_LEVEL)
             self.quit_listing()
         else:
-            xbmc.log('else condition onAction in frameMyMusic class AllArtists' , xbmc.LOGNOTICE)
+            debug('else condition onAction in frameMyMusic class AllArtists' , DEBUG_LEVEL)
             self._executeConnected(action, self.actions_connected)
 
     def f_detailAlbums(self):
@@ -860,7 +863,7 @@ class AllArtists(MyMusic):
 
         # enlever entête et queue
         texte_en_liste_a_traiter = reponse.split('|count:')
-        xbmc.log('texte_a_traiter : ' + str(texte_en_liste_a_traiter), xbmc.LOGNOTICE)
+        debug('texte_a_traiter : ' + str(texte_en_liste_a_traiter), DEBUG_LEVEL)
         if texte_en_liste_a_traiter == ['']:
             # erreur dans la réponse
             outils.functionNotYetImplemented()
@@ -873,7 +876,7 @@ class AllArtists(MyMusic):
         try:
             texte_a_traiter_titre = texte_en_liste_a_traiter.pop()
             texte_en_liste_a_traiter_entete = texte_a_traiter_titre.split('tags:' + TAGS + '|')
-            xbmc.log('texte_a_traiter titre: ' + str(texte_en_liste_a_traiter_entete), xbmc.LOGNOTICE)
+            debug('texte_a_traiter titre: ' + str(texte_en_liste_a_traiter_entete), DEBUG_LEVEL)
         except IndexError:
             item = xbmcgui.ListItem()
             item.setLabel('Get an Error from Server! ')
@@ -882,15 +885,15 @@ class AllArtists(MyMusic):
         # exemple :
         try:
             lesItemsTracksNormalised = texte_en_liste_a_traiter_entete[1]
-            xbmc.log('lesItemsTracksNormalised : ' + lesItemsTracksNormalised, xbmc.LOGNOTICE)
+            debug('lesItemsTracksNormalised : ' + lesItemsTracksNormalised, DEBUG_LEVEL)
         except IndexError:
             return
 
         try:
             lachainedesItemsTracks = lesItemsTracksNormalised.split('|')  #
-            xbmc.log('detail Albums : ' + str(lachainedesItemsTracks), xbmc.LOGNOTICE)
+            debug('detail Albums : ' + str(lachainedesItemsTracks), DEBUG_LEVEL)
         except IndexError:
-            xbmc.log('functionNotYetImplemented detailAlbums 310', xbmc.LOGNOTICE)
+            debug('functionNotYetImplemented detailAlbums 310', DEBUG_LEVEL)
             outils.functionNotYetImplemented()
 
         '''
@@ -919,7 +922,7 @@ class AllArtists(MyMusic):
         itemsTracks = []  # une liste
         itemtampon = xbmcgui.ListItem()
         for chaine in lachainedesItemsTracks:
-            debug('detail album 1 item : ' + str(chaine), xbmc.LOGNOTICE)
+            debug('detail album 1 item : ' + str(chaine), DEBUG_LEVEL)
             try:
                 clef, valeur = chaine.split(':', 1)
             except ValueError:
@@ -936,8 +939,8 @@ class AllArtists(MyMusic):
                     itemsTracks.append(itemtampon)
                     itemtampon = xbmcgui.ListItem()
                     index = index + 1
-                    xbmc.log('Ajout de l item dans listItem tampon' + titre + ' ' + itemtampon.getProperty('track_id'),
-                             xbmc.LOGNOTICE)
+                    debug('Ajout de l item dans listItem tampon' + titre + ' ' + itemtampon.getProperty('track_id'),
+                             DEBUG_LEVEL)
 
                 itemtampon.setProperty('track_id', valeur)
                 secondEtsuivant = True
@@ -972,14 +975,14 @@ class AllArtists(MyMusic):
         itemtampon.setProperty('artist_id', artist_id)
         itemtampon.setLabel(indice + ' - ' + titre + ' - ' + year + ' : ' + duree + ' .')
         itemsTracks.append(itemtampon)
-        xbmc.log('Ajout de l item dans listItem tampon ' + titre + ' ' + itemtampon.getProperty('track_id'),
-                 xbmc.LOGNOTICE)
+        debug('Ajout de l item dans listItem tampon ' + titre + ' ' + itemtampon.getProperty('track_id'),
+                 DEBUG_LEVEL)
 
         # sort the itemsTracks list by tracknum todo test this function or similar
         # sorted(itemsTracks, key=lambda tracknum: tracknum[1])   # sort by n° track not always true
 
         for item in itemsTracks:
-            xbmc.log('ajout de item tracks dans menu detailAlbum  : ' + item.getLabel(), xbmc.LOGNOTICE)
+            debug('ajout de item tracks dans menu detailAlbum  : ' + item.getLabel(), DEBUG_LEVEL)
             self.listMenu_detailAlbums.addItem(item)
     # End of funcion f_detailAlbums
 

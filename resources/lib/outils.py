@@ -123,8 +123,8 @@ class WhereIsTheLMSServer():
 
         """
         if Kodi:
-            xbmc.log("decodage de la trame : " , xbmc.LOGNOTICE)
-            xbmc.log(reponse, xbmc.LOGNOTICE)
+            debug("decodage de la trame : " , DEBUG_LEVEL)
+            debug(reponse, DEBUG_LEVEL)
         else:
             print ('decodage de la trame : ' + reponse)
         #octetlongueurInfo = 0
@@ -145,7 +145,7 @@ class WhereIsTheLMSServer():
         Recherche = SecondduTuple[1:octetlongueurInfo]
         self.LMSversion = Recherche.decode('ascii')
         if Kodi:
-            xbmc.log('La version du Serveur  est : ' + self.LMSversion , xbmc.LOGNOTICE)
+            debug('La version du Serveur  est : ' + self.LMSversion , DEBUG_LEVEL)
         else:
             print ('La version du Serveur est : \t' + self.LMSversion)
 
@@ -154,7 +154,7 @@ class WhereIsTheLMSServer():
         (PremierduTuple, SecondduTuple) = Recherche
         self.LMSUUID = SecondduTuple.decode('ascii')
         if Kodi:
-            xbmc.log('l UUID du serveur est : ' + self.LMSUUID , xbmc.LOGNOTICE)
+            debug('l UUID du serveur est : ' + self.LMSUUID , DEBUG_LEVEL)
         else:
             print ('l UUID du serveur est : \t  \t' + self.LMSUUID)
 
@@ -165,7 +165,7 @@ class WhereIsTheLMSServer():
         Recherche = SecondduTuple[1:octetlongueurInfo + 1]
         self.LMSwebport = Recherche.decode('ascii')
         if Kodi:
-            xbmc.log('le port sur serveur Web est : ' + self.LMSwebport , xbmc.LOGNOTICE)
+            debug('le port sur serveur Web est : ' + self.LMSwebport , DEBUG_LEVEL)
         else:
             print ('le port sur serveur Web est : \t' + self.LMSwebport)
 
@@ -177,7 +177,7 @@ class WhereIsTheLMSServer():
         Recherche = SecondduTuple[1:octetlongueurInfo + 1]
         self.LMSnom = Recherche.decode('ascii')
         if Kodi:
-            xbmc.log('le nom du serveur est : ' + self.LMSnom , xbmc.LOGNOTICE)
+            debug('le nom du serveur est : ' + self.LMSnom , DEBUG_LEVEL)
         else:
             print ('le nom du serveur est : \t   \t%s' % self.LMSnom)
         return
@@ -192,8 +192,8 @@ class WhereIsTheLMSServer():
         :return:
         '''
         if Kodi:
-            xbmc.log("decodage de la trame : " , xbmc.LOGNOTICE)
-            xbmc.log(reponse, xbmc.LOGNOTICE)
+            debug("decodage de la trame : " , DEBUG_LEVEL)
+            debug(reponse, DEBUG_LEVEL)
         else:
             print ('decodage de la trame : ' + reponse)
 
@@ -204,7 +204,7 @@ class WhereIsTheLMSServer():
         # Todo : blabla
         #
             if Kodi:
-                xbmc.log('le nom du serveur est :' + self.LMSnom, xbmc.LOGNOTICE)
+                debug('le nom du serveur est :' + self.LMSnom, DEBUG_LEVEL)
             else:
                 print ('le nom du serveur est : ' +  self.LMSnom)
         return
@@ -302,8 +302,7 @@ class WhereIsTheLMSServer():
             data = bytes('eIPAD\x00NAME\x00JSON\x00UUID\x00VERS\x00')  # python 2.7
         # création du socket UDP
         if Kodi:
-            #xbmc.log("creation du socket, envoi du datagram de découverte" + str(data) , xbmc.LOGDEBUG) # erreur sur kodi
-            xbmc.log("creation du socket, envoi du datagram de découverte" , xbmc.LOGDEBUG)
+            debug("creation du socket, envoi du datagram de découverte" , xbmc.LOGDEBUG)
         else:
             print ("creation du socket, envoi du datagram de découverte")
 
@@ -317,7 +316,7 @@ class WhereIsTheLMSServer():
             monSocket.sendto(data, adresse)
         except:
             if Kodi:
-                xbmc.log("pas de connexion réseau" , xbmc.LOGNOTICE)
+                debug("pas de connexion réseau" , DEBUG_LEVEL)
             else:
                 print ("pas de connexion réseau")
             exit(1)
@@ -334,11 +333,11 @@ class WhereIsTheLMSServer():
             except:
                 Eureka = False
                 if Kodi:
-                    xbmc.log("connecté au réseau mais pas de réponse d'un serveur" , xbmc.LOGNOTICE)
+                    debug("connecté au réseau mais pas de réponse d'un serveur" , DEBUG_LEVEL)
                 else:
                     print ("connecté au réseau mais pas de réponse d'un serveur")
         if Kodi:
-            xbmc.log("réponse => %s" % reponse, xbmc.LOGNOTICE) # marche sur kodi ?
+            debug("réponse => %s" % reponse, DEBUG_LEVEL) # marche sur kodi ?
         else:
             print ( '======réponse======>' + str(reponse.split(bytes(' '))))
             # exemple de reponse :
@@ -346,8 +345,8 @@ class WhereIsTheLMSServer():
 
         (self.LMSCLIip, self.LMSUDPport) = adr
         if Kodi:
-            xbmc.log('adresse du serveur LMS : ' + self.LMSCLIip , xbmc.LOGNOTICE)
-            xbmc.log('port de l interface d ecoute des players de LMS :' + str(self.LMSUDPport) , xbmc.LOGNOTICE)
+            debug('adresse du serveur LMS : ' + self.LMSCLIip , DEBUG_LEVEL)
+            debug('port de l interface d ecoute des players de LMS :' + str(self.LMSUDPport) , DEBUG_LEVEL)
         else:
             print ('adresse du serveur LMS : ' + self.LMSCLIip )
             print ('port de l interface d ecoute des players de LMS :' + str(self.LMSUDPport))
@@ -358,7 +357,7 @@ class WhereIsTheLMSServer():
         # fermeture de la connexion
         monSocket.close()
         if Kodi:
-            xbmc.log("fin du client UDP de recherche du Serveur" , xbmc.LOGNOTICE)
+            debug("fin du client UDP de recherche du Serveur" , DEBUG_LEVEL)
         else:
             print ("++++++++fin du client UDP de recherche du Serveur+++++++")
         return Eureka
@@ -435,18 +434,18 @@ class WhatAreThePlayers():  # pas utilisé , ou cela va servir ?
         b = recu_ext.split('|')                 # eclate la trame dans une liste selon les espaces
         count_str = b.pop()                  # on sait que ce champs est le nombre de player
         count_int = int(count_str)           # and did the stuff
-        xbmc.log(recu_ext, xbmc.LOGNOTICE)   # log when testing the programm -> to suppress later (pb : codage)
+        debug(recu_ext, DEBUG_LEVEL)   # log when testing the programm -> to suppress later (pb : codage)
         #informationText = ['nbre players : ' + count_str ]    #  text that will be show on the screen in the informational box
         #self.update_textbox(informationText)
           # so we know and print  the number of players what next ?
-        xbmc.log("il y a " + count_str + " receivers , cool ", xbmc.LOGNOTICE)
+        debug("il y a " + count_str + " receivers , cool ", DEBUG_LEVEL)
         if count_int == 0:
             line1 = " No receiver to listen to music."
             line2 = " ...Exit...Error n° 35 "
             xbmcgui.Dialog().ok( ADDON_ID, line1 , line2 )
             # no player
             #informationText.append('no player to listen...Exit program')
-            xbmc.log(" pas de platine pour jouer de la musique", xbmc.LOGNOTICE)
+            debug(" pas de platine pour jouer de la musique", DEBUG_LEVEL)
             xbmc.Monitor().waitForAbort(5)
             exit(35)
 
@@ -474,19 +473,19 @@ class WhatAreThePlayers():  # pas utilisé , ou cela va servir ?
                 connected%3A1|firmware%3A77'''
 
         d = urllib.unquote(c)                               # decodage escape web du string
-        xbmc.log('String d ' + d, xbmc.LOGNOTICE)
+        debug('String d ' + d, DEBUG_LEVEL)
         listedesplayers  = d.split('playerindex')                   # une liste de  X receivers + début de trame (X+1)
         if count_int == len(listedesplayers) - 1:
             pass
         else:
-            xbmc.log("There is a little bug : the number of players is not what it should", xbmc.LOGNOTICE)
+            debug("There is a little bug : the number of players is not what it should", DEBUG_LEVEL)
             line1 =  'There is a little bug : the number of players is not what it should'
             xbmcgui.Dialog().ok(ADDON_ID, line1)
 
         # pompé de https://stackoverflow.com/questions/21549809/how-to-create-dynamic-dictionary-names
         # accès aux players par dictionnairedesPlayers[1/2/3/...] - 0 est réservé au nombre de player
         dictionnairedesPlayers = [{} for _ in range(len(listedesplayers))]
-        xbmc.log('dictionnaire des players : ' + str(dictionnairedesPlayers), xbmc.LOGNOTICE)
+        debug('dictionnaire des players : ' + str(dictionnairedesPlayers), DEBUG_LEVEL)
             # c'est magique !
         # noter que :
         # dictionnairedesPlayers est une liste
@@ -503,7 +502,7 @@ class WhatAreThePlayers():  # pas utilisé , ou cela va servir ?
             print (type(dictionnairedesPlayers[x]))
             swapa = listedesplayers[x]
             swapb = swapa.split('|')  # une nouvelle liste swapb temporaire
-            xbmc.log('liste spliter swapb ' + str(swapb), xbmc.LOGDEBUG)
+            debug('liste spliter swapb ' + str(swapb), xbmc.LOGDEBUG)
             print("print p.A : " + str(swapb))
             # pb pour chaque player dans la liste des players
             playerindex = swapb[0].lstrip(':')
@@ -517,12 +516,12 @@ class WhatAreThePlayers():  # pas utilisé , ou cela va servir ?
                 else:
                     clef, valeur = swapb[y].split(':', 1)
                     dictionnairedesPlayers[x][clef] = valeur
-                    # xbmc.log(str(clef) + ' ++  ' + str(dictionnaireunplayer[clef]), xbmc.LOGNOTICE)
+                    # debug(str(clef) + ' ++  ' + str(dictionnaireunplayer[clef]), DEBUG_LEVEL)
                     # print(" Boucle_y p.B : " + str(dictionnaireunplayer.items()))
 
             dictionnairedesPlayers[x]['playerid'] = playerid
             dictionnairedesPlayers[x]['playerindex'] = playerindex
-            xbmc.log('le simple dico d un player : ' + str(dictionnairedesPlayers[x]), xbmc.LOGNOTICE)
+            debug('le simple dico d un player : ' + str(dictionnairedesPlayers[x]), DEBUG_LEVEL)
 
         # line1 = 'Found at least one player : ' + '\n' + \
         #        'nom du player : ' + dictionnairedesPlayers[x]['name'] + '\n' + \
@@ -537,7 +536,7 @@ class WhatAreThePlayers():  # pas utilisé , ou cela va servir ?
         dictionnairedesPlayers[0]['count'] = nombredeplayers
         dictionnairedesPlayers[0]['Description'] = 'contient les players - le zero est réservé '
 
-        xbmc.log('le super dico à la sortie : ' + str(dictionnairedesPlayers),xbmc.LOGDEBUG) # return example : {1: {}, 2: {}, 3: {}}
+        debug('le super dico à la sortie : ' + str(dictionnairedesPlayers),xbmc.LOGDEBUG) # return example : {1: {}, 2: {}, 3: {}}
         '''
         example of dictionnairedesPlayers return : 
         [{'count': 3, 'Description': 'contient les players - le zero est r\xc3\xa9serv\xc3\xa9 '},
@@ -567,13 +566,13 @@ class WhatAreThePlayers():  # pas utilisé , ou cela va servir ?
         :param dictionnairedesPlayers:
         :return:
         '''
-        xbmc.log('le super dico à l entrée de la fonction : ' + str(dictionnairedesPlayers),xbmc.LOGDEBUG)
+        debug('le super dico à l entrée de la fonction : ' + str(dictionnairedesPlayers),xbmc.LOGDEBUG)
         nombredeplayers = dictionnairedesPlayers[0]['count']
-        xbmc.log('nbre : ' + str(nombredeplayers), xbmc.LOGNOTICE)
+        debug('nbre : ' + str(nombredeplayers), DEBUG_LEVEL)
         for x in range (1, nombredeplayers + 1 ):
-            xbmc.log('  player x est : ' + str(x), xbmc.LOGNOTICE)
-            xbmc.log(str(dictionnairedesPlayers[x]['isplaying'] == '1'), xbmc.LOGDEBUG)
-            xbmc.log(str(dictionnairedesPlayers[x]['connected'] == '1'), xbmc.LOGDEBUG)
+            debug('  player x est : ' + str(x), DEBUG_LEVEL)
+            debug(str(dictionnairedesPlayers[x]['isplaying'] == '1'), xbmc.LOGDEBUG)
+            debug(str(dictionnairedesPlayers[x]['connected'] == '1'), xbmc.LOGDEBUG)
             #if (dictionnairedesPlayers[x]['isplaying'] == '1'):
             if (dictionnairedesPlayers[x]['connected'] == '1'):
                 # à revoir plutôt tester [ ' connected'] == '1' . vs 'isplaying' parce que sinon
@@ -585,14 +584,14 @@ class WhatAreThePlayers():  # pas utilisé , ou cela va servir ?
                 #self.update_playerbox(playerText)
                 #playerText.append( self.dictionnairedesplayers[x]['name'])  # sometime : player_name
                 #self.update_playerbox(playerText)
-                xbmc.log(str(dictionnairedesPlayers[x]['isplaying'] == '1'), xbmc.LOGDEBUG)
-                xbmc.log(str(dictionnairedesPlayers[x]['connected'] == '1'), xbmc.LOGDEBUG)
+                debug(str(dictionnairedesPlayers[x]['isplaying'] == '1'), xbmc.LOGDEBUG)
+                debug(str(dictionnairedesPlayers[x]['connected'] == '1'), xbmc.LOGDEBUG)
                 self.unplayeractif = dictionnairedesPlayers[x]['playerid']
                 return ( True , x , dictionnairedesPlayers[x]['playerid'])
         return (False, x , dictionnairedesPlayers[(random.randint(1,nombredeplayers))]['playerid']) # return whatever if no one actif
 
     def get_unplayeractif(self):
-        xbmc.log('request of one player :  ' + str(self.unplayeractif) ,xbmc.LOGNOTICE)
+        debug('request of one player :  ' + str(self.unplayeractif) ,DEBUG_LEVEL)
         if self.playerSelectionID:
             # this one must be selected by the user in the beginning of the program
             return self.playerSelectionID
@@ -626,7 +625,7 @@ class VolumeFrameChild(pyxbmct.BlankDialogWindow):  # this one is transparent ba
         Size_H_ChildSelf = 80
         SIZESCREEN_HEIGHT = xbmcgui.getScreenHeight()  # exemple  # 1080
         SIZESCREEN_WIDTH = xbmcgui.getScreenWidth()  # exemple 1920
-        xbmc.log('size screen FrameParentVolume : ' + str(SIZESCREEN_WIDTH) + ' x ' + str(SIZESCREEN_HEIGHT), xbmc.LOGNOTICE)
+        debug('size screen FrameParentVolume : ' + str(SIZESCREEN_WIDTH) + ' x ' + str(SIZESCREEN_HEIGHT), DEBUG_LEVEL)
         # remember we fit the parent to 64 columns  x 32 rows
         self.setGeometry(width_= Size_W_ChildSelf,
                          height_=Size_H_ChildSelf,
@@ -653,7 +652,7 @@ class VolumeFrameChild(pyxbmct.BlankDialogWindow):  # this one is transparent ba
 
         self.setFocus(self.slider_volume)
 
-        xbmc.log('fin init child Volume Frame', xbmc.LOGDEBUG)
+        debug('fin init child Volume Frame', xbmc.LOGDEBUG)
 
     def set_info_controls(self):
 
@@ -789,7 +788,7 @@ class ContextMenuFrameChild(pyxbmct.AddonDialogWindow):  # this one is transpare
                                pyxbmct.ACTION_MOUSE_DRAG,
                                pyxbmct.ACTION_MOUSE_LEFT_CLICK],
                               self.context_update)
-        xbmc.log('fin init child ContextMenu Frame', xbmc.LOGDEBUG)
+        debug('fin init child ContextMenu Frame', xbmc.LOGDEBUG)
 
     def set_info_controls(self):
         self.label_context = pyxbmct.Label('-------------------Development future---------------------',
@@ -844,7 +843,7 @@ class ContextActionFrameChild(pyxbmctExtended.BackgroundDialogWindow):  # this o
                                pyxbmct.ACTION_MOUSE_DRAG,
                                pyxbmct.ACTION_MOUSE_LEFT_CLICK],
                               self.context_update)
-        xbmc.log('fin init child ContextMenu Frame', xbmc.LOGDEBUG)
+        debug('fin init child ContextMenu Frame', xbmc.LOGDEBUG)
 
     def set_info_controls(self):
         self.label_context = pyxbmct.Label('-------------------Development future---------------------',
@@ -886,7 +885,7 @@ def parse_duration(durationobj): #
             result = float(durationobj)
             result = int(result)
         except ValueError:
-            xbmc.log("Error parsing track duration" + str(durationobj), xbmc.LOGNOTICE)
+            debug("Error parsing track duration" + str(durationobj), DEBUG_LEVEL)
     return result
 
 
@@ -942,33 +941,15 @@ def recherchonsleServeur(self):
     self.rechercheduserveur = WhereIsTheLMSServer()
     if self.rechercheduserveur.RequeteExploratoire():
 
-        #informationText.append('nom du LogitechMediaServeur : ' + str(self.rechercheduserveur.LMSnom))
-        #self.update_textbox(informationText)
-        xbmc.log("Type LMSnom : " + str(type(self.rechercheduserveur.LMSnom)), xbmc.LOGDEBUG)
-        #informationText.append('UUID du LogitechMediaServeur : ' + str(self.rechercheduserveur.LMSUUID))
-        xbmc.log("Type LMSUUID : " + str(type(self.rechercheduserveur.LMSUUID)), xbmc.LOGDEBUG)
-        #self.update_textbox(informationText)
-        #informationText.append('version du LogitechMediaServeur : ' + str(self.rechercheduserveur.LMSversion))
-        xbmc.log("Type LMSversion : " + str(type(self.rechercheduserveur.LMSversion)), xbmc.LOGDEBUG)
-        #self.update_textbox(informationText)
-        # informationText.append('Répetition - Version du LMS : %(LMSversion)s ' % (self.rechercheduserveur.LMSversion))
-        #self.update_textbox(informationText)
-        #informationText.append('port web du LogitechMediaServeur : ' + str(self.rechercheduserveur.LMSwebport))
-        xbmc.log("Type LMSwebport : " + str(type(self.rechercheduserveur.LMSwebport)), xbmc.LOGDEBUG)
-        #self.update_textbox(informationText)
-        #informationText.append('ip du CLI du LogitechMediaServeur : ' + str(self.rechercheduserveur.LMSCLIip))
-        xbmc.log("Type LMSCLIip : " + str(type(self.rechercheduserveur.LMSCLIip)), xbmc.LOGDEBUG)
-        #self.update_textbox(informationText)
-        #informationText.append('port du CLI du LogitechMediaServeur : ' + str(self.rechercheduserveur.LMSCLIport))
-        xbmc.log("Type LMSCLIport : " + str(type(self.rechercheduserveur.LMSCLIport)), xbmc.LOGDEBUG)
-        #self.update_textbox(informationText)
-        #informationText.append("End scanning Network. Continue ...")
-        #self.update_textbox(informationText)
-        # need to retrieve cover jpg
+
+        debug("Type LMSnom : " + str(type(self.rechercheduserveur.LMSnom)))
+        debug("Type LMSUUID : " + str(type(self.rechercheduserveur.LMSUUID)))
+        debug("Type LMSversion : " + str(type(self.rechercheduserveur.LMSversion)))
+        debug("Type LMSwebport : " + str(type(self.rechercheduserveur.LMSwebport)), xbmc.LOGDEBUG)
+        debug("Type LMSCLIip : " + str(type(self.rechercheduserveur.LMSCLIip)), xbmc.LOGDEBUG)
+        debug("Type LMSCLIport : " + str(type(self.rechercheduserveur.LMSCLIport)), xbmc.LOGDEBUG)
         self.lmsip = self.rechercheduserveur.LMSCLIip
         self.lmswebport = self.rechercheduserveur.LMSwebport
-        #ne fonctionne pas comme je l'espérais
-        #self.rechercheduserveur.DonnonsAMangerAKodi()
 
         line0 = "Running scan on Network..."
         line1 = 'nom du LogitechMediaServeur : ' + str(self.rechercheduserveur.LMSnom) + '\n' + \

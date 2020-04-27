@@ -29,7 +29,6 @@ import time
 from resources.lib import connexionClient
 from resources.lib import outils, ecoute
 from resources.lib import pyxbmctExtended
-from resources.lib.outils import debug
 
 TIME_OF_LOOP_SUBSCRIBE = ecoute.TIME_OF_LOOP_SUBSCRIBE
 
@@ -48,6 +47,9 @@ if Kodi:
     ARTWORK = xbmc.translatePath(os.path.join(ADDON.getAddonInfo('path'), 'resources', 'skins', 'Default', 'media'))
     global savepath
     savepath = xbmc.translatePath('special://temp')
+
+    from resources.lib.outils import debug
+    DEBUG_LEVEL = xbmc.LOGDEBUG
 
 
     # screen 16:9 so to have grid square fix to 16-9 on 1280 x 720 max of pyxbmct
@@ -168,8 +170,8 @@ class SlimIsPlaying(pyxbmctExtended.BackgroundDialogWindow):
         super(SlimIsPlaying, self).__init__()
 
         self.WindowPlaying = xbmcgui.getCurrentWindowId()
-        xbmc.log('fenetre de class SlimIsPlaying n° : ' + str(self.WindowPlaying), xbmc.LOGNOTICE)
-        xbmc.log('Create Instance Slim is Now Playing KodiJivelette...' , xbmc.LOGNOTICE)
+        debug('fenetre de class SlimIsPlaying n° : ' + str(self.WindowPlaying), DEBUG_LEVEL)
+        debug('Create Instance Slim is Now Playing KodiJivelette...' , DEBUG_LEVEL)
 
         self.NowIsPlaying = True    # this is a flag for the main Loop in the method update
         self.threadRunning = True
@@ -179,8 +181,8 @@ class SlimIsPlaying(pyxbmctExtended.BackgroundDialogWindow):
         self.connectInterface()
         self.get_ident_server()
 
-        debug('server : ' + self.nomserver + ' - ' + self.lmsip + ' : ' + self.lmswebport, xbmc.LOGNOTICE)
-        debug('player : ' + self.playerid, xbmc.LOGNOTICE)
+        debug('server : ' + self.nomserver + ' - ' + self.lmsip + ' : ' + self.lmswebport, DEBUG_LEVEL)
+        debug('player : ' + self.playerid, DEBUG_LEVEL)
 
         SIZESCREEN_HEIGHT = xbmcgui.getScreenHeight()            # exemple  # 1080
         SIZESCREEN_WIDTH = xbmcgui.getScreenWidth()                         # 1920
@@ -190,7 +192,7 @@ class SlimIsPlaying(pyxbmctExtended.BackgroundDialogWindow):
 
         self.screenx = SIZESCREEN_WIDTH
         self.screeny = SIZESCREEN_HEIGHT
-        xbmc.log('Real Size of Screen : ' + str(self.screenx) + ' x ' + str(self.screeny), xbmc.LOGNOTICE)
+        debug('Real Size of Screen : ' + str(self.screenx) + ' x ' + str(self.screeny), DEBUG_LEVEL)
 
         if self.screenx > SIZE_WIDTH_pyxbmct:
             self.screenx = SIZE_WIDTH_pyxbmct
@@ -201,14 +203,14 @@ class SlimIsPlaying(pyxbmctExtended.BackgroundDialogWindow):
                          height_=self.screeny ,
                          rows_= NEUF,
                          columns_= SEIZE)
-        xbmc.log('Size of Screen pyxbmct fix to : ' + str(self.screenx) + ' x ' + str(self.screeny), xbmc.LOGNOTICE)
+        debug('Size of Screen pyxbmct fix to : ' + str(self.screenx) + ' x ' + str(self.screeny), DEBUG_LEVEL)
 
         # sizecover must be  a square
         #SIZECOVER_X  = int(self.GRIDSCREEN_X * 2.5)  # need to ask artWork size from server, adapt to the size screen
         SIZECOVER_X = (SEIZE // 2) - 6  # int(self.screenx / SEIZE * 28 )
         self.sizecover_x = SIZECOVER_X
         #SIZECOVER_Y = self.GRIDSCREEN_Y * 3  # and reserve a sized frame to covers,attention SIZECOVER_X != SIZECOVER_Y
-        xbmc.log('Taille pochette : ' + str(SIZECOVER_X) + ' x ' + str(SIZECOVER_X) , xbmc.LOGNOTICE)
+        debug('Taille pochette : ' + str(SIZECOVER_X) + ' x ' + str(SIZECOVER_X) , DEBUG_LEVEL)
 
         ligneButton = NEUF - 3
         SLIDER_INIT_VALUE = 0
@@ -340,44 +342,44 @@ class SlimIsPlaying(pyxbmctExtended.BackgroundDialogWindow):
         ``action`` is an instance of :class:`xbmcgui.Action` class.
         """
         if action == ACTION_PREVIOUS_MENU:
-            xbmc.log('Previous_menu' , xbmc.LOGNOTICE)
+            debug('Previous_menu' , DEBUG_LEVEL)
             self.quit_now_playing()
 
         elif action == ACTION_NAV_BACK:
-            xbmc.log('nav_back' , xbmc.LOGNOTICE)
+            debug('nav_back' , DEBUG_LEVEL)
             self.quit_now_playing()
 
         elif action == ACTION_PAUSE : # currently it's the space on my keyboard
-            xbmc.log('Action Pause', xbmc.LOGNOTICE)
+            debug('Action Pause', DEBUG_LEVEL)
             self.pause_play()
         
         elif action == ACTION_PLAY or action == ACTION_PLAYER_PLAY:
-            xbmc.log('Action Play', xbmc.LOGNOTICE)
+            debug('Action Play', DEBUG_LEVEL)
             self.pause_play()
 
         elif ( action == ACTION_VOLUME_DOWN )  or ( action == ACTION_VOLUME_UP ) :
-            xbmc.log('Action Volume' , xbmc.LOGNOTICE)
+            debug('Action Volume' , DEBUG_LEVEL)
             self.promptVolume()
         
         elif action == xbmcgui.ACTION_CONTEXT_MENU:
-            xbmc.log('Action previous Menu', xbmc.LOGNOTICE)
+            debug('Action previous Menu', DEBUG_LEVEL)
             self.promptContextMenu()
 
         else:
-            xbmc.log('else condition onAction in FramePlaying' , xbmc.LOGNOTICE)
+            debug('else condition onAction in FramePlaying' , DEBUG_LEVEL)
             self._executeConnected(action, self.actions_connected)
 
 
     def quit_now_playing(self):# todo : à tester
         self.NowIsPlaying = False       # with this flag the method update must exit the loop and stop
         self.WindowPlayinghere = xbmcgui.getCurrentWindowId()
-        xbmc.log('fenetre now_is_playing is exiting: ' + str(self.WindowPlayinghere), xbmc.LOGNOTICE)
+        debug('fenetre now_is_playing is exiting: ' + str(self.WindowPlayinghere), DEBUG_LEVEL)
         self.connectInterface()
         self.get_playerid()
         #self.subscribe = ecoute.Souscription(self.InterfaceCLI, self.playerid )
         #self.subscribe.resiliersouscription()
         self.InterfaceCLI.sendSignal('quit')
-        xbmc.log('sendsignal quit in A quit() FramePlaying', xbmc.LOGNOTICE)
+        debug('sendsignal quit in A quit() FramePlaying', DEBUG_LEVEL)
         # don't receive here because need in the answer of server to exit the update_now_is_playing()
         #recupropre = self.InterfaceCLI.receptionReponseEtDecodage()
 
@@ -459,15 +461,15 @@ class SlimIsPlaying(pyxbmctExtended.BackgroundDialogWindow):
         # exemple :
         urlcover = 'http://' + lmsip + ':' + lmswebport + \
                    '/music/current/cover.jpg?player=' + playerid    # or self.playerID ?
-        xbmc.log(urlcover, xbmc.LOGNOTICE)
+        debug(urlcover, DEBUG_LEVEL)
         filename = 'pochette' + str(compteur) + '.tmp'
         completeNameofFile = os.path.join(savepath , filename )
-        xbmc.log('filename tmp : ' + str(completeNameofFile), xbmc.LOGNOTICE)
+        debug('filename tmp : ' + str(completeNameofFile), DEBUG_LEVEL)
         try:
             urllib.urlretrieve(urlcover , completeNameofFile)
             self.pochette.setImage(completeNameofFile)  # fonction d'xbmcgui
         except:
-            debug('Erreur pour update coverbox in FramePlaying', xbmc.LOGNOTICE)
+            debug('Erreur pour update coverbox in FramePlaying', DEBUG_LEVEL)
 
         #os.remove(completeNameofFile)  # suppression du fichier
         # fin fonction update_cover
@@ -498,11 +500,11 @@ class SlimIsPlaying(pyxbmctExtended.BackgroundDialogWindow):
             thereis a similar method inside the class frameMenu.FenetreMenu when the frame use show()
             but use a different logic to exit the loop
         '''
-        xbmc.log('Entrée dans méthode Update_now_is_playing of FramePlaying', xbmc.LOGNOTICE)
+        debug('Entrée dans méthode Update_now_is_playing of FramePlaying', DEBUG_LEVEL)
 
         self.Window_is_playing = xbmcgui.getCurrentWindowId()
-        #xbmc.log('fenetre de player en maj n° : ' + str(self.WindowPlaying), xbmc.LOGDEBUG)
-        #xbmc.log('nouvelle fenetre de player n° : ' + str(self.Window_is_playing), xbmc.LOGDEBUG)
+        #debug('fenetre de player en maj n° : ' + str(self.WindowPlaying), xbmc.LOGDEBUG)
+        #debug('nouvelle fenetre de player n° : ' + str(self.Window_is_playing), xbmc.LOGDEBUG)
 
         # activation de la souscription au serveur process
         self.subscribe = ecoute.Souscription(self.InterfaceCLI , self.playerid )
@@ -522,7 +524,7 @@ class SlimIsPlaying(pyxbmctExtended.BackgroundDialogWindow):
             while (self.breakBoucle_A == False):  # Boucle A principale de Subscribe
 
                 if time.time() > timeoutdeTestdelaBoucle:
-                    xbmc.log('Timeout : break A  ', xbmc.LOGNOTICE)
+                    debug('Timeout : break A  ', DEBUG_LEVEL)
                     break
 
                 if xbmc.Monitor().waitForAbort(0.5):
@@ -547,17 +549,17 @@ class SlimIsPlaying(pyxbmctExtended.BackgroundDialogWindow):
                 # Here the program is blocked until data come from network (receptionReponse) and are store
                 # in recupropre
                 recupropre = self.InterfaceCLI.receptionReponseEtDecodage()
-                xbmc.log( 'recupropre = ' + str(recupropre), xbmc.LOGNOTICE)
+                debug( 'recupropre = ' + str(recupropre), DEBUG_LEVEL)
                 # Then Analyse de la trame
 
                 if 'subscribe:-' in recupropre:
-                    xbmc.log('recu fin souscription in update in FramePlaying' , xbmc.LOGNOTICE)
+                    debug('recu fin souscription in update in FramePlaying' , DEBUG_LEVEL)
                     self.NowIsPlaying = False
                     break
-                xbmc.log( '2eme ligne, recupropre = ' + str(recupropre), xbmc.LOGNOTICE)
+                debug( '2eme ligne, recupropre = ' + str(recupropre), DEBUG_LEVEL)
 
                 if recupropre.startswith('quit'):
-                    xbmc.log('recu quit in update in FramePlaying', xbmc.LOGNOTICE)
+                    debug('recu quit in update in FramePlaying', DEBUG_LEVEL)
                     self.NowIsPlaying = False
                     break
 
@@ -579,7 +581,7 @@ class SlimIsPlaying(pyxbmctExtended.BackgroundDialogWindow):
                     else:
                         clef = c[0]
                         dico[clef] = c[1]       # ensuite on pourra piocher dans le dico la valeur
-                # xbmc.log(str(dico.viewitems()), xbmc.LOGDEBUG)
+                # debug(str(dico.viewitems()), xbmc.LOGDEBUG)
                 '''
                 exemple du dictionnaire radio  suite :
                 dict_items([('mixer volume', '42'), ('playlist repeat', '0'), ('digital_volume_control', '1'), 
@@ -594,7 +596,7 @@ class SlimIsPlaying(pyxbmctExtended.BackgroundDialogWindow):
 
                 try:
                     pourcentagedureejouee = 100 * float(dico['time']) / float(dico['duration'])
-                    xbmc.log('percent duree : ' + str(pourcentagedureejouee) + ' - time: ' + dico['time'], xbmc.LOGDEBUG)
+                    debug('percent duree : ' + str(pourcentagedureejouee) + ' - time: ' + dico['time'], xbmc.LOGDEBUG)
                 except KeyError:
                     pourcentagedureejouee = 0
 
@@ -657,19 +659,19 @@ class SlimIsPlaying(pyxbmctExtended.BackgroundDialogWindow):
                 compteur += 1
                 timedutour = time.time()
                 tempsparcouru = timedutour - timeEntreeDansLaBoucle
-                xbmc.log(str(compteur) + ' tour de boucle : ' + str(tempsparcouru), xbmc.LOGDEBUG)
-                xbmc.log('bool threadRunning : ' + str(self.threadRunning), xbmc.LOGNOTICE)
+                debug(str(compteur) + ' tour de boucle : ' + str(tempsparcouru), xbmc.LOGDEBUG)
+                debug('bool threadRunning : ' + str(self.threadRunning), DEBUG_LEVEL)
                 if not self.threadRunning:          # must never happen because we are in the running thread
-                    xbmc.log(' threadRunning is not True ', xbmc.LOGNOTICE)
+                    debug(' threadRunning is not True ', DEBUG_LEVEL)
                     self.breakBoucle_A = True
                     self.NowIsPlaying
             # fin de la boucle A : sortie de subscribe
         # fin boucle while NowIsPlaying
-        xbmc.log('End of Boucle of Squueze , Bye', xbmc.LOGNOTICE)
+        debug('End of Boucle of Squueze , Bye', DEBUG_LEVEL)
         self.subscribe.resiliersouscription()
         reponse = self.InterfaceCLI.receptionReponseEtDecodage()
-        xbmc.log('Send resiliersouscription in A update now_is_playing() in FramePlaying', xbmc.LOGNOTICE)
+        debug('Send resiliersouscription in A update now_is_playing() in FramePlaying', DEBUG_LEVEL)
         #del subscribe
         self.InterfaceCLI.viderLeBuffer()
-        xbmc.log('End of fonction update_now_is_playing In FrmaePlaying, Bye', xbmc.LOGNOTICE)
+        debug('End of fonction update_now_is_playing In FrmaePlaying, Bye', DEBUG_LEVEL)
     #fin fonction update_now_is_playing

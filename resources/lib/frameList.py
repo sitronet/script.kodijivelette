@@ -18,6 +18,8 @@ from resources.lib.ecoute import Souscription
 from resources.lib import pyxbmctExtended
 
 
+
+
 if Kodi:
     import xbmc
     import xbmcgui
@@ -26,6 +28,9 @@ if Kodi:
 
     ADDON = xbmcaddon.Addon()
     ARTWORK = xbmc.translatePath(os.path.join(ADDON.getAddonInfo('path'), 'resources', 'skins', 'Default', 'media'))
+
+    from resources.lib.outils import debug
+    DEBUG_LEVEL = xbmc.LOGDEBUG
 
     SIZE_WIDTH_pyxbmct = 1280
     SIZE_HEIGHT_pyxbmct = 720
@@ -85,15 +90,15 @@ class ViewListPlugin(pyxbmctExtended.BackgroundDialogWindow):
         self.Abonnement = threading.Event()
         self.threadRunning = True
         self.WindowPlaying = xbmcgui.getCurrentWindowId()
-        xbmc.log('fenetre de class ViewListPlugin n° : ' + str(self.WindowPlaying), xbmc.LOGNOTICE)
-        xbmc.log('Create Instance ViewListPlugin KodiJivelette...' , xbmc.LOGNOTICE)
+        debug('fenetre de class ViewListPlugin n° : ' + str(self.WindowPlaying), DEBUG_LEVEL)
+        debug('Create Instance ViewListPlugin KodiJivelette...' , DEBUG_LEVEL)
 
         self.geometrie()
-        xbmc.log('geometrie set', xbmc.LOGNOTICE)
+        debug('geometrie set', DEBUG_LEVEL)
         self.controlMenus()
-        xbmc.log('control Menu set', xbmc.LOGNOTICE)
+        debug('control Menu set', DEBUG_LEVEL)
         self.set_navigation()
-        xbmc.log('navigation  set', xbmc.LOGNOTICE)
+        debug('navigation  set', DEBUG_LEVEL)
 
         self.get_playerid()
 
@@ -120,7 +125,7 @@ class ViewListPlugin(pyxbmctExtended.BackgroundDialogWindow):
         Size_H_ChildSelf = SIZE_HEIGHT_pyxbmct
         self.screenx = SIZESCREEN_WIDTH
         self.screeny = SIZESCREEN_HEIGHT
-        xbmc.log('Real Size of Screen : ' + str(self.screenx) + ' x ' + str(self.screeny), xbmc.LOGNOTICE)
+        debug('Real Size of Screen : ' + str(self.screenx) + ' x ' + str(self.screeny), DEBUG_LEVEL)
         if self.screenx > SIZE_WIDTH_pyxbmct:
             self.screenx = SIZE_WIDTH_pyxbmct
             self.screeny = SIZE_HEIGHT_pyxbmct
@@ -132,7 +137,7 @@ class ViewListPlugin(pyxbmctExtended.BackgroundDialogWindow):
                          pos_x= 1,
                          pos_y= 1 )
 
-        xbmc.log('Size of Screen pyxbmct fix to : ' + str(self.screenx) + ' x ' + str(self.screeny), xbmc.LOGNOTICE)
+        debug('Size of Screen pyxbmct fix to : ' + str(self.screenx) + ' x ' + str(self.screeny), DEBUG_LEVEL)
 
         self.image_dir = ARTWORK  # path to pictures used in the program (future development, todo)
 
@@ -203,19 +208,19 @@ class ViewListPlugin(pyxbmctExtended.BackgroundDialogWindow):
         ``action`` is an instance of :class:`xbmcgui.Action` class.
         """
         if action == ACTION_PREVIOUS_MENU:
-            xbmc.log('Previous_menu' , xbmc.LOGNOTICE)
+            debug('Previous_menu' , DEBUG_LEVEL)
             self.quit_listing()
         elif action == ACTION_NAV_BACK:
-            xbmc.log('nav_back' , xbmc.LOGNOTICE)
+            debug('nav_back' , DEBUG_LEVEL)
             self.quit_listing()
         else:
-            xbmc.log('else condition onAction in frameList' , xbmc.LOGNOTICE)
+            debug('else condition onAction in frameList' , DEBUG_LEVEL)
             self._executeConnected(action, self.actions_connected)
 
     def quit_listing(self):# todo : à tester
             self.WindowPlayinghere = xbmcgui.getCurrentWindowId()
-            xbmc.log('fenetre listing is exiting: ' + str(self.WindowPlayinghere), xbmc.LOGNOTICE)
-            #xbmc.log('fenetre enregistrée dans methode now_is_playing n° : ' + str(self.Window_is_playing), xbmc.LOGNOTICE) # attribute error here
+            debug('fenetre listing is exiting: ' + str(self.WindowPlayinghere), DEBUG_LEVEL)
+            #debug('fenetre enregistrée dans methode now_is_playing n° : ' + str(self.Window_is_playing), DEBUG_LEVEL) # attribute error here
             #self.Abonnement.clear() # -> AttributeError: 'SlimIsPlaying' object has no attribute 'Abonnement'
             # todo : tester appel fonction du prg principal
             # frameMenu.FenetreMenu.desabonner() -> TypeError: unbound method desabonner() must be called with FenetreMenu
@@ -275,7 +280,7 @@ class ViewListPlugin(pyxbmctExtended.BackgroundDialogWindow):
         except (=not audio or hasitem true)  we need to dig more -> open listmenu_2
 
         '''
-        xbmc.log('entrée dans la function launchPlayingItem', xbmc.LOGNOTICE  )
+        debug('entrée dans la function launchPlayingItem', DEBUG_LEVEL  )
 
         self.get_playerid()
         self.get_ident_server()
@@ -302,8 +307,8 @@ class ViewListPlugin(pyxbmctExtended.BackgroundDialogWindow):
             hasitems = self.listMenu_2.getListItem(self.listMenu_2.getSelectedPosition()).getProperty('hasitems')
 
 
-        xbmc.log('launch to play : ' + labelajouer + ' -> ' + cmd + ' playlist play item_id:' + item_id , xbmc.LOGNOTICE  )
-        xbmc.log('parametre : ' + str(item_id)  + ' commande :  ' + cmd + ' type : ' + audio_type + ' hasitems ? ' + hasitems  , xbmc.LOGNOTICE  )
+        debug('launch to play : ' + labelajouer + ' -> ' + cmd + ' playlist play item_id:' + item_id , DEBUG_LEVEL  )
+        debug('parametre : ' + str(item_id)  + ' commande :  ' + cmd + ' type : ' + audio_type + ' hasitems ? ' + hasitems  , DEBUG_LEVEL  )
 
         if audio_type == 'audio' and hasitems == '0':
 
@@ -317,7 +322,7 @@ class ViewListPlugin(pyxbmctExtended.BackgroundDialogWindow):
 
             if not choix < 0:
                 self.connectInterface()
-                xbmc.log('requete : ' + requete , xbmc.LOGNOTICE  )
+                debug('requete : ' + requete , DEBUG_LEVEL  )
 
                 self.InterfaceCLI.sendtoCLISomething(requete)
                 reponse = self.InterfaceCLI.receptionReponseEtDecodage()
@@ -328,7 +333,7 @@ class ViewListPlugin(pyxbmctExtended.BackgroundDialogWindow):
                 self.jivelette = framePlaying.SlimIsPlaying()
 
                 self.WindowPlaying = xbmcgui.getCurrentWindowId()
-                xbmc.log('fenetre en cours n° : ' + str(self.WindowPlaying), xbmc.LOGNOTICE)
+                debug('fenetre en cours n° : ' + str(self.WindowPlaying), DEBUG_LEVEL)
 
                 # todo : test inversion show et doModal
                 self.jivelette.show()
@@ -339,7 +344,7 @@ class ViewListPlugin(pyxbmctExtended.BackgroundDialogWindow):
                 #self.jivelette.doModal()
                 del self.jivelette
             else:
-                xbmc.log('not audio', xbmc.LOGNOTICE)
+                debug('not audio', DEBUG_LEVEL)
                 pass
 
         else:
@@ -352,7 +357,7 @@ class ViewListPlugin(pyxbmctExtended.BackgroundDialogWindow):
             self.InterfaceCLI.sendtoCLISomething(cmd + ' items  item_id:' + item_id +  ' count ')
             reponse =  self.InterfaceCLI.receptionReponseEtDecodage()
             texte_en_liste_a_traiter = reponse.split('|count:')
-            xbmc.log('texte_a_traiter : ' +  str(texte_en_liste_a_traiter) , xbmc.LOGNOTICE )
+            debug('texte_a_traiter : ' +  str(texte_en_liste_a_traiter) , DEBUG_LEVEL )
             if texte_en_liste_a_traiter == ['']:
                 # erreur dans la réponse
                 outils.functionNotYetImplemented()
@@ -366,7 +371,7 @@ class ViewListPlugin(pyxbmctExtended.BackgroundDialogWindow):
                 return
             texte_a_traiter_titre = texte_en_liste_a_traiter.pop()
             texte_en_liste_a_traiter_titre = texte_a_traiter_titre.split('title:')
-            xbmc.log('texte_a_traiter titre: ' +  str(texte_en_liste_a_traiter_titre) , xbmc.LOGNOTICE )
+            debug('texte_a_traiter titre: ' +  str(texte_en_liste_a_traiter_titre) , DEBUG_LEVEL )
             # exemple :  ['00:04:20:17:1c:44|picks|items|0|count|item_id:c4bca76a.0|', "Andy's Picks"]
             try:
                 title = texte_en_liste_a_traiter_titre.pop()
@@ -387,7 +392,7 @@ class ViewListPlugin(pyxbmctExtended.BackgroundDialogWindow):
                     self.InterfaceCLI.sendtoCLISomething( cmd + ' items ' +  str(start) + '  '  + \
                                              str(step) + ' item_id:' +  str(item_id) )
                     reponsepropre = self.InterfaceCLI.receptionReponseEtDecodage()
-                    xbmc.log('Les Fleurs unefoispropre : ' + str(reponsepropre) , xbmc.LOGNOTICE)
+                    debug('Les Fleurs unefoispropre : ' + str(reponsepropre) , DEBUG_LEVEL)
                     '''
                     exemple 1er tour : 00:04:20:17:1c:44|local|items|0|8|item_id:d4465007.0|title:Stations|
                     id:d4465007.0.0|name:Aquifm 98.0|type:audio|image:http://cdn-radiotime-logos.tunein.com/s296322q.png|isaudio:1|hasitems:0|
@@ -401,8 +406,8 @@ class ViewListPlugin(pyxbmctExtended.BackgroundDialogWindow):
                     count:50               
                     '''
                     lesItemsFleurs = reponsepropre.split('items|' + str(start) + '|' + str(step) + '|' )
-                    xbmc.log('ligne 269 : ' + 'items|' + str(start) + '|' + str(step) + '|'  , xbmc.LOGNOTICE)
-                    xbmc.log('ligne 270 : ' + str(lesItemsFleurs) , xbmc.LOGNOTICE)
+                    debug('ligne 269 : ' + 'items|' + str(start) + '|' + str(step) + '|'  , DEBUG_LEVEL)
+                    debug('ligne 270 : ' + str(lesItemsFleurs) , DEBUG_LEVEL)
                     nbre_recolted = nbre_recolted + step
                     nbre_restant_a_recolter = nbre_restant_a_recolter - step
                     start = start + step
@@ -411,7 +416,7 @@ class ViewListPlugin(pyxbmctExtended.BackgroundDialogWindow):
                     requete_construite = cmd + ' items ' +  str(start) + ' '  + str(nbre_restant_a_recolter) + ' item_id:' +  str(item_id)
                     self.InterfaceCLI.sendtoCLISomething( requete_construite )
                     reponsepropre = self.InterfaceCLI.receptionReponseEtDecodage()
-                    xbmc.log('Les Fleurs unefoispropre : ' + str(reponsepropre) , xbmc.LOGNOTICE)
+                    debug('Les Fleurs unefoispropre : ' + str(reponsepropre) , DEBUG_LEVEL)
                     '''
                     exemple : 00:04:20:17:1c:44|picks|items|0|3|item_id:63d6bace.0|title:Andy's Picks|
                     id:63d6bace.0.0|name:Sofaspace Ambient Radio (Vorbis)|type:audio|isaudio:1|hasitems:0|
@@ -422,20 +427,20 @@ class ViewListPlugin(pyxbmctExtended.BackgroundDialogWindow):
                     lesItemsFleurs = reponsepropre.split('items|' + str(start) + '|' + str(nbre_restant_a_recolter)  + '|' )
                     nbre_recolted = nbre_recolted + nbre_restant_a_recolter
 
-                xbmc.log('la récolte a été bonne de  : ' + str(nbre_recolted) , xbmc.LOGNOTICE)
+                debug('la récolte a été bonne de  : ' + str(nbre_recolted) , DEBUG_LEVEL)
 
                 #trim the count and trim the title
                 lesItemsFleurs_text = lesItemsFleurs[1]
-                xbmc.log('lesItemsFleurs_text : ' + lesItemsFleurs_text, xbmc.LOGDEBUG )
+                debug('lesItemsFleurs_text : ' + lesItemsFleurs_text, xbmc.LOGDEBUG )
                 index_du_count = lesItemsFleurs_text.find('|count:')
-                xbmc.log('index count : ' + str(index_du_count), xbmc.LOGDEBUG )
+                debug('index count : ' + str(index_du_count), xbmc.LOGDEBUG )
                 index_du_titre = lesItemsFleurs_text.find('title:')
-                xbmc.log('index titre : ' + str(index_du_titre), xbmc.LOGDEBUG )
+                debug('index titre : ' + str(index_du_titre), xbmc.LOGDEBUG )
                 index_du_fin_de_titre = lesItemsFleurs_text.find('|', index_du_titre)
-                xbmc.log('index fin du  titre : ' + str(index_du_fin_de_titre), xbmc.LOGDEBUG )
+                debug('index fin du  titre : ' + str(index_du_fin_de_titre), xbmc.LOGDEBUG )
 
                 lesItemsFleursNormalised = lesItemsFleurs_text[index_du_fin_de_titre + 1 : index_du_count]
-                xbmc.log('lesItemsFleursNormalised : ' + lesItemsFleursNormalised, xbmc.LOGNOTICE )
+                debug('lesItemsFleursNormalised : ' + lesItemsFleursNormalised, DEBUG_LEVEL )
                 '''
                 exemple : 
                 |id:3a7d1dbb.0.0|name:Sofaspace Ambient Radio (Vorbis)|type:audio|isaudio:1|hasitems:0|
@@ -445,9 +450,9 @@ class ViewListPlugin(pyxbmctExtended.BackgroundDialogWindow):
 
                 try:
                     lachainedesItemsFleurs = lesItemsFleursNormalised.split('|')#
-                    xbmc.log('frameList.py : ligne 422 : ' + str(lachainedesItemsFleurs) , xbmc.LOGNOTICE)
+                    debug('frameList.py : ligne 422 : ' + str(lachainedesItemsFleurs) , DEBUG_LEVEL)
                 except IndexError:
-                    xbmc.log('frameList.py : functionNotYetImplemented Ligne 422', xbmc.LOGNOTICE)
+                    debug('frameList.py : functionNotYetImplemented Ligne 422', DEBUG_LEVEL)
                     outils.functionNotYetImplemented()
                     return
 
@@ -456,7 +461,7 @@ class ViewListPlugin(pyxbmctExtended.BackgroundDialogWindow):
                 itemtampon = xbmcgui.ListItem()
                 #itemsFleur.append(itemtampon)
                 for chaine in lachainedesItemsFleurs:
-                    xbmc.log('ligne around 432 chaine d 1 item : ' + str(chaine), xbmc.LOGDEBUG)
+                    debug('ligne around 432 chaine d 1 item : ' + str(chaine), xbmc.LOGDEBUG)
                     clef, valeur = chaine.split(':', 1)
 
                     if clef == 'name':
@@ -483,7 +488,7 @@ class ViewListPlugin(pyxbmctExtended.BackgroundDialogWindow):
                         itemtampon.setProperty(clef, valeur)
 
                 for item in itemsFleur:
-                    xbmc.log('ajout de item dans menu frameList::listMenu_2 : ' + item.getLabel() , xbmc.LOGNOTICE)
+                    debug('ajout de item dans menu frameList::listMenu_2 : ' + item.getLabel() , DEBUG_LEVEL)
                     #self.longListing.ArrayOfMenu[indicedesmenus].addItem(item)
                     self.listMenu_2.addItem(item)
 
@@ -495,8 +500,8 @@ class ViewListPlugin(pyxbmctExtended.BackgroundDialogWindow):
         '''copier/coller de la fonction de frameMenu.py'''
 
         self.Window_is_playing = xbmcgui.getCurrentWindowId()
-        # xbmc.log('fenetre de player en maj n° : ' + str(self.WindowPlaying), xbmc.LOGDEBUG)
-        # xbmc.log('nouvelle fenetre de player n° : ' + str(self.Window_is_playing), xbmc.LOGDEBUG)
+        # debug('fenetre de player en maj n° : ' + str(self.WindowPlaying), xbmc.LOGDEBUG)
+        # debug('nouvelle fenetre de player n° : ' + str(self.Window_is_playing), xbmc.LOGDEBUG)
 
         self.subscribe = Souscription(self.InterfaceCLI, self.playerid )
         self.subscribe.subscription()
@@ -513,14 +518,14 @@ class ViewListPlugin(pyxbmctExtended.BackgroundDialogWindow):
             while (self.breakBoucle_A == False):  # Boucle A principale de Subscribe
 
                 if time.time() > timeoutdeTestdelaBoucle:
-                    xbmc.log('Timeout : break A  ', xbmc.LOGNOTICE)
+                    debug('Timeout : break A  ', DEBUG_LEVEL)
                     break
                 if not self.Abonnement.is_set:
                     break
                 if xbmc.Monitor().waitForAbort(0.5):
                     self.breakBoucle_A = True
                     self.Abonnement.clear()
-                # xbmc.log('trame recue suite à suscribe : ' + str(pourLog), xbmc.LOGDEBUG)
+                # debug('trame recue suite à suscribe : ' + str(pourLog), xbmc.LOGDEBUG)
                 ('\n'
                  '  exemple RadioParadise :\n'
                  '  b8:27:eb:cf:f2:c0 status - 2 subscribe:30 rescan:1 player_name:piCorePlayer player_connected:1 \n'
@@ -569,7 +574,7 @@ class ViewListPlugin(pyxbmctExtended.BackgroundDialogWindow):
 
                 try:
                     pourcentagedureejouee = 100 * float(dico['time']) / float(dico['duration'])
-                    xbmc.log('percent duree : ' + str(pourcentagedureejouee) + ' - time: ' + dico['time'],
+                    debug('percent duree : ' + str(pourcentagedureejouee) + ' - time: ' + dico['time'],
                              xbmc.LOGDEBUG)
                 except KeyError:
                     pourcentagedureejouee = 0
@@ -633,21 +638,21 @@ class ViewListPlugin(pyxbmctExtended.BackgroundDialogWindow):
                 compteur += 1
                 timedutour = time.time()
                 tempsparcouru = timedutour - timeEntreeDansLaBoucle
-                xbmc.log(str(compteur) + ' tour de boucle : ' + str(tempsparcouru), xbmc.LOGDEBUG)
-                xbmc.log('bool jivelette.threadRunning : ' + str(self.jivelette.threadRunning), xbmc.LOGNOTICE)
+                debug(str(compteur) + ' tour de boucle : ' + str(tempsparcouru), xbmc.LOGDEBUG)
+                debug('bool jivelette.threadRunning : ' + str(self.jivelette.threadRunning), DEBUG_LEVEL)
                 if not self.jivelette.threadRunning:
-                    xbmc.log(' jivelette.threadRunning is not True ', xbmc.LOGNOTICE)
+                    debug(' jivelette.threadRunning is not True ', DEBUG_LEVEL)
                     # self.subscribe.resiliersouscription() # double emploi
                     self.breakBoucle_A = True
                     self.Abonnement.clear()
             # fin de la boucle A : sortie de subscribe
         # fin boucle while
-        xbmc.log('End of Boucle of Squeeze in frameList , Bye', xbmc.LOGNOTICE)
+        debug('End of Boucle of Squeeze in frameList , Bye', DEBUG_LEVEL)
         self.subscribe.resiliersouscription()
         reponse = self.InterfaceCLI.receptionReponseEtDecodage()
-        xbmc.log('Send resiliersouscription in A update now_is_playing() in frameList', xbmc.LOGNOTICE)
+        debug('Send resiliersouscription in A update now_is_playing() in frameList', DEBUG_LEVEL)
         self.InterfaceCLI.viderLeBuffer()
-        xbmc.log('End of fonction update_now_is_playing in frameList , Bye', xbmc.LOGNOTICE)
+        debug('End of fonction update_now_is_playing in frameList , Bye', DEBUG_LEVEL)
     # fin fonction update_now_is_playing
 
     def connectInterface(self):
@@ -672,23 +677,23 @@ class ViewListPlugin(pyxbmctExtended.BackgroundDialogWindow):
         '''
         filename = 'icon.image_' + str(index) + '.tmp'
         completeNameofFile = os.path.join(savepath, filename)
-        xbmc.log('filename icon : ' + str(completeNameofFile), xbmc.LOGDEBUG)
+        debug('filename icon : ' + str(completeNameofFile), xbmc.LOGDEBUG)
 
         if 'http' in urlicone:
             urltoopen = urlicone
         else:
             if urlicone.startswith('/'):
-                xbmc.log('url icone avec /: ' + urlicone ,xbmc.LOGDEBUG )
+                debug('url icone avec /: ' + urlicone ,xbmc.LOGDEBUG )
             #urltoopen = 'http://' + self.origine.rechercheduserveur.LMSCLIip + ':' + self.origine.rechercheduserveur.LMSwebport + '/' + urlicone
                 urltoopen = 'http://' + self.lmsip + ':' + self.lmswebport + urlicone
             else:
-                xbmc.log('url icone sans /: ' + urlicone ,xbmc.LOGDEBUG )
+                debug('url icone sans /: ' + urlicone ,xbmc.LOGDEBUG )
                 urltoopen = 'http://' + self.lmsip + ':' + self.lmswebport + '/' + urlicone
         try:
             urllib.urlretrieve(urltoopen, completeNameofFile)
         except IOError:
             outils.functionNotYetImplemented()
-        xbmc.log('nom du fichier image : ' + completeNameofFile , xbmc.LOGNOTICE)
+        debug('nom du fichier image : ' + completeNameofFile , DEBUG_LEVEL)
         return completeNameofFile
         # fin fonction fin fonction get_icon, class Plugin_Generique
         # test
