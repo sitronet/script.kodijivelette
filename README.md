@@ -1,10 +1,10 @@
 **KODIJIVELETTE**
 
 This project is stopped
-It was just to learn a little python. communication between 
-the client and the server is based on the CLI interface.
-Rather than explore this path, I prefer to develop another 
-application based on the more efficient http json interface.
+It was just to learn a little bit the python language and the programmation. 
+the communication between the client and the server is based on the CLI interface.
+Rather than explore this path, I prefer to look for another 
+way based on the more efficient http json interface and the cometd (this seems very tricky)
 
 But you can install it and run it, normally it should work as is
 
@@ -16,7 +16,6 @@ operationnal. In this alpha version, kodijivelette could not drive enterely your
 playing and some more functions.
 To drive completely the streamed music you can get Android app on smartphone like Squeezer... 
 or use the web interface of the server. 
-In future release, if you wish, it will be able to add more control on the music streamed.
 
 **It doesn't include the player** (receiver the music) unlike other addons "Xqueeze" (author : bossanova) and
 "plugin.audio.squeezebox" (author : marcelvedt) that include Squeezelite. On LibreElec you can install
@@ -24,8 +23,6 @@ other Addon (MultimediaTools) to get Squeezelite binary running as a player ; or
 other hardware receiver, or simple player based on raspberry pi with improved softwares all-in-one like
 PicorePlayer, Max2Play, etcoetera , have a look to the appropriate documentation of these software. 
 But if you are here is that you already know all this, is not it?
-
-This is an alpha version and I have great hard work to increase its functionnality.
 
 I gave the name kodijivelette addon which is not a very great originality being a kind of tiny jivelite
 running on the platform kodi
